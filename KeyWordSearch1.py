@@ -5,6 +5,11 @@ Created on Tue Aug  1 11:32:04 2023
 @author: nau03220, kenny fong
 """
 
+''' 
+by attribution to Chung (Kenny) Fong: 
+    https://pureportal.strath.ac.uk/en/persons/chung-man-fong
+'''
+
 import fitz  # PyMuPDF
 
 
@@ -27,7 +32,7 @@ def read_pdf(pdf_path):
     return pdf_text, page_text_list
 
 
-pdf_file_path = "cnss-tast-gd-11.1.pdf"
+pdf_file_path = 'THSIS.Ch0.pdf' #"cnss-tast-gd-11.1.pdf"
 
 
 # Read the PDF
@@ -36,8 +41,8 @@ pdf_text, page_text_list = read_pdf(pdf_file_path)
 # Split the text into sentences
 sentences = pdf_text.split('. ')
 
-search_terms = ["GDA"]
-search_terms2 = ["After"]
+search_terms = ["capacitor"]
+search_terms2 = ["unit"]
 #search_terms = ["catastr", "hazard", "must", "should"] 
 #search_terms2 = ["electri", "battery"] 
 
