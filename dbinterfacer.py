@@ -107,16 +107,17 @@ class DatabaseInterfacer:
             return
         else:
             
-            rows = []
             
             try:
                 
                 dbCursor = self._databaseConnection.cursor()
                 
                 if access == 'w':
-                    rows = dbCursor.execute(query).fetchall()
-                else:    
                     dbCursor.execute(query)
+                else:    
+                    rows = []
+                    rows = dbCursor.execute(query).fetchall()
+                    return rows
                 
                 
                 # dbCursor.execute(sqlToCreateTableTasks)
@@ -141,7 +142,6 @@ class DatabaseInterfacer:
                 
                 print(e)
                 
-            return rows
             
     def insertData(self, data, table):
         """
@@ -171,11 +171,9 @@ class DatabaseInterfacer:
     def searchForData(self, searchterm, table):
         print('About to search for data.')
         
-        sqlQuery = """ SELECT id FROM tasks WHERE description LIKE '%blender%';
-                    """
-        pass
+        sqlQuery = """SELECT * FROM tasks;""" #""" SELECT id FROM tasks WHERE description LIKE '%blend%';"""
     
-        returndata = self.sendQueryToDatabase(sqlQuery)
+        returndata = self.sendQueryToDatabase(sqlQuery, 'r')
         print(returndata)
     
     def closeConnections(self):
