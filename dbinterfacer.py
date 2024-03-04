@@ -16,7 +16,8 @@ from sqlite3 import Error
 class DatabaseInterfacer:
     
     _databaseConnection = None
-    filename = r"pythonsqlite.db"
+    #filename = r"pythonsqlite.db"
+    filename = r"pythonsqlite-guidewords.db"
 
     def __init__(self):
         
@@ -89,46 +90,132 @@ class DatabaseInterfacer:
                                             FOREIGN KEY (countermeasure) REFERENCES countermeasures(id)
                                             );"""
         
+        self.sendQueryToDatabase(sqlToCreateTableTasks)
+        self.sendQueryToDatabase(sqlToCreateTableHazards)
+        self.sendQueryToDatabase(sqlToCreateTableHierarchyOfControls)
+        self.sendQueryToDatabase(sqlToCreateTableCountermeasures)
+        self.sendQueryToDatabase(sqlToCreateTableLikelihood)
+        self.sendQueryToDatabase(sqlToCreateTableMitigations)
+        
+    def sendQueryToDatabase(self, query, access='r'):
+        
+        stripQ = query.strip()
+        assert stripQ[len(stripQ)-1] == ';' # Verify it ends with an ';'.
+        
         if self._databaseConnection is None: 
             print('Could not create the database connection.')
             return
-        else:        
+        else:
+            
+            rows = []
+            
             try:
                 
                 dbCursor = self._databaseConnection.cursor()
                 
-                dbCursor.execute(sqlToCreateTableTasks)
+                if access == 'w':
+                    rows = dbCursor.execute(query).fetchall()
+                else:    
+                    dbCursor.execute(query)
                 
-                dbCursor.execute(sqlToCreateTableHazards)
                 
-                print('built 2 tables ')
+                # dbCursor.execute(sqlToCreateTableTasks)
                 
-                dbCursor.execute(sqlToCreateTableHierarchyOfControls)
+                # dbCursor.execute(sqlToCreateTableHazards)
+                
+                # #print('built 2 tables ')
+                
+                # dbCursor.execute(sqlToCreateTableHierarchyOfControls)
     
-                dbCursor.execute(sqlToCreateTableCountermeasures)            
+                # dbCursor.execute(sqlToCreateTableCountermeasures)            
                 
-                print('built 4 tables')
+                # #print('built 4 tables')
                 
-                dbCursor.execute(sqlToCreateTableLikelihood)
+                # dbCursor.execute(sqlToCreateTableLikelihood)
                 
-                print('built 5 tables')
+                # #print('built 5 tables')
                 
-                dbCursor.execute(sqlToCreateTableMitigations)
+                # dbCursor.execute(sqlToCreateTableMitigations)
                 
             except Error as e:
                 
                 print(e)
+                
+            return rows
             
+    def insertData(self, data, table):
+        """
+                            ('take powder A', 0),
+;"""
+        
+        sqlCommand = """ INSERT INTO tasks (description, follows)
+                        VALUES 
+                            ('place in blender', 1),
+                            ('take 3 kg of colourant powder B', 2),
+                            ('place in blender', 3),
+                            ('start blender', 4),
+                            ('mix for 15 min and stop blender', 5),
+                            ('remove blended mixture into 3 by 5 kg bags', 6),
+                            ('wash out blender', 7),
+                            ('add 50 l of resin to mixing vessel', 8),
+                            ('add 0.5 kg of hardener into mixing vessel', 9),
+                            ('add 5 kg of mixed powder A and B', 10),
+                            ('stir for 1 min', 11),
+                            ('pour mixture into molds within 5 min', 12);
+                    """
+        pass # TODO Run this query to add the data
+        #place in blender, take 3 kg of colourant powder),
+        #(0, 1, 2);
+        self.sendQueryToDatabase(sqlCommand)
+    
+    def searchForData(self, searchterm, table):
+        print('About to search for data.')
+        
+        sqlQuery = """ SELECT id FROM tasks WHERE description LIKE '%blender%';
+                    """
+        pass
+    
+        returndata = self.sendQueryToDatabase(sqlQuery)
+        print(returndata)
+    
     def closeConnections(self):
         
         if self._databaseConnection is not None:
             self._databaseConnection.close()
-
+            print('connection successfully closed')
+            
+        
+    
+    def checkTables(self):
+        
+        sqlToCheckTables = '.tables'
+        
+        try:
+            
+            dbCursor = self._databaseConnection.cursor()
+            
+            dbCursor.execute(sqlToCheckTables)
+            
+            outcome = dbCursor.fetchall()
+            
+            print(outcome)
+            
+        except Error as e:
+            
+            print(e)
+            
     
 def main():
     
     dbi = DatabaseInterfacer()
     dbi.createTables()
+    
+    # TODO Here we would populate with data.
+    if 'y' == input('Check database? (y/n)'):
+        # dbi.checkTables()
+        dbi.insertData(None, None)
+        print('data inserted, about to search')
+        dbi.searchForData(None, None)
     
     dbi.closeConnections()
 
