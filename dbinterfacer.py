@@ -115,28 +115,7 @@ class DatabaseInterfacer:
                 if access == 'w':
                     dbCursor.execute(query)
                 else:    
-                    rows = []
-                    rows = dbCursor.execute(query).fetchall()
-                    return rows
-                
-                
-                # dbCursor.execute(sqlToCreateTableTasks)
-                
-                # dbCursor.execute(sqlToCreateTableHazards)
-                
-                # #print('built 2 tables ')
-                
-                # dbCursor.execute(sqlToCreateTableHierarchyOfControls)
-    
-                # dbCursor.execute(sqlToCreateTableCountermeasures)            
-                
-                # #print('built 4 tables')
-                
-                # dbCursor.execute(sqlToCreateTableLikelihood)
-                
-                # #print('built 5 tables')
-                
-                # dbCursor.execute(sqlToCreateTableMitigations)
+                    return dbCursor.execute(query).fetchall()
                 
             except Error as e:
                 
@@ -162,7 +141,7 @@ class DatabaseInterfacer:
                             ('add 5 kg of mixed powder A and B', 10),
                             ('stir for 1 min', 11),
                             ('pour mixture into molds within 5 min', 12);
-                    """
+                        """
         pass # TODO Run this query to add the data
         #place in blender, take 3 kg of colourant powder),
         #(0, 1, 2);
@@ -174,7 +153,17 @@ class DatabaseInterfacer:
         sqlQuery = """SELECT * FROM tasks;""" #""" SELECT id FROM tasks WHERE description LIKE '%blend%';"""
     
         returndata = self.sendQueryToDatabase(sqlQuery, 'r')
-        print(returndata)
+        for row in returndata:
+            
+            print(row)
+            
+        print(' ')
+        
+        newData = self.sendQueryToDatabase("SELECT * FROM tasks WHERE description LIKE '%blend%';", 'r')
+        for row in newData:
+            print(row)
+            
+        #print(returndata)
     
     def closeConnections(self):
         
