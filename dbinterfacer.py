@@ -18,6 +18,16 @@ class DatabaseInterfacer:
     _databaseConnection = None
     #filename = r"pythonsqlite.db"
     filename = r"pythonsqlite-guidewords.db"
+    _tableNames = [
+            'tasks',
+            'hazards',
+            'countermeasures',
+            'likelihood',
+            'mitigations',
+            'hierarchy_of_controls',
+            'guidewords'
+        ]
+
 
     def __init__(self):
         
@@ -220,17 +230,9 @@ class DatabaseInterfacer:
     
     def dropEverything(self):
         
-        tableNames = [
-                'tasks',
-                'hazards',
-                'countermeasures',
-                'likelihood',
-                'mitigations',
-                'hierarchy_of_controls',
-                'guidewords'
-            ]
-        
-        for table in tableNames:
+        if 'y' != input('Are you sure? (y/n)'): return
+                
+        for table in self._tableNames:
             sqlToDropEverything = """
                 DROP TABLE IF EXISTS """ + table + """ ;
             """
@@ -271,12 +273,18 @@ class DatabaseInterfacer:
 def main():
     
     dbi = DatabaseInterfacer()
-#    dbi.createTables()
     
+    if 'y' == input('Drop all tables? (y/n)'):
+        dbi.dropEverything()
+        
+    if 'y' == input('Create Tables? (y/n)'):
+        dbi.createTables()
+        
     # TODO Here we would populate with data.
     if 'y' == input('Insert data? (y/n)'):
         dbi.insertData(None, None)
         print('CALUM: data inserted, about to search')
+        
     if 'y' == input('Check database? (y/n)'):
         dbi.searchForData(None, None)
         # dbi.checkTables()
