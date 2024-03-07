@@ -47,48 +47,67 @@ class DatabaseInterfacer:
 
     def createTables(self):
         
-        sqlToCreateTableTasks = """ CREATE TABLE IF NOT EXISTS tasks (
-                                        id INTEGER PRIMARY KEY,
-                                        description TEXT NOT NULL,
-                                        follows INTEGER
-                                        );"""
+        sqlToCreateTableTasks = """ 
+        CREATE TABLE IF NOT EXISTS tasks (
+            id INTEGER PRIMARY KEY,
+            description TEXT NOT NULL,
+            follows INTEGER
+            );
+        """
         
-        sqlToCreateTableHazards = """ CREATE TABLE IF NOT EXISTS hazards (
-                                        id INTEGER PRIMARY KEY,
-                                        description TEXT NOT NULL
-                                        );"""
+        sqlToCreateTableHazards = """ 
+        CREATE TABLE IF NOT EXISTS hazards (
+            id INTEGER PRIMARY KEY,
+            description TEXT NOT NULL
+            );
+        """
+                
+        sqlToCreateTableHierarchyOfControls = """ 
+        CREATE TABLE IF NOT EXISTS hierarchy_of_controls (
+            id INTEGER PRIMARY KEY,
+            type TEXT UNIQUE
+            );
+        """
         
+        sqlToCreateTableCountermeasures = """ 
+        CREATE TABLE IF NOT EXISTS countermeasures (
+            id INTEGER PRIMARY KEY,
+            description TEXT NOT NULL,
+            class INTEGER, 
+            control_type INTEGER,
+            FOREIGN KEY (control_type) REFERENCES hierarchy_of_controls(id)
+            );
+        """
         
-        sqlToCreateTableHierarchyOfControls = """ CREATE TABLE IF NOT EXISTS hierarchy_of_controls (
-                                                id INTEGER PRIMARY KEY,
-                                                type TEXT UNIQUE
-                                                );"""
-        
-        
-        sqlToCreateTableCountermeasures = """ CREATE TABLE IF NOT EXISTS countermeasures (
-                                                id INTEGER PRIMARY KEY,
-                                                description TEXT NOT NULL,
-                                                class INTEGER, 
-                                                control_type INTEGER,
-                                                FOREIGN KEY (control_type) REFERENCES hierarchy_of_controls(id)
-                                                );"""
-        
-        sqlToCreateTableLikelihood = """ CREATE TABLE IF NOT EXISTS likelihood (
-                                            id INTEGER PRIMARY KEY,
-                                            task INTEGER,
-                                            hazard INTEGER,
-                                            probability REAL CHECK (probability < 1),
-                                            FOREIGN KEY (task) REFERENCES tasks(id),
-                                            FOREIGN KEY (hazard) REFERENCES hazards(id)
-                                            );"""
+        sqlToCreateTableLikelihood = """ 
+        CREATE TABLE IF NOT EXISTS likelihood (
+            id INTEGER PRIMARY KEY,
+            task INTEGER,
+            hazard INTEGER,
+            probability REAL CHECK (probability < 1),
+            guideword TEXT,
+            FOREIGN KEY (task) REFERENCES tasks(id),
+            FOREIGN KEY (hazard) REFERENCES hazards(id),
+            FOREIGN KEY (guideword) REFERENCES guidewords(id)
+            );
+        """
     
-        sqlToCreateTableMitigations = """ CREATE TABLE IF NOT EXISTS mitigations (
-                                            id INTEGER PRIMARY KEY,
-                                            danger INTEGER,
-                                            countermeasure INTEGER,
-                                            FOREIGN KEY (danger) REFERENCES hazards(id),
-                                            FOREIGN KEY (countermeasure) REFERENCES countermeasures(id)
-                                            );"""
+        sqlToCreateTableMitigations = """ 
+        CREATE TABLE IF NOT EXISTS mitigations (
+            id INTEGER PRIMARY KEY,
+            danger INTEGER,
+            countermeasure INTEGER,
+            FOREIGN KEY (danger) REFERENCES hazards(id),
+            FOREIGN KEY (countermeasure) REFERENCES countermeasures(id)
+            );
+        """
+    
+        sqlTableGuidewords = """
+        CREATE TABLE IF NOT EXISTS guidewords (
+            id INTEGER PRIMARY KEY,
+            word TEXT UNIQUE NOT NULL
+            );
+        """
         
         self.sendQueryToDatabase(sqlToCreateTableTasks)
         self.sendQueryToDatabase(sqlToCreateTableHazards)
@@ -100,7 +119,7 @@ class DatabaseInterfacer:
     def sendQueryToDatabase(self, query, access='r'):
         
         stripQ = query.strip()
-        assert stripQ[len(stripQ)-1] == ';' # Verify it ends with an ';'.
+       # assert stripQ[len(stripQ)-1] == ';' # Verify it ends with an ';'.
         
         if self._databaseConnection is None: 
             print('Could not create the database connection.')
@@ -120,8 +139,9 @@ class DatabaseInterfacer:
             except Error as e:
                 
                 print(e)
-                
             
+    
+    
     def insertData(self, data, table):
         """
                             ('take powder A', 0),
@@ -146,6 +166,34 @@ class DatabaseInterfacer:
         #place in blender, take 3 kg of colourant powder),
         #(0, 1, 2);
         self.sendQueryToDatabase(sqlCommand)
+        
+        sqlHoC = """
+            INSERT INTO hierarchy_of_controls (type)
+            VALUES
+                ('elimination'),
+                ('substitution'),
+                ('engineering_controls'),
+                ('administrative_controls'),
+                ('ppe');
+        """
+        
+        sqlGuidewords = """
+            INSERT INTO guidewords (word)
+            VALUES
+                ('no or not'),
+                ('more'),
+                ('less'),
+                ('as well as'),
+                ('part of'),
+                ('reverse'),
+                ('other than'),
+                ('early'),
+                ('late'),
+                ('before'),
+                ('after');
+        """
+        
+        # self.sendQueryToDatabase(""".save""")
     
     def searchForData(self, searchterm, table):
         print('About to search for data.')
