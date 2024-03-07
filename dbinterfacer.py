@@ -44,69 +44,75 @@ class DatabaseInterfacer:
             
         return conn
     
-
     def createTables(self):
         
         sqlToCreateTableTasks = """ 
-        CREATE TABLE IF NOT EXISTS tasks (
-            id INTEGER PRIMARY KEY,
-            description TEXT NOT NULL,
-            follows INTEGER
-            );
+            CREATE TABLE IF NOT EXISTS 
+                tasks (
+                    id INTEGER PRIMARY KEY,
+                    description TEXT NOT NULL,
+                    follows INTEGER
+                );
         """
         
         sqlToCreateTableHazards = """ 
-        CREATE TABLE IF NOT EXISTS hazards (
-            id INTEGER PRIMARY KEY,
-            description TEXT NOT NULL
-            );
+            CREATE TABLE IF NOT EXISTS 
+                hazards (
+                    id INTEGER PRIMARY KEY,
+                    description TEXT NOT NULL
+                );
         """
                 
         sqlToCreateTableHierarchyOfControls = """ 
-        CREATE TABLE IF NOT EXISTS hierarchy_of_controls (
-            id INTEGER PRIMARY KEY,
-            type TEXT UNIQUE
-            );
+            CREATE TABLE IF NOT EXISTS 
+                hierarchy_of_controls (
+                    id INTEGER PRIMARY KEY,
+                    type TEXT UNIQUE
+                );
         """
         
         sqlToCreateTableCountermeasures = """ 
-        CREATE TABLE IF NOT EXISTS countermeasures (
-            id INTEGER PRIMARY KEY,
-            description TEXT NOT NULL,
-            class INTEGER, 
-            control_type INTEGER,
-            FOREIGN KEY (control_type) REFERENCES hierarchy_of_controls(id)
-            );
+            CREATE TABLE IF NOT EXISTS 
+                countermeasures (
+                    id INTEGER PRIMARY KEY,
+                    description TEXT NOT NULL,
+                    class INTEGER, 
+                    control_type INTEGER,
+                    FOREIGN KEY (control_type) REFERENCES hierarchy_of_controls(id)
+                );
         """
         
         sqlToCreateTableLikelihood = """ 
-        CREATE TABLE IF NOT EXISTS likelihood (
-            id INTEGER PRIMARY KEY,
-            task INTEGER,
-            hazard INTEGER,
-            probability REAL CHECK (probability < 1),
-            guideword TEXT,
-            FOREIGN KEY (task) REFERENCES tasks(id),
-            FOREIGN KEY (hazard) REFERENCES hazards(id),
-            FOREIGN KEY (guideword) REFERENCES guidewords(id)
-            );
+            CREATE TABLE IF NOT EXISTS 
+                likelihood (
+                    id INTEGER PRIMARY KEY,
+                    task INTEGER,
+                    hazard INTEGER,
+                    probability REAL CHECK (probability < 1),
+                    guideword TEXT,
+                    FOREIGN KEY (task) REFERENCES tasks(id),
+                    FOREIGN KEY (hazard) REFERENCES hazards(id),
+                    FOREIGN KEY (guideword) REFERENCES guidewords(id)
+                );
         """
     
         sqlToCreateTableMitigations = """ 
-        CREATE TABLE IF NOT EXISTS mitigations (
-            id INTEGER PRIMARY KEY,
-            danger INTEGER,
-            countermeasure INTEGER,
-            FOREIGN KEY (danger) REFERENCES hazards(id),
-            FOREIGN KEY (countermeasure) REFERENCES countermeasures(id)
-            );
+            CREATE TABLE IF NOT EXISTS 
+                mitigations (
+                    id INTEGER PRIMARY KEY,
+                    danger INTEGER,
+                    countermeasure INTEGER,
+                    FOREIGN KEY (danger) REFERENCES hazards(id),
+                    FOREIGN KEY (countermeasure) REFERENCES countermeasures(id)
+                );
         """
     
-        sqlTableGuidewords = """
-        CREATE TABLE IF NOT EXISTS guidewords (
-            id INTEGER PRIMARY KEY,
-            word TEXT UNIQUE NOT NULL
-            );
+        sqlToCreateTableGuidewords = """
+            CREATE TABLE IF NOT EXISTS 
+                guidewords (
+                    id INTEGER PRIMARY KEY,
+                    word TEXT UNIQUE NOT NULL
+                );
         """
         
         self.sendQueryToDatabase(sqlToCreateTableTasks)
@@ -115,11 +121,13 @@ class DatabaseInterfacer:
         self.sendQueryToDatabase(sqlToCreateTableCountermeasures)
         self.sendQueryToDatabase(sqlToCreateTableLikelihood)
         self.sendQueryToDatabase(sqlToCreateTableMitigations)
-        
+        self.sendQueryToDatabase(sqlToCreateTableGuidewords)
+    
     def sendQueryToDatabase(self, query, access='r'):
         
+        # Verify the query ends with an ';'.
         stripQ = query.strip()
-       # assert stripQ[len(stripQ)-1] == ';' # Verify it ends with an ';'.
+        assert stripQ[len(stripQ)-1] == ';', 'A semicolon is missing.'
         
         if self._databaseConnection is None: 
             print('Could not create the database connection.')
@@ -140,63 +148,62 @@ class DatabaseInterfacer:
                 
                 print(e)
             
-    
+        
     
     def insertData(self, data, table):
-        """
-                            ('take powder A', 0),
-;"""
         
-        sqlCommand = """ INSERT INTO tasks (description, follows)
-                        VALUES 
-                            ('place in blender', 1),
-                            ('take 3 kg of colourant powder B', 2),
-                            ('place in blender', 3),
-                            ('start blender', 4),
-                            ('mix for 15 min and stop blender', 5),
-                            ('remove blended mixture into 3 by 5 kg bags', 6),
-                            ('wash out blender', 7),
-                            ('add 50 l of resin to mixing vessel', 8),
-                            ('add 0.5 kg of hardener into mixing vessel', 9),
-                            ('add 5 kg of mixed powder A and B', 10),
-                            ('stir for 1 min', 11),
-                            ('pour mixture into molds within 5 min', 12);
-                        """
-        pass # TODO Run this query to add the data
-        #place in blender, take 3 kg of colourant powder),
-        #(0, 1, 2);
-        self.sendQueryToDatabase(sqlCommand)
+        sqlCommand = """ 
+            INSERT INTO tasks (description, follows)
+                VALUES 
+                    ('place in blender'                             , 1),
+                    ('take 3 kg of colourant powder B'              , 2),
+                    ('place in blender'                             , 3),
+                    ('start blender'                                , 4),
+                    ('mix for 15 min and stop blender'              , 5),
+                    ('remove blended mixture into 3 by 5 kg bags'   , 6),
+                    ('wash out blender'                             , 7),
+                    ('add 50 l of resin to mixing vessel'           , 8),
+                    ('add 0.5 kg of hardener into mixing vessel'    , 9),
+                    ('add 5 kg of mixed powder A and B'             , 10),
+                    ('stir for 1 min'                               , 11),
+                    ('pour mixture into molds within 5 min'         , 12);
+        """
         
         sqlHoC = """
             INSERT INTO hierarchy_of_controls (type)
-            VALUES
-                ('elimination'),
-                ('substitution'),
-                ('engineering_controls'),
-                ('administrative_controls'),
-                ('ppe');
+                VALUES
+                    ('elimination'),
+                    ('substitution'),
+                    ('engineering_controls'),
+                    ('administrative_controls'),
+                    ('ppe');
         """
         
         sqlGuidewords = """
             INSERT INTO guidewords (word)
-            VALUES
-                ('no or not'),
-                ('more'),
-                ('less'),
-                ('as well as'),
-                ('part of'),
-                ('reverse'),
-                ('other than'),
-                ('early'),
-                ('late'),
-                ('before'),
-                ('after');
+                VALUES
+                    ('no or not'),
+                    ('more'),
+                    ('less'),
+                    ('as well as'),
+                    ('part of'),
+                    ('reverse'),
+                    ('other than'),
+                    ('early'),
+                    ('late'),
+                    ('before'),
+                    ('after');
         """
+        
+        self.sendQueryToDatabase(sqlCommand,    'w')
+        self.sendQueryToDatabase(sqlHoC,        'w')
+        self.sendQueryToDatabase(sqlGuidewords, 'w')
         
         # self.sendQueryToDatabase(""".save""")
     
     def searchForData(self, searchterm, table):
-        print('About to search for data.')
+        
+        print('CALUM: About to search for data.')
         
         sqlQuery = """SELECT * FROM tasks;""" #""" SELECT id FROM tasks WHERE description LIKE '%blend%';"""
     
@@ -210,15 +217,36 @@ class DatabaseInterfacer:
         newData = self.sendQueryToDatabase("SELECT * FROM tasks WHERE description LIKE '%blend%';", 'r')
         for row in newData:
             print(row)
-            
-        #print(returndata)
     
+    def dropEverything(self):
+        
+        tableNames = [
+                'tasks',
+                'hazards',
+                'countermeasures',
+                'likelihood',
+                'mitigations',
+                'hierarchy_of_controls',
+                'guidewords'
+            ]
+        
+        for table in tableNames:
+            sqlToDropEverything = """
+                DROP TABLE IF EXISTS """ + table + """ ;
+            """
+        
+            self.sendQueryToDatabase(sqlToDropEverything)
+        
+        
     def closeConnections(self):
         
         if self._databaseConnection is not None:
-            self._databaseConnection.close()
-            print('connection successfully closed')
             
+            self._databaseConnection.commit() # Actually save the data to file.
+            
+            self._databaseConnection.close()
+            
+            print('CALUM: Connection successfully closed.')
         
     
     def checkTables(self):
@@ -243,23 +271,22 @@ class DatabaseInterfacer:
 def main():
     
     dbi = DatabaseInterfacer()
-    dbi.createTables()
+#    dbi.createTables()
     
     # TODO Here we would populate with data.
-    if 'y' == input('Check database? (y/n)'):
-        # dbi.checkTables()
+    if 'y' == input('Insert data? (y/n)'):
         dbi.insertData(None, None)
-        print('data inserted, about to search')
+        print('CALUM: data inserted, about to search')
+    if 'y' == input('Check database? (y/n)'):
         dbi.searchForData(None, None)
+        # dbi.checkTables()
     
     dbi.closeConnections()
 
-    print('To test, navigate to ' + str(dbi.filename) + ' and run sqlite3 ' + dbi.filename + ', then use the command .tables')
+    print('\n\nCALUM: To test, navigate to ' + str(dbi.filename) + ' and run sqlite3 ' + dbi.filename + ', then use the command .tables')
 
 if __name__ == '__main__':
     #create_connection(r"C:\sqlite\db\pythonsqlite.db")
     #create_connection(r"pythonsqlite.db")
     main()
-    
-    
     
