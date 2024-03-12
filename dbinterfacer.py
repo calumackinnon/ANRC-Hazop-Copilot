@@ -208,8 +208,6 @@ class DatabaseInterfacer:
         self.sendQueryToDatabase(sqlCommand,    'w')
         self.sendQueryToDatabase(sqlHoC,        'w')
         self.sendQueryToDatabase(sqlGuidewords, 'w')
-        
-        # self.sendQueryToDatabase(""".save""")
     
     def searchForData(self, searchterm, table):
         
