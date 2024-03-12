@@ -61,7 +61,7 @@ class MyEquipmentEntity:
             if control_instance:
                 self.control_instance.append(control_instance)
                 
-        def set_intended_function(self, inteded_function):
+        def set_intended_function(self, intended_function):
             
             if intended_function:
                 self.intended_function.append(intended_function(None))
@@ -108,11 +108,24 @@ class MyEquipmentEntity:
         def assemble_ontology_object(self, equipment_entity):
             
             self.onto_object = equipment_entity(
-                hasFixture = self.fixture,
-                hasInstrumentation = self.instrumentation,
-                hasMaterialTransferEquipment = self.material_transfer_equipment,
-                hasSubunit = self.subunit
+                    hasFixture = self.fixture,
+                    hasInstrumentation = self.instrumentation,
+                    hasMaterialTransferEquipment = self.material_transfer_equipment,
+                    hasSubunit = self.subunit,
+                    hasApparatus=self.apparatus,
+                    hasPiping=self.piping,
+                    hasIntendedFunction=self.intended_function,
+                    hasConnectionToAdjacentPlantItem=self.connected_plant_item,
+                    hasMaximumOperatingPressureInBarGauge=self.max_operating_pressure_in_barg,
+                    hasMaximumOperatingTemperatureInKelvin=self.max_operating_temperature_in_kelvin,
+                    isTransportable=self.transportable,
+                    entityControlledBy=self.control_instance,
+                    hasPort=[],
+                    hasOperationMode=[]
                 )
+            
+        def set_max_operating_pressure_in_barg(self, max_operating_pressure):
+            self.max_operating_pressure_in_barg = max_operating_pressure 
             
         
         
