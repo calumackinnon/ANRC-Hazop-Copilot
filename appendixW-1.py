@@ -27,6 +27,24 @@ class HexaneTankModel(OverallModel):
         
         self.siteInfo = SiteInformation()
 
+class Ports:
+    
+    def __init__(self):
+        
+        pass
+
+class BoundaryCondition:
+    
+    def __init__(self):
+        
+        pass
+
+class Substance:
+    
+    def __init__(self):
+        
+        pass
+    
 
 class EquipmentEntity:
     
@@ -61,23 +79,20 @@ class StorageTank(EquipmentEntity):
         
         pass
 
-class Ports:
-    
-    def __init__(self):
-        
-        pass
 
-class BoundaryCondition:
+def create_process_plant_hexane_storage_tank():
     
-    def __init__(self):
-        
-        pass
-
-class Substance:
+    hazard_classes = [substance_onto.FlammableLiquidCategory2, 
+                      substance_onto.SkinCorrosionIrritationCategory2,
+                      substance_onto.ReproductiveToxicityCategory2, 
+                      substance_onto.SpecificTargetOrganToxicityRepeatedExposureCategory2,
+                      substance_onto.SpecificTargetOrganToxicitySingleExposureCategory3, 
+                      substance_onto.AspirationHazardCategory1
+                      ]
     
-    def __init__(self):
-        
-        pass
+    stability_reactivity_information = [
+        substance_onto.FormsExplosiveMixtureWithAir,
+        substance_onto.ReactsViolentlyWithOxidizer
+        ]
     
-
-
+    
