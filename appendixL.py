@@ -501,8 +501,7 @@ class MalfunctionLubricationSystem(causes_onto.Cause):
  causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.CompressorEntity &
  equipment_onto.hasSubunit.some(equipment_onto.LubricationSystem)) &
  causes_onto.isCauseOfDeviation.some(deviation_onto.HighTemperature))]
-MalfunctionLubricationSystem.comment = ["Issues described in 'How to limit fire and explosion hazards with oil-flooded rotary screw compressors' by
-Steven J. Luzik"]
+MalfunctionLubricationSystem.comment = ["Issues described in 'How to limit fire and explosion hazards with oil-flooded rotary screw compressors' by Steven J. Luzik"]
 class InsufficientVentilation(causes_onto.Cause):
  equivalent_to = [causes_onto.Cause &
  (causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.CompressorEntity) &

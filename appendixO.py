@@ -39,7 +39,9 @@ class involvesLikelihood(RiskCategory >> Likelihood):
  pass
 class VeryUnlikely(Likelihood):
  pass
+
 VeryUnlikely.comment = ["corresponds to category F5", "10^-6 - 10^-4"]
+
 class Unlikely(Likelihood):
  equivalent_to = [Likelihood &
  (
@@ -63,55 +65,58 @@ class Unlikely(Likelihood):
  likelihoodInvolvesDeviation.some(deviation_onto.HighPressure) &
  likelihoodInvolvesEquipment.some(
  equipment_onto.hasApparatus.some(equipment_onto.PressureVessel))))]
+ 
 Unlikely.comment = ["corresponds to category F4", "10^-4 - 10^-3"]
+
 class Possible(Likelihood):
  equivalent_to = [Likelihood &
  (
   (
      (likelihoodInvolvesEquipment.some(
-     equipment_onto.hasMaterialTransferEquipment.some(equipment_onto.ScrewCompressor | equipment_onto.PistonCompressor)) &
-     likelihoodInvolvesCause.some(causes_onto.MalfunctionLubricationSystem))
-     |
-     (likelihoodInvolvesEquipment.some(
-     equipment_onto.hasMaterialTransferEquipment.some(equipment_onto.PistonCompressor | equipment_onto.ScrewCompressor |
-     equipment_onto.CentrifugalPump | equipment_onto.ReciprocatingPump)) &
-     likelihoodInvolvesDeviation.some(deviation_onto.HighTemperature))
-     |
-     (likelihoodInvolvesEquipment.some(
-     equipment_onto.hasMaterialTransferEquipment.some(equipment_onto.CentrifugalPump | equipment_onto.ReciprocatingPump)) &
-     likelihoodInvolvesCause.some(causes_onto.DeadHeadingOfPump | causes_onto.OperationBelowMinimumFlowRate))
-     |
-     (likelihoodInvolvesCause.some(causes_onto.ExcessiveInflow | causes_onto.PumpIncorrectlySet) &
-     likelihoodInvolvesEquipment.some(
-     equipment_onto.hasApparatus.some(equipment_onto.AtmosphericStorageTank | equipment_onto.PressureVessel |
-     equipment_onto.OpenVessel)))
-     |
-     likelihoodInvolvesCause.some(causes_onto.PhysicalImpact | causes_onto.ControlValveFailsOpen | causes_onto.LossOfInflow |
-     causes_onto.WrongTankLinedUp | causes_onto.LeakingDrainValve |
-     causes_onto.ContaminationByWaterAndTemperatureFallsBelowFreezingPoint |
-     causes_onto.PumpingAgainstPolymerizedLine)
-     |
-     (likelihoodInvolvesCause.some(causes_onto.MechanicalFailureOfSupport) &
-     likelihoodInvolvesEquipment.some(equipment_onto.hasApparatus.some(equipment_onto.AtmosphericStorageTank)) &
-     likelihoodInvolvesSiteInformation.some(site_information.DangerOfSeismicActivity))
-     |
-     (likelihoodInvolvesDeviation.some(deviation_onto.HighCorrosion) &
-     likelihoodInvolvesUnderlyingcause.some(causes_onto.CondensationAirHumidity) &
-     likelihoodInvolvesEquipment.some(equipment_onto.StorageTankEntity))
-     |
-     (likelihoodInvolvesCause.some(causes_onto.BlockedInflowLine) &
-     likelihoodInvolvesUnderlyingcause.some(causes_onto.DepositionOfImpurities))
-     |
-     (likelihoodInvolvesCause.some(causes_onto.ThermalExpansion) &
-     likelihoodInvolvesUnderlyingcause.some(causes_onto.BlockedPipingAndHeatInput))
-     |
-     (likelihoodInvolvesCause.some(causes_onto.AbnormalHeatInput) &
-     likelihoodInvolvesUnderlyingcause.some(causes_onto.SolarRadiation))
-     |
-     (likelihoodInvolvesDeviation.some(deviation_onto.OtherThanComposition) &
-     likelihoodInvolvesCause.some(causes_onto.OtherSubstanceFromUpstream))
-   )
+         equipment_onto.hasMaterialTransferEquipment.some(equipment_onto.ScrewCompressor | equipment_onto.PistonCompressor)) &
+         likelihoodInvolvesCause.some(causes_onto.MalfunctionLubricationSystem))
+         |
+         (likelihoodInvolvesEquipment.some(
+         equipment_onto.hasMaterialTransferEquipment.some(equipment_onto.PistonCompressor | equipment_onto.ScrewCompressor |
+         equipment_onto.CentrifugalPump | equipment_onto.ReciprocatingPump)) &
+         likelihoodInvolvesDeviation.some(deviation_onto.HighTemperature))
+         |
+         (likelihoodInvolvesEquipment.some(
+         equipment_onto.hasMaterialTransferEquipment.some(equipment_onto.CentrifugalPump | equipment_onto.ReciprocatingPump)) &
+         likelihoodInvolvesCause.some(causes_onto.DeadHeadingOfPump | causes_onto.OperationBelowMinimumFlowRate))
+         |
+         (likelihoodInvolvesCause.some(causes_onto.ExcessiveInflow | causes_onto.PumpIncorrectlySet) &
+         likelihoodInvolvesEquipment.some(
+         equipment_onto.hasApparatus.some(equipment_onto.AtmosphericStorageTank | equipment_onto.PressureVessel |
+         equipment_onto.OpenVessel)))
+         |
+         likelihoodInvolvesCause.some(causes_onto.PhysicalImpact | causes_onto.ControlValveFailsOpen | causes_onto.LossOfInflow |
+         causes_onto.WrongTankLinedUp | causes_onto.LeakingDrainValve |
+         causes_onto.ContaminationByWaterAndTemperatureFallsBelowFreezingPoint |
+         causes_onto.PumpingAgainstPolymerizedLine)
+         |
+         (likelihoodInvolvesCause.some(causes_onto.MechanicalFailureOfSupport) &
+         likelihoodInvolvesEquipment.some(equipment_onto.hasApparatus.some(equipment_onto.AtmosphericStorageTank)) &
+         likelihoodInvolvesSiteInformation.some(site_information.DangerOfSeismicActivity))
+         |
+         (likelihoodInvolvesDeviation.some(deviation_onto.HighCorrosion) &
+         likelihoodInvolvesUnderlyingcause.some(causes_onto.CondensationAirHumidity) &
+         likelihoodInvolvesEquipment.some(equipment_onto.StorageTankEntity))
+         |
+         (likelihoodInvolvesCause.some(causes_onto.BlockedInflowLine) &
+         likelihoodInvolvesUnderlyingcause.some(causes_onto.DepositionOfImpurities))
+         |
+         (likelihoodInvolvesCause.some(causes_onto.ThermalExpansion) &
+         likelihoodInvolvesUnderlyingcause.some(causes_onto.BlockedPipingAndHeatInput))
+         |
+         (likelihoodInvolvesCause.some(causes_onto.AbnormalHeatInput) &
+         likelihoodInvolvesUnderlyingcause.some(causes_onto.SolarRadiation))
+         |
+         (likelihoodInvolvesDeviation.some(deviation_onto.OtherThanComposition) &
+         likelihoodInvolvesCause.some(causes_onto.OtherSubstanceFromUpstream))
+       ))
   ]
+  
 Possible.comment = ["corresponds to category F3", "10^-3 - 10^-2"]
 
 

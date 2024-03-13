@@ -19,7 +19,8 @@ class InsufficientFilling(Effect):
  (isEffectOfDeviation.some(deviation_onto.NoFlow) &
  effectOfPropagatedCause.value(True) &
  effectInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
- equipment_onto.hasIntendedFunction.some(process_onto.Filling)))]
+ equipment_onto.hasIntendedFunction.some(process_onto.Filling))))]
+     
 class UnintendedExothermicPolymerization(Effect):
  equivalent_to = [Effect &
  (
@@ -242,7 +243,7 @@ class PressureExceedingDesignPressure(Effect):
  PotentialViolentReactionWithOxidizers)] 
  
  
- class Fracture(Effect):
+class Fracture(Effect):
  equivalent_to = [Effect &
  (
  (effectImpliedByCause.some(causes_onto.PhysicalImpact) &

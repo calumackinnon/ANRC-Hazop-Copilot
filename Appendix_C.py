@@ -14,7 +14,7 @@ if __name__ == '__main__':
 	# === Tearing strategy/strategy for defining order of process equipment/start-end point
 	if len(process_plant_model.nodes) > 1:
 		graph_type, newly_arranged_graphs, intersections = algorithm.determine_propagation_strategy(process_plant_model)
-	print(list(newly_arranged_graphs))
+		print(list(newly_arranged_graphs))
 
 	if config.EQUIPMENT_BASED_EVALUATION:
 		for index in range(len(process_plant_model.nodes)):
@@ -24,6 +24,7 @@ if __name__ == '__main__':
 			# Add port information to equipment entity
 			for key, value in process_plant_model.nodes[index]["ports"].items():
 				equipment_entity.onto_object.hasPort.append(value.onto_object)
+                
 				# Add port information to equipment entity
 				if value.port_instrumentation:
 					equipment_entity.onto_object.hasInstrumentation.append(value.port_instrumentation)
@@ -87,23 +88,23 @@ if __name__ == '__main__':
 	# === Hazop table
 	if results:
 		counter = 0
-			for row in results:
-				if row["cause"] or row["effect"] or row["consequence"]:
-					output.hazop_table.add_row([counter,
-												row["process_equipment"],
-												row["process_equipment_id"],
-												', '.join(row["operation_mode"]),
-												row["substance"],
-												', '.join(row["deviation"]),
+		for row in results:
+			if row["cause"] or row["effect"] or row["consequence"]:
+				output.hazop_table.add_row([counter,
+											row["process_equipment"],
+											row["process_equipment_id"],
+											', '.join(row["operation_mode"]),
+											row["substance"],
+											', '.join(row["deviation"]),
 											', '.join(row["super_cause"]),
 											', '.join(row["cause"]),
 											', '.join(row["effect"]),
 											', '.join(row["consequence"]),
 											', '.join(row["safeguard"]),
-												row["propagated"],
-												', '.join(row["risk"]),
-												])
-				counter += 1
+											row["propagated"],
+											', '.join(row["risk"]),
+											])
+			counter += 1
 	
 	print(output.hazop_table)
 	
