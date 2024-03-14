@@ -93,6 +93,9 @@ def determine_recycles(graph):
         comparison = check_equality_of_list(ratios)
         if comparison:
             return False
+        
+        # I think the code below is simpler as
+        # return not comparison and cycles # untested
         if not comparison and cycles:
             return True
         else:

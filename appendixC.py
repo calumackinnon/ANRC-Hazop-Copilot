@@ -1,3 +1,24 @@
+
+
+import appendixA
+import appendixB
+import appendixD
+import appendixE
+import appendixG
+import appendixH
+import appendixI
+import appendixJ
+import appendixK
+import appendixL
+import appendixM
+import appendixO
+import appendixP
+import appendixQ
+import appendicesRS
+import appendixW
+
+
+
 if __name__ == '__main__':
     
 	# === save all ontologies
