@@ -287,105 +287,104 @@ def create_olefin_feed_section():
             
     boundary_conditions.append(boundary_onto.UpstreamProcessInvolved)
     boundary_conditions.append(boundary_onto.IntroductionOfAir)
-    
     set_further_boundary_conditions(boundary_conditions, upper_onto.lowest_ambient_temperature)
     boundary_conditions = instantiate_boundary_conditions(boundary_conditions)
     
     # === Equipment entity definition
     transfer_pump = equipment_entities.centrifugal_pump_2("P200",
-    boundary_conditions,
-    equipment_onto.Operator(),
-    False,
-    [(prep.DictName.intended_function, process_onto.DeliverConstantVolumeFlow),
-    (prep.DictName.intended_function, process_onto.ModeIndependent)],
-    10.0, # barg
-    400., # K
-    25.) # m³/h
+                                                          boundary_conditions,
+                                                          equipment_onto.Operator(),
+                                                          False,
+                                                          [(prep.DictName.intended_function, process_onto.DeliverConstantVolumeFlow),
+                                                           (prep.DictName.intended_function, process_onto.ModeIndependent)],
+                                                          10.0, # barg
+                                                          400., # K
+                                                          25.) # m³/h
     pipe = equipment_entities.connection_pipe("PIP1",
-    boundary_conditions,
-    equipment_onto.NotControlled(),
-    False,
-    [(prep.DictName.intended_function, process_onto.ModeIndependent),
-    (None, None)],
-    10.0,
-    500.0)
+                                              boundary_conditions,
+                                              equipment_onto.NotControlled(),
+                                              False,
+                                              [(prep.DictName.intended_function, process_onto.ModeIndependent),
+                                               (None, None)],
+                                              10.0,
+                                              500.0)
     settling_tank = equipment_entities.settling_tank("ST01",
-    boundary_conditions,
-    equipment_onto.NotControlled(),
-    False,
-    [(prep.DictName.intended_function, process_onto.Separating),
-    (prep.DictName.intended_function, process_onto.ModeIndependent)],
-    1.0, # barg
-    400., # K
-    50.) # m³
+                                                     boundary_conditions,
+                                                     equipment_onto.NotControlled(),
+                                                     False,
+                                                     [(prep.DictName.intended_function, process_onto.Separating),
+                                                      (prep.DictName.intended_function, process_onto.ModeIndependent)],
+                                                     1.0, # barg
+                                                     400., # K
+                                                     50.) # m³
     inertization = equipment_entities.inertgas_blanketing("IB01",
-    boundary_conditions,
-    equipment_onto.NotControlled(),
-    False,
-    [(prep.DictName.intended_function, process_onto.Inerting),
-    (prep.DictName.intended_function, process_onto.ModeIndependent)],
-    2.0, # barg
-    400., # K
-    )
+                                                          boundary_conditions,
+                                                          equipment_onto.NotControlled(),
+                                                          False,
+                                                          [(prep.DictName.intended_function, process_onto.Inerting),
+                                                           (prep.DictName.intended_function, process_onto.ModeIndependent)],
+                                                          2.0, # barg
+                                                          400., # K
+                                                          )
     control_valve = equipment_entities.pneumatically_flow_control_valve_1("CV01",
-    boundary_conditions,
-    equipment_onto.NotControlled(),
-    False,
-    [(prep.DictName.intended_function, process_onto.FlowControl),
-    (prep.DictName.intended_function, process_onto.ModeIndependent)],
-    10.0, # barg
-    400., # K
-    )
+                                                                          boundary_conditions,
+                                                                          equipment_onto.NotControlled(),
+                                                                          False,
+                                                                          [(prep.DictName.intended_function, process_onto.FlowControl),
+                                                                           (prep.DictName.intended_function, process_onto.ModeIndependent)],
+                                                                          10.0, # barg
+                                                                          400., # K
+                                                                          )
     
     graph.add_node(0,
-    data=equipment_entities.source("Source", boundary_conditions, equipment_onto.NotControlled(), False,
-    [(prep.DictName.intended_function, process_onto.ModeIndependent),
-    (None, None)], None, None),
-    ports=dict(p1=equipment_entities.MyPort('p1', None, equipment_onto.Outlet())),
-    substances=[substances[0]],
-    environment=ambient_information)
+                   data=equipment_entities.source("Source", boundary_conditions, equipment_onto.NotControlled(), False,
+                                                  [(prep.DictName.intended_function, process_onto.ModeIndependent),
+                                                   (None, None)], None, None),
+                   ports=dict(p1=equipment_entities.MyPort('p1', None, equipment_onto.Outlet())),
+                   substances=[substances[0]],
+                   environment=ambient_information)
     graph.add_node(1,
-    data=transfer_pump,
-    ports=dict(p1=equipment_entities.MyPort('p1', equipment_onto.InletValve(), equipment_onto.Inlet()),
-    p2=equipment_entities.MyPort('p2', equipment_onto.OutletValve(), equipment_onto.Outlet()),
-    p3=equipment_entities.MyPort('p3', equipment_onto.BottomDrainValve(),
-    equipment_onto.Outlet())),
-    substances=[substances[0]],
-    environment=ambient_information)
+                   data=transfer_pump,
+                   ports=dict(p1=equipment_entities.MyPort('p1', equipment_onto.InletValve(), equipment_onto.Inlet()),
+                              p2=equipment_entities.MyPort('p2', equipment_onto.OutletValve(), equipment_onto.Outlet()),
+                              p3=equipment_entities.MyPort('p3', equipment_onto.BottomDrainValve(),
+                                                           equipment_onto.Outlet())),
+                   substances=[substances[0]],
+                   environment=ambient_information)
     graph.add_node(2,
-    data=pipe,
-    ports=dict(p1=equipment_entities.MyPort('p1', None, equipment_onto.Inlet()),
-    p2=equipment_entities.MyPort('p2', None, equipment_onto.Outlet())),
-    substances=[substances[0]],
-    environment=ambient_information)
+                   data=pipe,
+                   ports=dict(p1=equipment_entities.MyPort('p1', None, equipment_onto.Inlet()),
+                              p2=equipment_entities.MyPort('p2', None, equipment_onto.Outlet())),
+                   substances=[substances[0]],
+                   environment=ambient_information)
     graph.add_node(3,
-    data=control_valve,
-    ports=dict(p1=equipment_entities.MyPort('p1', None, equipment_onto.Inlet()),
-    p2=equipment_entities.MyPort('p2', None, equipment_onto.Outlet())),
-    substances=[substances[0]],
-    environment=ambient_information)
+                   data=control_valve,
+                   ports=dict(p1=equipment_entities.MyPort('p1', None, equipment_onto.Inlet()),
+                              p2=equipment_entities.MyPort('p2', None, equipment_onto.Outlet())),
+                   substances=[substances[0]],
+                   environment=ambient_information)
     graph.add_node(4,
-    data=settling_tank,
-    ports=dict(p1=equipment_entities.MyPort('p1', equipment_onto.InletValve(), equipment_onto.Inlet()),
-    p2=equipment_entities.MyPort('p2', equipment_onto.OutletValve(), equipment_onto.Outlet()),
-    p3=equipment_entities.MyPort('p3', equipment_onto.BottomDrainValve(),
-    equipment_onto.Outlet()),
-    p4=equipment_entities.MyPort('p4', None, equipment_onto.Inlet())),
-    substances=[substances[2]],
-    environment=ambient_information)
+                   data=settling_tank,
+                   ports=dict(p1=equipment_entities.MyPort('p1', equipment_onto.InletValve(), equipment_onto.Inlet()),
+                              p2=equipment_entities.MyPort('p2', equipment_onto.OutletValve(), equipment_onto.Outlet()),
+                              p3=equipment_entities.MyPort('p3', equipment_onto.BottomDrainValve(),
+                                                           equipment_onto.Outlet()),
+                              p4=equipment_entities.MyPort('p4', None, equipment_onto.Inlet())),
+                   substances=[substances[2]],
+                   environment=ambient_information)
     graph.add_node(5,
-    data=inertization,
-    ports=dict(p1=equipment_entities.MyPort('p1', None, equipment_onto.Inlet()),
-    p2=equipment_entities.MyPort('p2', None, equipment_onto.Outlet())),
-    substances=[substances[1]],
-    environment=ambient_information)
+                   data=inertization,
+                   ports=dict(p1=equipment_entities.MyPort('p1', None, equipment_onto.Inlet()),
+                              p2=equipment_entities.MyPort('p2', None, equipment_onto.Outlet())),
+                   substances=[substances[1]],
+                   environment=ambient_information)
     # graph.add_node(6,
-    # data=equipment_entities.Sink("Sink", boundary_conditions, equipment_onto.NotControlled(), False,
-    # [equipment_onto.ContinuesProcess, equipment_onto.ModeIndependent], None, None),
-    # ports=dict(
-    # p1=equipment_entities.MyPort('p1', None, equipment_onto.Inlet())),
-    # substances=[substances[0]],
-    # environment=ambient_information)
+    #                data=equipment_entities.Sink("Sink", boundary_conditions, equipment_onto.NotControlled(), False,
+    #                                             [equipment_onto.ContinuesProcess, equipment_onto.ModeIndependent], None, None),
+    #                ports=dict(
+    #                    p1=equipment_entities.MyPort('p1', None, equipment_onto.Inlet())),
+    #                substances=[substances[0]],
+    #                environment=ambient_information)
     
     add_edge_port(graph, 0, 'p1', 1, 'p1')
     add_edge_port(graph, 1, 'p2', 2, 'p1')
