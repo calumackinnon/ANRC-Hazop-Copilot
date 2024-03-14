@@ -213,6 +213,7 @@ def pressure_vessel(identifier, circumstances, control_instance, transportable, 
     equipment_entity.set_intended_function(process_onto.Storage)
     equipment_entity.set_control_instance(control_instance)
     equipment_entity.assemble_ontology_object(equipment)
+    
     return equipment_entity
 
 def pressure_receiver(identifier, circumstances, control_instance, transportable, operating_modes, max_pressure, max_temperature, volume):
@@ -226,6 +227,7 @@ def pressure_receiver(identifier, circumstances, control_instance, transportable
     equipment_entity.set_volume_of_enclosure(volume)
     equipment_entity.set_control_instance(control_instance)
     equipment_entity.assemble_ontology_object(equipment)
+    
     return equipment_entity
 
 def plate_heat_exchanger(identifier, circumstances, control_instance, transportable, operating_modes):
@@ -239,6 +241,7 @@ def plate_heat_exchanger(identifier, circumstances, control_instance, transporta
     equipment_entity.set_intended_function(process_onto.HeatTransfer)
     equipment_entity.set_control_instance(control_instance)
     equipment_entity.assemble_ontology_object(equipment)
+    
     return equipment_entity
 
 def centrifugal_pump_1(identifier, circumstances, control_instance, transportable, operating_modes):
@@ -255,17 +258,18 @@ def centrifugal_pump_1(identifier, circumstances, control_instance, transportabl
     equipment_entity.set_intended_function(process_onto.MaterialTransfer)
     equipment_entity.set_control_instance(control_instance)
     equipment_entity.assemble_ontology_object(equipment)
+    
     return equipment_entity 
 
 
-def centrifugal_pump_2(identifier,
-    circumstances,
-    control_instance,
-    transportable,
-    operating_modes,
-    max_pressure,
-    max_temperature,
-    volume_flow):
+def centrifugal_pump_2( identifier,
+                        circumstances,
+                        control_instance,
+                        transportable,
+                        operating_modes,
+                        max_pressure,
+                        max_temperature,
+                        volume_flow):
     equipment = equipment_onto.PumpEntity
     equipment_entity = MyEquipmentEntity(equipment, identifier, circumstances, transportable, operating_modes, max_pressure, max_temperature)
     equipment_entity.set_volume_flow_of_transfer_equipment(volume_flow)
@@ -283,8 +287,11 @@ def centrifugal_pump_2(identifier,
     equipment_entity.add_subunit(equipment_onto.NonReturnValve)
     equipment_entity.set_control_instance(control_instance)
     equipment_entity.assemble_ontology_object(equipment)
+    
     return equipment_entity
+
 def screw_compressor(identifier, circumstances, control_instance, transportable, operating_modes, max_pressure, max_temperature, volume_flow):
+    
     equipment = equipment_onto.CompressorEntity
     equipment_entity = MyEquipmentEntity(equipment, identifier, circumstances, transportable, operating_modes, max_pressure, max_temperature)
     equipment_entity.add_instrumentation((equipment_onto.InletValve, "{}-VA1".format(identifier)))
@@ -300,7 +307,9 @@ def screw_compressor(identifier, circumstances, control_instance, transportable,
     equipment_entity.set_volume_flow_of_transfer_equipment(volume_flow)
     equipment_entity.set_control_instance(control_instance)
     equipment_entity.assemble_ontology_object(equipment)
+    
     return equipment_entity
+
 def piston_compressor(identifier, circumstances, control_instance, transportable, operating_modes):
     equipment = equipment_onto.CompressorEntity
     equipment_entity = MyEquipmentEntity(equipment, identifier, circumstances, transportable, operating_modes)
@@ -316,7 +325,9 @@ def piston_compressor(identifier, circumstances, control_instance, transportable
     equipment_entity.set_intended_function(process_onto.MaterialTransfer)
     equipment_entity.set_control_instance(control_instance)
     equipment_entity.assemble_ontology_object(equipment)
+    
     return equipment_entity
+
 
 def pneumatically_flow_control_valve_1(identifier, circumstances, control_instance, transportable, operating_modes, max_pressure, max_temperature):
     equipment = equipment_onto.ValveEntity
@@ -331,6 +342,7 @@ def pneumatically_flow_control_valve_1(identifier, circumstances, control_instan
     equipment_entity.add_connected_plant_item(equipment_onto.LevelIndicatorController)
     equipment_entity.set_control_instance(control_instance)
     equipment_entity.assemble_ontology_object(equipment)
+    
     return equipment_entity
 
 def pneumatically_pressure_control_valve_1(identifier, circumstances, control_instance, transportable, operating_modes):
@@ -345,6 +357,7 @@ def pneumatically_pressure_control_valve_1(identifier, circumstances, control_in
     equipment_entity.add_connected_plant_item(equipment_onto.PressureIndicatorController)
     equipment_entity.set_control_instance(control_instance)
     equipment_entity.assemble_ontology_object(equipment)
+    
     return equipment_entity
 
 def manual_three_way_valve(identifier, circumstances, control_instance, transportable, operating_modes):
@@ -355,6 +368,7 @@ def manual_three_way_valve(identifier, circumstances, control_instance, transpor
     equipment_entity.set_intended_function(process_onto.FluidControl)
     equipment_entity.set_control_instance(control_instance)
     equipment_entity.assemble_ontology_object(equipment)
+    
     return equipment_entity
 
 def throttling_valve(identifier, circumstances, control_instance, transportable, operating_modes, max_pressure, max_temperature):
@@ -365,9 +379,8 @@ def throttling_valve(identifier, circumstances, control_instance, transportable,
     equipment_entity.set_intended_function(process_onto.FluidControl)
     equipment_entity.set_control_instance(control_instance)
     equipment_entity.assemble_ontology_object(equipment)
+    
     return equipment_entity 
-
-
 
 def manual_valve(identifier, circumstances, control_instance, transportable, operating_modes):
     equipment = equipment_onto.ValveEntity
@@ -377,7 +390,9 @@ def manual_valve(identifier, circumstances, control_instance, transportable, ope
     equipment_entity.set_intended_function(process_onto.FluidControl)
     equipment_entity.set_control_instance(control_instance)
     equipment_entity.assemble_ontology_object(equipment)
+    
     return equipment_entity
+
 def air_cooled_condenser(identifier, circumstances, control_instance, transportable, operating_modes, max_pressure, max_temperature):
     equipment = equipment_onto.AirCooledCondenserEntity
     equipment_entity = MyEquipmentEntity(equipment, identifier, circumstances, transportable, operating_modes, max_pressure, max_temperature)
@@ -392,7 +407,9 @@ def air_cooled_condenser(identifier, circumstances, control_instance, transporta
     equipment_entity.set_intended_function(process_onto.Condensation)
     equipment_entity.set_control_instance(control_instance)
     equipment_entity.assemble_ontology_object(equipment)
+    
     return equipment_entity
+
 def shell_tube_evaporator(identifier, circumstances, control_instance, transportable, operating_modes, max_pressure, max_temperature, volume):
     equipment = equipment_onto.ShellTubeEvaporatorEntity
     equipment_entity = MyEquipmentEntity(equipment, identifier, circumstances, transportable, operating_modes, max_pressure, max_temperature)
@@ -405,8 +422,11 @@ def shell_tube_evaporator(identifier, circumstances, control_instance, transport
     equipment_entity.set_intended_function(process_onto.Evaporation)
     equipment_entity.set_control_instance(control_instance)
     equipment_entity.assemble_ontology_object(equipment)
+    
     return equipment_entity
+
 def fin_tube_evaporator(identifier, circumstances, control_instance, transportable, operating_modes):
+    
     equipment = equipment_onto.FinTubeEvaporatorEntity
     equipment_entity = MyEquipmentEntity(equipment, identifier, circumstances, transportable, operating_modes)
     equipment_entity.add_instrumentation((equipment_onto.InletValve, "{}-VA1".format(identifier)))
@@ -420,9 +440,11 @@ def fin_tube_evaporator(identifier, circumstances, control_instance, transportab
     equipment_entity.set_intended_function(process_onto.Evaporation)
     equipment_entity.set_control_instance(control_instance)
     equipment_entity.assemble_ontology_object(equipment)
+    
     return equipment_entity
 
 def wet_scrubber(identifier, circumstances, control_instance, transportable, operating_modes):
+    
     equipment = equipment_onto.WetScrubberEntity
     equipment_entity = MyEquipmentEntity(equipment, identifier, circumstances, transportable, operating_modes)
     equipment_entity.set_apparatus(equipment_onto.PressureVessel)
@@ -431,9 +453,11 @@ def wet_scrubber(identifier, circumstances, control_instance, transportable, ope
     equipment_entity.set_intended_function(process_onto.Purification)
     equipment_entity.set_control_instance(control_instance)
     equipment_entity.assemble_ontology_object(equipment)
+    
     return equipment_entity
 
 def cooling_tower(identifier, circumstances, control_instance, transportable, operating_modes):
+    
     equipment = equipment_onto.CoolingTowerEntity
     equipment_entity = MyEquipmentEntity(equipment, identifier, circumstances, transportable, operating_modes)
     equipment_entity.set_apparatus(equipment_onto.OpenVessel)
@@ -446,6 +470,7 @@ def cooling_tower(identifier, circumstances, control_instance, transportable, op
     equipment_entity.set_intended_function(process_onto.HeatTransfer)
     equipment_entity.set_control_instance(control_instance)
     equipment_entity.assemble_ontology_object(equipment)
+    
     return equipment_entity
 
 def crude_stabilizer_column(identifier, circumstances, control_instance, transportable, operating_modes, max_pressure, max_temperature):
@@ -458,4 +483,5 @@ def crude_stabilizer_column(identifier, circumstances, control_instance, transpo
     equipment_entity.add_instrumentation((equipment_onto.LevelIndicatorController, None))
     equipment_entity.set_control_instance(control_instance)
     equipment_entity.assemble_ontology_object(equipment)
+    
     return equipment_entity 

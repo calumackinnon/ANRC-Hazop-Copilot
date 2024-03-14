@@ -1,22 +1,23 @@
 
 
-import appendixA
-import appendixB
-import appendixD
-import appendixE
-import appendixG
-import appendixH
-import appendixI
-import appendixJ
-import appendixK
-import appendixL
-import appendixM
-import appendixO
-import appendixP
-import appendixQ
-import appendicesRS
-import appendixW
+# import appendixA
+# import appendixB
+# import appendixD
+# import appendixE
+# import appendixG
+# import appendixH
+# import appendixI
+# import appendixJ
+# import appendixK
+# import appendixL
+# import appendixM
+# import appendixO
+# import appendixP
+# import appendixQ
+# import appendicesRS
+# import appendixW
 
+from owlready2 import *
 
 
 if __name__ == '__main__':
@@ -64,11 +65,11 @@ if __name__ == '__main__':
 			deviations = config.deviation_selector(process_unit_obj)
 			
 			# === Infer hazards
-			infer.equipment_based_analysis(equipment_entity,
+			infer.equipment_based_analysis( equipment_entity,
 											deviations,
 											substances,
 											environment,
-											equipment_specific_prop_scenarios)
+											equipment_specific_prop_scenarios )
 			
 			stack_elements.append({"{0}".format(equipment_entity.name): equipment_entity,
 									pre_processing.DictName.scenario: equipment_specific_prop_scenarios})
