@@ -692,7 +692,10 @@ class CaseAttributes(Enum):
     IntendedFunction = 5
     SubstancePhase = 6
     InferredDeviation = 7
+    #TODO Error here
     
+    
+    '''
     propagation_case_base = [
         # === Pump
         {CaseAttributes.No: 1,
@@ -2063,6 +2066,8 @@ class CaseAttributes(Enum):
          CaseAttributes.InferredDeviation: [deviation_onto.OtherThanComposition]}, 
     ] 
     
+    '''
+    
     def calculate_similarity(new_case, old_case):
         
         if new_case is None or old_case is None:
@@ -2116,7 +2121,7 @@ class CaseAttributes(Enum):
 # ===Cause ========================================
 class Cause(Thing):
     pass
-Cause.label = ["cause"]
+Cause.label = ["cause"] #TODO
 Cause.comment = ["Initiating event in the sequence of events of a scenario", "represents an event or situation"]
 class UnderlyingCause(Thing):
     pass
