@@ -8,20 +8,25 @@ The idea is just to see if this can allow method name errors to be resolved.
 
 PS this looks useful: https://towardsdatascience.com/graphs-with-python-overview-and-best-libraries-a92aa485c2f8
 
-Presently working on a bug to do with line 23 I believe is to do with NetworkX.
+Presently fixing a bug at the first #TODO, I believe it is to do with NetworkX.
+Could it be this? https://sdopt-tearing.readthedocs.io/en/latest/
+It is to do with p 118 in the dissertation.
 
 @author: qrb15201 Calum Mackinnon
 """
 
 
-#from enum import Enum
+# from enum import Enum
 from owlready2 import *
+import itertools
+
+
 
 #%% Appendix R
 
 import networkx as nx
-from tearing import graph_operations as go #TODO
-from string import ascii_lowercase
+from tearing import graph_operations as go #TODO Is this tensorflow?
+from string import ascii_lowercase 
 from enum import Enum
 
 class GraphType(Enum):
@@ -151,10 +156,12 @@ def determine_propagation_strategy(graph):
     # === Cycle detection
     cycles = nx.simple_cycles(graph)
     cycles = list(cycles)
+    
     # === Determine recycle streams
     recycle = go.determine_recycles(graph)
     # === Calculate outflow - inflow ratio
     ratios = go.calc_out_in_flow_ratio(graph)
+    
     # === Identify single line pattern
     single_line = identify_single_line(ratios)
     # === identify roots and potential leaves === see documentation:
@@ -197,13 +204,16 @@ def determine_propagation_strategy(graph):
     elif (recycle or cycles) and len(leaves) == 1:
         # === Tearing procedure in case of recycles
         H = graph.copy()
+        
         # === Calculate outflow - inflow ratio
         ratios = go.calc_out_in_flow_ratio(H)
+        
         # === Evaluate max ratio, position and node
         max_ratio = max(ratios)
         max_ratio_node_pos = ratios.index(max_ratio)
         successors_of_branch = list(graph.successors(max_ratio_node_pos))
         global_list = []
+        
         # === consider first path until diverging node
         node_list = []
         
@@ -211,6 +221,7 @@ def determine_propagation_strategy(graph):
             node_list.append(node)
             
         global_list.append(node_list)
+        
         # === detect nodes that form the recycle
         successor_streams = []
         
@@ -236,6 +247,7 @@ def determine_propagation_strategy(graph):
         
         # sort nodes according to numbers (nodes with highest numbers last)
         successor_streams.sort(key=my_max)
+        
         # Very first list are nodes from first to diverging node
         new_graph = global_list + successor_streams
         type_of_graph = GraphType.RecycleFlowSystem
@@ -256,6 +268,7 @@ def determine_propagation_strategy(graph):
             m = max(num_inflow_nodes)
             max_pos = [i for i, j in enumerate(num_inflow_nodes) if j == m][0]
             upstream_nodes_of_max_pos = list(graph.predecessors(max_pos))
+            
             # === The intention is to identify all streams that lead into the junction
             global_list = []
             for node in upstream_nodes_of_max_pos:
@@ -303,6 +316,7 @@ def determine_propagation_strategy(graph):
                     tmp_list = [node]
                     current_node = node
                     identify_and_add_predecessors_to_list(graph, current_node, tmp_list)
+                    
                     # === rearrange global list
                     tmp_list.insert(0, min_ratio_node)
                     tmp_list.reverse()
@@ -312,34 +326,43 @@ def determine_propagation_strategy(graph):
                 tmp_list = [min_ratio_node]
                 current_node = min_ratio_node
                 identify_and_add_successors_to_list(graph, current_node, tmp_list)
+                
                 # === Sort results
                 global_list.append(tmp_list)
                 new_graph = global_list
+                
             elif len(leaves) > 1 and len(cycles) == 0 and len(roots) == 1: # Multiple leaves are an indicator for a branch
+                
                 type_of_graph = GraphType.BranchSystem
                 all_paths = []
+                
                 for root in roots:
                     paths = nx.all_simple_paths(graph, root, leaves)
                     all_paths.extend(paths)
+                    
                 new_graph = all_paths
             else:
                 type_of_graph = GraphType.ComplexSystem
                 all_paths = []
+                
                 for root in roots:
                     for leaf in leaves:
                         paths = nx.all_simple_paths(graph, root, leaf)
                         all_paths.extend(paths)
+                        
                 all_paths2 = []
                 for root in roots:
                     paths = nx.all_simple_paths(graph, root, leaves)
                     all_paths2.extend(paths)
+                    
                 new_graph = all_paths
         
     return type_of_graph, new_graph, intersection_node 
 
 #%% Appendix S
 
-class TestUnderlyingCauses(unittest.TestCase):
+'''
+class TestUnderlyingCauses(unittest.TestCase):  #TODO 'unittest' not defined.
     
     def test_solar_radiation_1(self):
         cause = causes_onto.AbnormalHeatInput()
@@ -365,7 +388,7 @@ class TestUnderlyingCauses(unittest.TestCase):
         time.sleep(0.01)
         self.assertEqual(super_cause_, ['BlockedPipingAndHeatInput'],
                          "Should be ['BlockedPipingAndHeatInput']")
- 
+''' 
 
 #%% Appendix A
 
@@ -1052,6 +1075,7 @@ class CaseAttributes(Enum):
     InferredDeviation = 7    
     
 # propagation_case_base is a list of dictionaries.
+#TODO Check that equipment_onto is defined.
 propagation_case_base = [
     # === Pump
     {CaseAttributes.No: 1,
