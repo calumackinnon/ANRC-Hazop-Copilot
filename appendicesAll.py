@@ -6,6 +6,10 @@ Making a file which combines all appendices into a single script.
 
 The idea is just to see if this can allow method name errors to be resolved.
 
+PS this looks useful: https://towardsdatascience.com/graphs-with-python-overview-and-best-libraries-a92aa485c2f8
+
+Presently working on a bug to do with line 23 I believe is to do with NetworkX.
+
 @author: qrb15201 Calum Mackinnon
 """
 
@@ -16,18 +20,18 @@ from owlready2 import *
 #%% Appendix R
 
 import networkx as nx
-from tearing import graph_operations as go
+from tearing import graph_operations as go #TODO
 from string import ascii_lowercase
 from enum import Enum
 
 class GraphType(Enum):
- SingleLineSystem = 0
- MultiCycleSystem = 1
- RecycleFlowSystem = 2
- JunctionSystem = 3
- BranchSystem = 4
- SingleCycleSystem = 6
- ComplexSystem = 7
+    SingleLineSystem = 0
+    MultiCycleSystem = 1
+    RecycleFlowSystem = 2
+    JunctionSystem = 3
+    BranchSystem = 4
+    SingleCycleSystem = 6
+    ComplexSystem = 7
  
 # === Function to identify ratio pattern [0, 1, .., 1, 0]
 def identify_single_line(out_in_ratios):
@@ -57,7 +61,9 @@ def identify_and_add_predecessors_to_list(graph, current_node, tmp_list):
     return
 
 def identify_and_add_successors_to_list(graph, current_node, tmp_list):
+
     end_reached = False
+    
     while not end_reached:
         try:
             tmp_successor = list(graph.successors(current_node))[0]
@@ -65,34 +71,43 @@ def identify_and_add_successors_to_list(graph, current_node, tmp_list):
             current_node = tmp_successor
         except IndexError:
             end_reached = True
+            
     return
 
 def my_max(e):
- return max(e)
+    return max(e)
 
 def calc_out_in_flow_ratio(graph):
+    
     node_out_in_ratio = []
+    
     for g in graph.nodes:
+        
         upstream = list(graph.predecessors(g))
         downstream = list(graph.successors(g))
+        
         if len(upstream) == 0:
             node_out_in_ratio.append(0)
         else:
             ratio = len(downstream) / len(upstream)
             node_out_in_ratio.append(ratio)
+            
     return node_out_in_ratio
 
 def identify_upstream_equipment(graph, reference_node):
- return dict(nx.bfs_predecessors(graph, source=reference_node))
+    
+    return dict(nx.bfs_predecessors(graph, source=reference_node))
 
 # source https://stackoverflow.com/questions/32997395/iterate-through-a-list-given-a-starting-point
 def starting_with(arr, start_index):
+    
     for i in range(start_index, len(arr)):
         yield arr[i]
     for i in range(start_index):
         yield arr[i]
  
 def determine_recycles(graph):
+    
     ratios = calc_out_in_flow_ratio(graph)
     
     if all(p == 0 or p == 1 for p in ratios):
@@ -112,19 +127,24 @@ def determine_recycles(graph):
             return False
 
 def determine_cycle_intersections(list_of_cycles):
+    
     list_of_intersections = []
+    
     for a, b in itertools.combinations(list_of_cycles, 2):
         # find intersections
         intersection = list(set(list_of_cycles.get(a)).intersection(list_of_cycles.get(b)))
         list_of_intersections.append({"cycles": [a, b], "intersection": intersection})
+        
     return list_of_intersections
 
 # Check whether a list contains the same items
 def check_equality_of_list(lst):
- return not lst or lst.count(lst[0]) == len(lst) 
+    
+    return not lst or lst.count(lst[0]) == len(lst) 
 
 
 def determine_propagation_strategy(graph):
+    
     new_graph = []
     type_of_graph = None
     intersection_node = None
@@ -138,6 +158,7 @@ def determine_propagation_strategy(graph):
     # === Identify single line pattern
     single_line = identify_single_line(ratios)
     # === identify roots and potential leaves === see documentation:
+        
     # https://networkx.org/documentation/stable/reference/algorithms/generated/networkx.algorithms
     # .simple_paths.all_simple_paths.html
     roots = list(v for v, d in graph.in_degree() if d == 0)
@@ -169,6 +190,7 @@ def determine_propagation_strategy(graph):
         type_of_graph = GraphType.MultiCycleSystem
     
     elif cycles and not recycle and not single_line:
+        
         new_graph = list(graph.copy())
         type_of_graph = GraphType.SingleCycleSystem
     
@@ -184,21 +206,25 @@ def determine_propagation_strategy(graph):
         global_list = []
         # === consider first path until diverging node
         node_list = []
+        
         for node in range(max_ratio_node_pos+1):
             node_list.append(node)
             
         global_list.append(node_list)
         # === detect nodes that form the recycle
         successor_streams = []
+        
         for successor in successors_of_branch:
             node_list = [max_ratio_node_pos, successor]
             end_reached = False
             current_node = successor
+            
             # === identify all paths after diverging node
             while not end_reached:
                 try:
                     next_successor = list(graph.successors(current_node))[0]
                     node_list.append(next_successor)
+                    
                     # === back at diverging node (indicated by maximum ratio)
                     if next_successor == max_ratio_node_pos:
                         end_reached = True
@@ -252,12 +278,16 @@ def determine_propagation_strategy(graph):
         # Idea: in a junction system there is just 1 element where >2 nodes enter and 1 exits
         # this means, just one element has the lowest ratios
         else:
+            
             # === identify minimum ratio
             min_ratio = min(i for i in ratios if i > 0)
+            
             # === get position of minimum ratio
             pos_min_elements = [i for i, x in enumerate(ratios) if x == min_ratio]
+            
             # === check for cycles
             cycles = list(nx.simple_cycles(graph))
+            
             # === in case a cycle is detected the plant section is more complex and requires another strategy
             if len(pos_min_elements) == 1 and \
                 min_ratio <= 0.5 and len(cycles) == 0 and len(roots) == 1:
@@ -266,6 +296,7 @@ def determine_propagation_strategy(graph):
                 min_ratio_node_pos = ratios.index(min_ratio)
                 min_ratio_node = node_list[min_ratio_node_pos]
                 upstream_nodes_of_min_ratio = list(graph.predecessors(min_ratio_node))
+                
                 # === The intention is to identify all streams that lead into the junction
                 global_list = []
                 for node in upstream_nodes_of_min_ratio:
