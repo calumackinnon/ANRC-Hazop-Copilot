@@ -332,7 +332,7 @@ def reactor(identifier, circumstances, control_instance, transportable, operatin
 def shell_tube_heat_exchanger(identifier, circumstances, control_instance, transportable, operating_modes):
     equipment = equipment_onto.ShellTubeHeatExchangerEntity
     equipment_entity = MyEquipmentEntity(equipment, identifier, circumstances, transportable, operating_modes)
-    # TODO: wieso nur 2 Anschlüsse
+    # T-O-D-O: wieso nur 2 Anschlüsse
     equipment_entity.add_instrumentation((equipment_onto.InletValve, "{}-VA1".format(identifier)))
     equipment_entity.add_instrumentation((equipment_onto.OutletValve, "{}-VA2".format(identifier)))
     equipment_entity.set_apparatus(equipment_onto.PressureVessel)
@@ -695,7 +695,7 @@ class CaseAttributes(Enum):
     #TODO Error here
     
     
-    '''
+    
     propagation_case_base = [
         # === Pump
         {CaseAttributes.No: 1,
@@ -2066,7 +2066,7 @@ class CaseAttributes(Enum):
          CaseAttributes.InferredDeviation: [deviation_onto.OtherThanComposition]}, 
     ] 
     
-    '''
+    
     
     def calculate_similarity(new_case, old_case):
         
@@ -2398,7 +2398,8 @@ class OperatorAndProcessControlSystem(ControlInstance):
  pass
 class NotControlled(ControlInstance):
  pass
-AllDisjoint([Operator, ProgrammableLogicController, NotControlled])
+#TODO
+AllDisjoint([Operator, ProgrammableLogicController, NotControlled]) #TODO
 # === FailSafePosition
 class FailSafePosition(Thing):
  pass
@@ -6152,7 +6153,7 @@ def equipment_based_hazard_specific_deviation(deviation, args):
         preliminary_scenario_list.append(scenario)
     sync_reasoner(debug=0)
     
-infer_follow_up(process_unit,
+infer_follow_up(process_unit,   #TODO
     substance,
     deviation,
     environment,
