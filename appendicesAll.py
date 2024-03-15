@@ -14,6 +14,8 @@ from enum import Enum
 from owlready2 import *
 
 
+#%% Appendix A
+
 class MyPort:
     
     def __init__(self, name, port_instrumentation, connection_type):
@@ -54,88 +56,89 @@ class MyEquipmentEntity:
         self.volume_flow_of_transfer_equipment = None
         self.pressure_volume_product = None
         
-        def set_volume_of_enclosure(self, voe):
-            self.volume_of_enclosure = voe
-            
-        def set_volume_flow_of_transfer_equipment(self, volFlow):
-            self.volume_flow_of_transfer_equipment = volFlow
-            
-        def add_connected_plantItem(self, item):
-            if item:
-                self.connected_plant_item.append(item(None))
-                
-        def set_control_instance(self, control_instance):
-            
-            if control_instance:
-                self.control_instance.append(control_instance)
-                
-        def set_intended_function(self, intended_function):
-            
-            if intended_function:
-                self.intended_function.append(intended_function(None))
-                
-        def set_apparatus(self, apparatus):
-            
-            if apparatus:
-                self.set_apparatus.append(apparatus(None))
-                
-                
-        def addFixture(self, fixture):
-            
-            if fixture:
-                self.fixture.append(fixture(None))
-                
-        def add_piping(self, piping):
-            
-            if piping:
-                self.piping.append(piping(None))
-                
-        def add_instrumentation(self, instrumentation):
-            
-            if instrumentation:
-                instrumentation_instance = instrumentation[0](None)
-                
-                #Append a unique tag of instrumentation as an annotation to instrumentation instance
-                if instrumentation[1]:
-                    instrumentation_instance.comment = instrumentation[1]
-                self.instrumentation.append(instrumentation_instance)
-                
-                
-        def add_subunit(self, subunit):
-            if subunit:
-                self.subunit.append(subunit(None))
-                
-        def set_material_transfer_equipment(self, mat):
-            
-            if mat: self.material_transfer_equipment.append(mat(None))
-            
-        def determine_pv_product(self):
-            
-            self.pressure_volume_product = self.max_operating_pressure_in_barg * self.volume_of_enclosure
-            
-        def assemble_ontology_object(self, equipment_entity):
-            
-            self.onto_object = equipment_entity(
-                    hasFixture = self.fixture,
-                    hasInstrumentation = self.instrumentation,
-                    hasMaterialTransferEquipment = self.material_transfer_equipment,
-                    hasSubunit = self.subunit,
-                    hasApparatus=self.apparatus,
-                    hasPiping=self.piping,
-                    hasIntendedFunction=self.intended_function,
-                    hasConnectionToAdjacentPlantItem=self.connected_plant_item,
-                    hasMaximumOperatingPressureInBarGauge=self.max_operating_pressure_in_barg,
-                    hasMaximumOperatingTemperatureInKelvin=self.max_operating_temperature_in_kelvin,
-                    isTransportable=self.transportable,
-                    entityControlledBy=self.control_instance,
-                    hasPort=[],
-                    hasOperationMode=[]
-                )
-            
-        def set_max_operating_pressure_in_barg(self, max_operating_pressure):
-            self.max_operating_pressure_in_barg = max_operating_pressure 
-            
+    def set_volume_of_enclosure(self, voe):
+        self.volume_of_enclosure = voe
         
+    def set_volume_flow_of_transfer_equipment(self, volFlow):
+        self.volume_flow_of_transfer_equipment = volFlow
+        
+    def add_connected_plantItem(self, item):
+        if item:
+            self.connected_plant_item.append(item(None))
+            
+    def set_control_instance(self, control_instance):
+        
+        if control_instance:
+            self.control_instance.append(control_instance)
+            
+    def set_intended_function(self, intended_function):
+        
+        if intended_function:
+            self.intended_function.append(intended_function(None))
+            
+    def set_apparatus(self, apparatus):
+        
+        if apparatus:
+            self.set_apparatus.append(apparatus(None))
+            
+            
+    def addFixture(self, fixture):
+        
+        if fixture:
+            self.fixture.append(fixture(None))
+            
+    def add_piping(self, piping):
+        
+        if piping:
+            self.piping.append(piping(None))
+            
+    def add_instrumentation(self, instrumentation):
+        
+        if instrumentation:
+            instrumentation_instance = instrumentation[0](None)
+            
+            #Append a unique tag of instrumentation as an annotation to instrumentation instance
+            if instrumentation[1]:
+                instrumentation_instance.comment = instrumentation[1]
+            self.instrumentation.append(instrumentation_instance)
+            
+            
+    def add_subunit(self, subunit):
+        if subunit:
+            self.subunit.append(subunit(None))
+            
+    def set_material_transfer_equipment(self, mat):
+        
+        if mat: self.material_transfer_equipment.append(mat(None))
+        
+    def determine_pv_product(self):
+        
+        self.pressure_volume_product = self.max_operating_pressure_in_barg * self.volume_of_enclosure
+        
+    def assemble_ontology_object(self, equipment_entity):
+        
+        self.onto_object = equipment_entity(
+                hasFixture = self.fixture,
+                hasInstrumentation = self.instrumentation,
+                hasMaterialTransferEquipment = self.material_transfer_equipment,
+                hasSubunit = self.subunit,
+                hasApparatus=self.apparatus,
+                hasPiping=self.piping,
+                hasIntendedFunction=self.intended_function,
+                hasConnectionToAdjacentPlantItem=self.connected_plant_item,
+                hasMaximumOperatingPressureInBarGauge=self.max_operating_pressure_in_barg,
+                hasMaximumOperatingTemperatureInKelvin=self.max_operating_temperature_in_kelvin,
+                isTransportable=self.transportable,
+                entityControlledBy=self.control_instance,
+                hasPort=[],
+                hasOperationMode=[]
+            )
+        
+    def set_max_operating_pressure_in_barg(self, max_operating_pressure):
+        self.max_operating_pressure_in_barg = max_operating_pressure 
+        
+        
+#%% Appendix B
 
 class MySubstance:
     
@@ -192,6 +195,8 @@ class MySubstance:
         )
         
         
+        
+#%% Appendix D 
 
 def source(identifier, circumstances, control_instance, transportable, operating_modes, max_pressure, max_temperature):
 
@@ -701,30 +706,30 @@ class CaseAttributes(Enum):
 propagation_case_base = [
     # === Pump
     {CaseAttributes.No: 1,
-    CaseAttributes.EquipmentEntity: (equipment_onto.PumpEntity, equipment_weight), #TODO equipment_onto not defined
-    CaseAttributes.Event: (effect_onto.PumpRunningDry, event_weight),
-    CaseAttributes.Apparatus: (equipment_onto.PumpCasing, apparatus_weight),
-    CaseAttributes.IntendedFunction: (process_onto.MaterialTransfer, intended_function_weight),
-    CaseAttributes.SubstancePhase: (substance_onto.Liquid, phase_weight),
-    CaseAttributes.InferredDeviation: [deviation_onto.HighTemperature,
-    deviation_onto.HighVibration]},
+    CaseAttributes.EquipmentEntity:     (equipment_onto.PumpEntity, equipment_weight), #TODO equipment_onto not defined
+    CaseAttributes.Event:               (effect_onto.PumpRunningDry, event_weight),
+    CaseAttributes.Apparatus:           (equipment_onto.PumpCasing, apparatus_weight),
+    CaseAttributes.IntendedFunction:     process_onto.MaterialTransfer, intended_function_weight),
+    CaseAttributes.SubstancePhase:      (substance_onto.Liquid, phase_weight),
+    CaseAttributes.InferredDeviation:   [deviation_onto.HighTemperature,
+                                         deviation_onto.HighVibration]},
     
     {CaseAttributes.No: 2,
-    CaseAttributes.EquipmentEntity: (equipment_onto.PumpEntity, equipment_weight),
-    CaseAttributes.Event: (causes_onto.EntrainedAir, event_weight),
-    CaseAttributes.Apparatus: (equipment_onto.PumpCasing, apparatus_weight),
-    CaseAttributes.IntendedFunction: (process_onto.MaterialTransfer, intended_function_weight),
-    CaseAttributes.SubstancePhase: (substance_onto.Liquid, phase_weight),
-    CaseAttributes.InferredDeviation: [deviation_onto.NoFlow,
-    deviation_onto.LowFlow]},
+    CaseAttributes.EquipmentEntity:     (equipment_onto.PumpEntity, equipment_weight),
+    CaseAttributes.Event:               (causes_onto.EntrainedAir, event_weight),
+    CaseAttributes.Apparatus:           (equipment_onto.PumpCasing, apparatus_weight),
+    CaseAttributes.IntendedFunction:    (process_onto.MaterialTransfer, intended_function_weight),
+    CaseAttributes.SubstancePhase:      (substance_onto.Liquid, phase_weight),
+    CaseAttributes.InferredDeviation:   [deviation_onto.NoFlow,
+                                         deviation_onto.LowFlow]},
     
     {CaseAttributes.No: 3,
-    CaseAttributes.EquipmentEntity: (equipment_onto.StorageTankEntity, equipment_weight),
-    CaseAttributes.Event: (effect_onto.VolumetricDisplacement, event_weight),
-    CaseAttributes.Apparatus: (equipment_onto.AtmosphericStorageTank, apparatus_weight),
-    CaseAttributes.IntendedFunction: (process_onto.Storage, intended_function_weight),
-    CaseAttributes.SubstancePhase: (substance_onto.Multiphase, phase_weight),
-    CaseAttributes.InferredDeviation: [deviation_onto.HighPressure]},
+    CaseAttributes.EquipmentEntity:     (equipment_onto.StorageTankEntity, equipment_weight),
+    CaseAttributes.Event:               (effect_onto.VolumetricDisplacement, event_weight),
+    CaseAttributes.Apparatus:           (equipment_onto.AtmosphericStorageTank, apparatus_weight),
+    CaseAttributes.IntendedFunction:    (process_onto.Storage, intended_function_weight),
+    CaseAttributes.SubstancePhase:      (substance_onto.Multiphase, phase_weight),
+    CaseAttributes.InferredDeviation:   [deviation_onto.HighPressure]},
     
     {CaseAttributes.No: 4,
     CaseAttributes.EquipmentEntity: (equipment_onto.PumpEntity, equipment_weight),
@@ -2119,8 +2124,7 @@ def match_case_with_cb(current_case, case_base):
 
 
 
-""" Appendix E Ends """
-
+#%% Appendix G
 
 
 
@@ -2252,14 +2256,7 @@ class hasParameter(Deviation >> Parameter):
 
 
 
-
-
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Mar 12 16:10:27 2024
-
-@author: qrb15201
-"""
+#%% Appendix H
 
 # === Guideword ========================================
 class Guideword(Thing):
@@ -2368,7 +2365,7 @@ AllDisjoint([HighVibration, HighTemperature, HighCorrosion, LowTemperature, High
 
 
 
-
+#%% Appendix I
 
 # === HIGHER-LEVEL STRUCTURE
 class PlantItem(Thing):
@@ -2763,6 +2760,7 @@ class DeliverConstantVolumeFlow(IntendedFunction):
  pass
 
 
+#%% Appendix J
 
 class Substance(Thing):
  pass
@@ -3014,7 +3012,7 @@ class hasStateOfAggregation(Substance >> StateOfAggregation):
 
 
 
-
+#%% Appendix K
 
 
 class UtilityFailure(UnderlyingCause):
@@ -3382,6 +3380,9 @@ class WrongElectricSignal(causes_onto.UnderlyingCause):
  ))] 
  
  
+ 
+ 
+#%% Appendix L
 
 class ReducedFlowArea(Cause):
  equivalent_to = [Cause &
@@ -4279,7 +4280,7 @@ class IncorrectFilling(causes_onto.Cause):
 
 
 
-
+#%% Appendix M
 
 class BackContaminationOfSupply(Effect):
  equivalent_to = [Effect &
@@ -4952,7 +4953,7 @@ class AbnormalOperationCondition(effect_onto.Effect):
 
 
 
-
+#%% Appendix N
 
 class PumpBreakdown(Consequence):
  equivalent_to = [Consequence &
@@ -5220,7 +5221,7 @@ class ReductionOfCoolingCapacity(consequence_onto.Consequence):
 
 
 
-
+#%% Appendix O
 
 class Likelihood(Thing):
  pass
@@ -5649,7 +5650,7 @@ class D(RiskCategory):
 
 
 
-
+#%% Appendix P
 
 class AddCorrosionInhibitor(Safeguard):
  equivalent_to = [Safeguard &
@@ -6077,6 +6078,7 @@ class EmergencyStabilization(safeguard_onto.Safeguard):
 
 
 
+#%% Appendix Q
 
 def equipment_based_hazard_specific_deviation(deviation, args):
     # === Input
@@ -6802,6 +6804,12 @@ def propagation_based_hazard(devex, process_unit, substance, last_equipment_enti
                                          )
                 previous_case = current_case
 
+
+#TODO Appendix R is missing
+#TODO Appendix S is missing
+
+#%% Appendix W
+
 def create_process_plant_hexane_storage_tank():
     hazard_classes = [substance_onto.FlammableLiquidCategory2, substance_onto.SkinCorrosionIrritationCategory2,
                       substance_onto.ReproductiveToxicityCategory2, substance_onto.SpecificTargetOrganToxicityRepeatedExposureCategory2,
@@ -7106,6 +7114,7 @@ def create_olefin_feed_section():
 
 
 
+#%% Appendix C
 
 
 if __name__ == '__main__':
