@@ -75,16 +75,8 @@ def identify_single_line(out_in_ratios):
         
         return True # the sequence definitely matches the expected pattern.
     
-        # The code was previously as follows before Calum got his paws on it.
-        # if out_in_ratios[0] == 0 and out_in_ratios[-1] == 0:
-        #     for i in out_in_ratios[1:-1]:
-        #         if i != 1: return False
-                
-        #     return True # the sequence definitely matches the expected pattern
-        
-        # else:
-        #     return False
     else:
+        
         return True #TODO not sure! [1,1] would return True here.
 
 def identify_and_add_predecessors_to_list(graph, current_node, tmp_list):
@@ -171,10 +163,12 @@ def determine_recycles(graph):
         
         # I think the code below is simpler as
         # return not comparison and cycles # untested
-        if not comparison and cycles:
-            return True
-        else:
-            return False
+        # if not comparison and cycles:
+        #     return True
+        # else:
+        #     return False
+        
+        return not comparison and cycles
 
 def determine_cycle_intersections(list_of_cycles):
     
@@ -286,19 +280,14 @@ def replicate(graph, graph_type):
     ratios = calc_out_in_flow_ratio(graph)
     # single_line = identify_single_line(ratios)
     cycles = nx.simple_cycles(graph)
-    
     # recycle = determine_recycles(graph)
-    
     roots = list(v for v, d in graph.in_degree() if d == 0)
     leaves = list(v for v, d in graph.out_degree() if d == 0)
-
 
     new_graph = []
     
     match graph_type:
-        case GraphType.SingleLineSystem:
-            new_graph = list(graph.copy())
-
+        
         case GraphType.MultiCycleSystem:
             for cycle in cycles:
                 copy_of_graph = graph.copy()
@@ -311,7 +300,7 @@ def replicate(graph, graph_type):
                 new_graph.append(list(copy_of_graph))
 
         case GraphType.RecycleFlowSystem:
-            # === Tearing procedure in case of recycles #TODO Tearing is mentioned. 
+            # === Tearing procedure in case of recycles  
             # H = graph.copy()
             
             # === Calculate outflow - inflow ratio
@@ -431,9 +420,6 @@ def replicate(graph, graph_type):
                 
             new_graph = all_paths
 
-        case GraphType.SingleCycleSystem:
-            new_graph = list(graph.copy())
-
         case GraphType.ComplexSystem:
             all_paths = []
             
@@ -448,9 +434,48 @@ def replicate(graph, graph_type):
                 all_paths2.extend(paths)
                 
             new_graph = all_paths
-
+            
+        case _: # the default works for SingleLineSystem and SingleCycleSystem.
+            new_graph = list(graph.copy())
         
     return new_graph
+
+def getIntersectionNode(graph, graph_type):
+    """
+    In a MultiCycleSystem, find one node where different cycles intersect.
+
+    Parameters
+    ----------
+    graph : NetworkX.Graph
+        A directed Graph.
+    graph_type : GraphType
+        An Enum for the type of Graph structure.
+
+    Returns
+    -------
+    intersection_node : NetworkX.Graph.Node
+        A node which forms a part of more than one cycle within the Graph.
+
+    """
+    
+    if graph_type != GraphType.MultiCycleSystem: return None
+        
+    # === Cycle detection
+    cycles = nx.simple_cycles(graph)
+    cycles = list(cycles)
+
+    list_of_cycles = {}
+    # Loop over cycles and assign a letter to each cycle (unambiguous identification)
+    for idx, cycle in enumerate(cycles):
+        list_of_cycles.update({ascii_lowercase[idx]: cycle})
+        
+    # === Determine intersections between cycles
+    intersections = determine_cycle_intersections(list_of_cycles)
+    intersection_node = intersections[0]["intersection"]
+    if len(intersection_node) == 1:
+        intersection_node = intersection_node[0]
+        
+    return intersection_node
 
 
 def determine_propagation_strategy(graph):
@@ -473,6 +498,8 @@ def determine_propagation_strategy(graph):
         GraphType.MultiCycleSystem.
 
     """
+    
+    assert False, 'This method has now been deprecated, but is being called.'
     
     new_graph = []
     type_of_graph = None
@@ -503,6 +530,7 @@ def determine_propagation_strategy(graph):
         # Loop over cycles and assign a letter to each cycle (unambiguous identification)
         for idx, cycle in enumerate(cycles):
             list_of_cycles.update({ascii_lowercase[idx]: cycle})
+            
         # === Determine intersections between cycles
         intersections = go.determine_cycle_intersections(list_of_cycles)
         intersection_node = intersections[0]["intersection"]
@@ -529,7 +557,7 @@ def determine_propagation_strategy(graph):
     
     elif (recycle or cycles) and len(leaves) == 1:
         
-        # === Tearing procedure in case of recycles #TODO Tearing is mentioned. 
+        # === Tearing procedure in case of recycles. 
         H = graph.copy()
         
         # === Calculate outflow - inflow ratio
@@ -7867,10 +7895,13 @@ if __name__ == '__main__':
     
     # === Tearing strategy/strategy for defining order of process equipment/start-end point
     if len(process_plant_model.nodes) > 1:
+        
+        # The following single method is now subdivided into 3 for clarity.
         # graph_type, newly_arranged_graphs, intersections = algorithm.determine_propagation_strategy(process_plant_model)
         graph_type = findTypeOf(process_plant_model)
         newly_arranged_graphs = replicate(process_plant_model, graph_type)
-        intersections = None #TODO A consequence of the refactoring.
+        intersections = getIntersectionNode(process_plant_model, graph_type)
+        
         print(list(newly_arranged_graphs))
 
     if config.EQUIPMENT_BASED_EVALUATION:
