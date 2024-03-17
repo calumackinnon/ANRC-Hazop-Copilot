@@ -19,7 +19,7 @@ It is to do with p 118 in the dissertation.
 # from enum import Enum
 from owlready2 import *
 import itertools
-
+import unittest
 
 
 #%% Appendix R
@@ -361,8 +361,8 @@ def determine_propagation_strategy(graph):
 
 #%% Appendix S
 
-'''
-class TestUnderlyingCauses(unittest.TestCase):  #TODO 'unittest' not defined.
+
+class TestUnderlyingCauses(unittest.TestCase):
     
     def test_solar_radiation_1(self):
         cause = causes_onto.AbnormalHeatInput()
@@ -388,7 +388,7 @@ class TestUnderlyingCauses(unittest.TestCase):  #TODO 'unittest' not defined.
         time.sleep(0.01)
         self.assertEqual(super_cause_, ['BlockedPipingAndHeatInput'],
                          "Should be ['BlockedPipingAndHeatInput']")
-''' 
+
 
 #%% Appendix A
 
