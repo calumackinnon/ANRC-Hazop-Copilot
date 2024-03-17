@@ -8,13 +8,14 @@ The idea is just to see if this can allow method name errors to be resolved.
 
 PS this looks useful: https://towardsdatascience.com/graphs-with-python-overview-and-best-libraries-a92aa485c2f8
 
-Presently fixing a bug at the first #TODO, I believe it is to do with NetworkX.
-Could it be this? https://sdopt-tearing.readthedocs.io/en/latest/
-It is to do with p 118 in the dissertation.
 
 Generally speaking, this code has to be trusted to do what it says on the tin, 
 but it is opaque and not structured in a readable manner. Many of the functions
 could be subdivided and commented. It appears some global variables are in use.
+
+Presently fixing a bug at from tearing import ... as go, I believe it is to do 
+with NetworkX. Is it this? https://sdopt-tearing.readthedocs.io/en/latest/
+It is to do with p 118 in the dissertation.
 
 @author: qrb15201 Calum Mackinnon
 """
@@ -25,13 +26,13 @@ from owlready2 import *
 import itertools
 import unittest
 
-equipment_onto = None
+# equipment_onto = None #TODO Is this a global variable?
 
 
-#%% Appendix R - Graph Manipulation
+#%% Appendix R - Graph Manipulation # Tearing
 
 import networkx as nx
-from tearing import graph_operations as go #TODO Is this tensorflow?
+# from tearing import graph_operations as go # Is this tensorflow?
 from string import ascii_lowercase 
 from enum import Enum
 
@@ -41,7 +42,9 @@ class GraphType(Enum):
     RecycleFlowSystem = 2
     JunctionSystem = 3
     BranchSystem = 4
-    SingleCycleSystem = 6
+    JunctionSystemRatiosAllZero = 5 # This has been created in response to
+    # the structure of the code in the determine_propagation_strategy() method.
+    SingleCycleSystem = 6 
     ComplexSystem = 7
  
 # === Function to identify ratio pattern [0, 1, .., 1, 0]
@@ -93,7 +96,6 @@ def identify_and_add_predecessors_to_list(graph, current_node, tmp_list):
             current_node = tmp_predecessor
         except IndexError:
             end_reached = True
-    return
 
 def identify_and_add_successors_to_list(graph, current_node, tmp_list):
 
@@ -107,12 +109,25 @@ def identify_and_add_successors_to_list(graph, current_node, tmp_list):
         except IndexError:
             end_reached = True
             
-    return
-
-def my_max(e):
-    return max(e)
+    
+def my_max(e):  return max(e)
 
 def calc_out_in_flow_ratio(graph):
+    """
+    Evaluate the Graph structure in terms of output/input edges for each node.
+
+    Parameters
+    ----------
+    graph : NetworkX.Graph
+        A directed Graph.
+
+    Returns
+    -------
+    node_out_in_ratio : list[float]
+        A list of the same length as the numver of nodes in the Graph. It has a
+        ratio of output / input edges for each node.
+
+    """
     
     node_out_in_ratio = []
     
@@ -121,7 +136,7 @@ def calc_out_in_flow_ratio(graph):
         upstream = list(graph.predecessors(g))
         downstream = list(graph.successors(g))
         
-        if len(upstream) == 0:
+        if len(upstream) == 0: # if the first // do not divide by zero
             node_out_in_ratio.append(0)
         else:
             ratio = len(downstream) / len(upstream)
@@ -146,7 +161,7 @@ def determine_recycles(graph):
     ratios = calc_out_in_flow_ratio(graph)
     
     if all(p == 0 or p == 1 for p in ratios):
-        return False
+        return False #TODO not sure! 3 / 3 = 1, so some cycles can still exist.
     else:
         cycles = nx.simple_cycles(graph)
         cycles = list(cycles)
@@ -179,7 +194,285 @@ def check_equality_of_list(lst):
     return not lst or lst.count(lst[0]) == len(lst) 
 
 
+def findTypeOf(graph):
+    """
+    Evaluate a Graph's structure in order to help pick a propagation strategy.
+
+    Parameters
+    ----------
+    graph : NetworkX.Graph
+        A Graph as defined by NetworkX.
+
+    Returns
+    -------
+    GraphType
+        An Enum which describes the Graph structure.
+
+    """
+    
+    assert isinstance(graph, nx.Digraph), 'Not a directed graph as anticipated'
+    
+    ratios = calc_out_in_flow_ratio(graph)
+    single_line = identify_single_line(ratios)
+    cycles = nx.simple_cycles(graph)
+    
+    recycle = determine_recycles(graph)
+    
+    roots = list(v for v, d in graph.in_degree() if d == 0)
+    leaves = list(v for v, d in graph.out_degree() if d == 0)
+
+    
+    if len(cycles) > 1 and isinstance(cycles[0], list):
+        return GraphType.MultiCycleSystem
+    
+    elif cycles and not recycle and not single_line:
+        return GraphType.SingleCycleSystem
+    
+    elif (recycle or cycles) and len(leaves) == 1:
+        return GraphType.RecycleFlowSystem
+    
+    elif not cycles and not recycle and single_line:
+        return GraphType.SingleLineSystem
+    
+    else:
+    
+        # Check in case all ratios are zero
+        if not all(v == 0 for v in ratios): # if some ratios are not zero
+            return GraphType.JunctionSystem
+        
+        else: # all ratios are zero
+        
+            # === identify minimum ratio
+            min_ratio = min(i for i in ratios if i > 0)
+            
+            # === get position of minimum ratio
+            pos_min_elements = [i for i, x in enumerate(ratios) if x == min_ratio]
+            
+            # === check for cycles
+            cycles = list(nx.simple_cycles(graph))
+
+            if len(pos_min_elements) == 1 and \
+                min_ratio <= 0.5 and len(cycles) == 0 and len(roots) == 1:
+                return GraphType.JunctionSystem    
+        
+            elif len(leaves) > 1 and len(cycles) == 0 and len(roots) == 1: 
+                return GraphType.BranchSystem
+            
+            else:
+                return GraphType.ComplexSystem
+    
+    
+def replicate(graph, graph_type):
+    """
+    Create a replica of the Graph according to its type.
+
+    Parameters
+    ----------
+    graph : NetworkX.Graph
+        A Graph.
+    graph_type : GraphType
+        An Enum to specify the structure of the Graph.
+
+    Returns
+    -------
+    new_graph : list
+        A copy of the graph structured as a list.
+
+    """
+    
+    
+    assert isinstance(graph, nx.Digraph), 'Not a directed graph as anticipated'
+    
+    ratios = calc_out_in_flow_ratio(graph)
+    # single_line = identify_single_line(ratios)
+    cycles = nx.simple_cycles(graph)
+    
+    # recycle = determine_recycles(graph)
+    
+    roots = list(v for v, d in graph.in_degree() if d == 0)
+    leaves = list(v for v, d in graph.out_degree() if d == 0)
+
+
+    new_graph = []
+    
+    match graph_type:
+        case GraphType.SingleLineSystem:
+            new_graph = list(graph.copy())
+
+        case GraphType.MultiCycleSystem:
+            for cycle in cycles:
+                copy_of_graph = graph.copy()
+                for node in graph.nodes:
+                    if node not in cycle:
+                        copy_of_graph.remove_node(node)
+                        
+                for current, next in zip(cycle, cycle[1:]):
+                    copy_of_graph.add_edge(current, next)
+                new_graph.append(list(copy_of_graph))
+
+        case GraphType.RecycleFlowSystem:
+            # === Tearing procedure in case of recycles #TODO Tearing is mentioned. 
+            # H = graph.copy()
+            
+            # === Calculate outflow - inflow ratio
+            # ratios = go.calc_out_in_flow_ratio(H)
+            
+            # === Evaluate max ratio, position and node
+            max_ratio = max(ratios)
+            max_ratio_node_pos = ratios.index(max_ratio)
+            successors_of_branch = list(graph.successors(max_ratio_node_pos))
+            
+            
+            # === consider first path until diverging node
+            global_list = []
+            node_list = []
+            for node in range(max_ratio_node_pos+1):
+                node_list.append(node)
+            global_list.append(node_list)
+            
+            # === detect nodes that form the recycle
+            successor_streams = []
+            
+            for successor in successors_of_branch:
+                node_list = [max_ratio_node_pos, successor]
+                end_reached = False
+                current_node = successor
+                
+                # === identify all paths after diverging node
+                while not end_reached:
+                    try:
+                        next_successor = list(graph.successors(current_node))[0]
+                        node_list.append(next_successor)
+                        
+                        # === back at diverging node (indicated by maximum ratio)
+                        if next_successor == max_ratio_node_pos:
+                            end_reached = True
+                        else:
+                            current_node = next_successor
+                    except IndexError:
+                        end_reached = True
+                successor_streams.append(node_list)
+            
+            # sort nodes according to numbers (nodes with highest numbers last)
+            successor_streams.sort(key=my_max)
+            
+            # Very first list are nodes from first to diverging node
+            new_graph = global_list + successor_streams
+
+        case GraphType.JunctionSystem:
+            # In determine_propagation_strategy(), there are two sections of 
+            # code which create a new_graph for the GraphType.JunctionSystem
+            # case, so I am creating a new value in the GraphType Enum.
+            
+            num_inflow_nodes = []
+            # search for nodes with max inflow streams
+            for g in graph.nodes:
+                upstream = list(graph.predecessors(g))
+                num_inflow_nodes.append(len(upstream))
+                
+            m = max(num_inflow_nodes)
+            max_pos = [i for i, j in enumerate(num_inflow_nodes) if j == m][0]
+            upstream_nodes_of_max_pos = list(graph.predecessors(max_pos))
+            
+            # === The intention is to identify all streams that lead into the junction
+            global_list = []
+            for node in upstream_nodes_of_max_pos:
+                tmp_list = list(nx.ancestors(graph, list(graph.nodes)[node]))
+                tmp_list.append(node) # Append first node before max pos node
+                tmp_list.append(max_pos) # append max pos node
+                global_list.append(tmp_list)
+                
+            # === Consider successors of merged node
+            downstream_line = list(nx.descendants(graph, list(graph.nodes)[max_pos]))
+            if downstream_line:
+                downstream_line = [list(graph.nodes)[max_pos]] + downstream_line
+                global_list.append(downstream_line)
+                
+            # assemble new structure
+            new_graph = global_list
+            
+        case GraphType.JunctionSystemRatiosAllZero: # Newly created
+        
+            # === identify minimum ratio
+            min_ratio = min(i for i in ratios if i > 0)
+
+            node_list = list(graph.nodes)
+            min_ratio_node_pos = ratios.index(min_ratio)
+            min_ratio_node = node_list[min_ratio_node_pos]
+            upstream_nodes_of_min_ratio = list(graph.predecessors(min_ratio_node))
+            
+            # === The intention is to identify all streams that lead into the junction
+            global_list = []
+            for node in upstream_nodes_of_min_ratio:
+                tmp_list = [node]
+                current_node = node
+                identify_and_add_predecessors_to_list(graph, current_node, tmp_list)
+                
+                # === rearrange global list
+                tmp_list.insert(0, min_ratio_node)
+                tmp_list.reverse()
+                global_list.append(tmp_list)
+            
+            # === Search for successors of min ratio node, to find final propagation route
+            tmp_list = [min_ratio_node]
+            current_node = min_ratio_node
+            identify_and_add_successors_to_list(graph, current_node, tmp_list)
+            
+            # === Sort results
+            global_list.append(tmp_list)
+            new_graph = global_list
+
+        case GraphType.BranchSystem:
+            all_paths = []
+            
+            for root in roots:
+                paths = nx.all_simple_paths(graph, root, leaves)
+                all_paths.extend(paths)
+                
+            new_graph = all_paths
+
+        case GraphType.SingleCycleSystem:
+            new_graph = list(graph.copy())
+
+        case GraphType.ComplexSystem:
+            all_paths = []
+            
+            for root in roots:
+                for leaf in leaves:
+                    paths = nx.all_simple_paths(graph, root, leaf)
+                    all_paths.extend(paths)
+                    
+            all_paths2 = []
+            for root in roots:
+                paths = nx.all_simple_paths(graph, root, leaves)
+                all_paths2.extend(paths)
+                
+            new_graph = all_paths
+
+        
+    return new_graph
+
+
 def determine_propagation_strategy(graph):
+    """
+    To be deprecated & replaced by findTypeOf(graph) and replicate(graph).
+
+    Parameters
+    ----------
+    graph : NetworkX.Graph
+        A Graph for use with the NetworkX package.
+
+    Returns
+    -------
+    type_of_graph : Enum
+        GraphType set to a value in {0,1,2,3,4,6,7}.
+    new_graph : list
+        A list representing the graph in some new manner I'm not yet sure of.
+    intersection_node : TYPE
+        The node(s) at which cycles intersect. Only applies to 
+        GraphType.MultiCycleSystem.
+
+    """
     
     new_graph = []
     type_of_graph = None
@@ -205,12 +498,11 @@ def determine_propagation_strategy(graph):
     leaves = list(v for v, d in graph.out_degree() if d == 0)
     
     if len(cycles) > 1 and isinstance(cycles[0], list): # check dimensions
+    
         list_of_cycles = {}
-        
         # Loop over cycles and assign a letter to each cycle (unambiguous identification)
         for idx, cycle in enumerate(cycles):
             list_of_cycles.update({ascii_lowercase[idx]: cycle})
-            
         # === Determine intersections between cycles
         intersections = go.determine_cycle_intersections(list_of_cycles)
         intersection_node = intersections[0]["intersection"]
@@ -247,14 +539,13 @@ def determine_propagation_strategy(graph):
         max_ratio = max(ratios)
         max_ratio_node_pos = ratios.index(max_ratio)
         successors_of_branch = list(graph.successors(max_ratio_node_pos))
-        global_list = []
+        
         
         # === consider first path until diverging node
+        global_list = []
         node_list = []
-        
         for node in range(max_ratio_node_pos+1):
             node_list.append(node)
-            
         global_list.append(node_list)
         
         # === detect nodes that form the recycle
@@ -293,7 +584,7 @@ def determine_propagation_strategy(graph):
     
     else:
         # Check in case all ratios are zero
-        if not all(v == 0 for v in ratios):
+        if not all(v == 0 for v in ratios): # if some ratios are not zero
             num_inflow_nodes = []
             # search for nodes with max inflow streams
             for g in graph.nodes:
@@ -325,7 +616,7 @@ def determine_propagation_strategy(graph):
     
         # Idea: in a junction system there is just 1 element where >2 nodes enter and 1 exits
         # this means, just one element has the lowest ratios
-        else:
+        else: # all ratios are zero
             
             # === identify minimum ratio
             min_ratio = min(i for i in ratios if i > 0)
@@ -339,7 +630,8 @@ def determine_propagation_strategy(graph):
             # === in case a cycle is detected the plant section is more complex and requires another strategy
             if len(pos_min_elements) == 1 and \
                 min_ratio <= 0.5 and len(cycles) == 0 and len(roots) == 1:
-                type_of_graph = GraphType.JunctionSystem
+                    
+                type_of_graph = GraphType.JunctionSystemRatiosAllZero
                 node_list = list(graph.nodes)
                 min_ratio_node_pos = ratios.index(min_ratio)
                 min_ratio_node = node_list[min_ratio_node_pos]
@@ -7227,7 +7519,7 @@ def propagation_based_hazard(devex, process_unit, substance, last_equipment_enti
                 previous_case = current_case
 
 
-#%% Appendix W - Specific case studies
+#%% Appendix W - Specific Case Studies
 
 def create_process_plant_hexane_storage_tank():
     """
@@ -7560,129 +7852,132 @@ def create_olefin_feed_section():
 
 if __name__ == '__main__':
     
-	# === save all ontologies
-	ontology_operations.save_ontology()
-	ontology_operations.save_ontology_as_sql()
-	upper_onto.determine_onto()
-
-	start_time = time.time()
+    # === save all ontologies
+    ontology_operations.save_ontology()
+    ontology_operations.save_ontology_as_sql()
+    upper_onto.determine_onto()
     
-	# === Process model
-	process_plant_model = model.create_hazid_benchmark_1()
-	
-	deviation_number = None
-	stack_elements = []
-	
-	# === Tearing strategy/strategy for defining order of process equipment/start-end point
-	if len(process_plant_model.nodes) > 1:
-		graph_type, newly_arranged_graphs, intersections = algorithm.determine_propagation_strategy(process_plant_model)
-		print(list(newly_arranged_graphs))
+    start_time = time.time()
+    
+    # === Process model
+    process_plant_model = model.create_hazid_benchmark_1()
+    
+    deviation_number = None
+    stack_elements = []
+    
+    # === Tearing strategy/strategy for defining order of process equipment/start-end point
+    if len(process_plant_model.nodes) > 1:
+        # graph_type, newly_arranged_graphs, intersections = algorithm.determine_propagation_strategy(process_plant_model)
+        graph_type = findTypeOf(process_plant_model)
+        newly_arranged_graphs = replicate(process_plant_model, graph_type)
+        intersections = None #TODO A consequence of the refactoring.
+        print(list(newly_arranged_graphs))
 
-	if config.EQUIPMENT_BASED_EVALUATION:
+    if config.EQUIPMENT_BASED_EVALUATION:
         
-		for index in range(len(process_plant_model.nodes)):
-			equipment_specific_prop_scenarios = []
-			
-			equipment_entity = process_plant_model.nodes[index]["data"]
+        for index in range(len(process_plant_model.nodes)):
+            equipment_specific_prop_scenarios = []
             
-			# Add port information to equipment entity
-			for key, value in process_plant_model.nodes[index]["ports"].items():
-				equipment_entity.onto_object.hasPort.append(value.onto_object)
+            equipment_entity = process_plant_model.nodes[index]["data"]
+            
+            # Add port information to equipment entity
+            for key, value in process_plant_model.nodes[index]["ports"].items():
+                equipment_entity.onto_object.hasPort.append(value.onto_object)
                 
-				# Add port information to equipment entity
-				if value.port_instrumentation:
-					equipment_entity.onto_object.hasInstrumentation.append(value.port_instrumentation)
-			
-			process_unit_obj = equipment_entity.onto_object.is_a[0]
-			
-			# === continue in case of source and sink, since they are not relevant in
-			# equipment-based mode to save reasoner calls
-			if process_unit_obj == equipment_onto.SinkEntity:
-				continue
-			
-			substances = process_plant_model.nodes[index]["substances"]
-			environment = process_plant_model.nodes[index]["environment"]
-			deviations = config.deviation_selector(process_unit_obj)
-			
-			# === Infer hazards
-			infer.equipment_based_analysis( equipment_entity,
-											deviations,
-											substances,
-											environment,
-											equipment_specific_prop_scenarios )
-			
-			stack_elements.append({"{0}".format(equipment_entity.name): equipment_entity,
-									pre_processing.DictName.scenario: equipment_specific_prop_scenarios})
-
-	# === Entry point for hazard/malfunction propagation
-	if config.PROPAGATION_BASED_EVALUATION:
-        
-		if graph_type == algorithm.GraphType.SingleLineSystem:
-			infer.propagation_based_analysis(process_plant_model, newly_arranged_graphs, stack_elements)
-		
-		elif graph_type == algorithm.GraphType.MultiCycleSystem:
+                # Add port information to equipment entity
+                if value.port_instrumentation:
+                    equipment_entity.onto_object.hasInstrumentation.append(value.port_instrumentation)
+                    
+            process_unit_obj = equipment_entity.onto_object.is_a[0]
             
-			for index, cycle in enumerate(newly_arranged_graphs):
-				# intersection of cycles
-				intersection_node_index = cycle.index(intersections)
-				
-				# start first cycle one node after intersection and following nodes at intersection
-				if index == 0:
-					intersection_node_index += 1
+            # === continue in case of source and sink, since they are not relevant in
+            # equipment-based mode to save reasoner calls
+            if process_unit_obj == equipment_onto.SinkEntity:
+                continue
+            
+            substances = process_plant_model.nodes[index]["substances"]
+            environment = process_plant_model.nodes[index]["environment"]
+            deviations = config.deviation_selector(process_unit_obj)
+            
+            # === Infer hazards
+            infer.equipment_based_analysis( equipment_entity,
+                                            deviations,
+                                            substances,
+                                            environment,
+                                            equipment_specific_prop_scenarios )
+    
+            stack_elements.append({"{0}".format(equipment_entity.name): equipment_entity,
+                                   pre_processing.DictName.scenario: equipment_specific_prop_scenarios})
 
-				# === Change order of graph [intersection + 1] as starting node
-				new_order = []
-				for node in go.starting_with(cycle, intersection_node_index):
-					new_order.append(node)
-				
-				infer.propagation_based_analysis(process_plant_model,
-												new_order,
-												stack_elements)
-		
-		elif graph_type == algorithm.GraphType.JunctionSystem or \
-				graph_type == algorithm.GraphType.ComplexSystem or \
-				graph_type == algorithm.GraphType.RecycleFlowSystem:
-			for stream in newly_arranged_graphs:
-				infer.propagation_based_analysis(process_plant_model, stream, stack_elements)
-		else:
-			print("Case not covered by any strategy!")
+    # === Entry point for hazard/malfunction propagation
+    if config.PROPAGATION_BASED_EVALUATION:
+        
+        if graph_type == algorithm.GraphType.SingleLineSystem:
+            infer.propagation_based_analysis(process_plant_model, newly_arranged_graphs, stack_elements)
+            
+        elif graph_type == algorithm.GraphType.MultiCycleSystem:
+            
+            for index, cycle in enumerate(newly_arranged_graphs):
+                # intersection of cycles
+                intersection_node_index = cycle.index(intersections)
+    
+                # start first cycle one node after intersection and following nodes at intersection
+                if index == 0:
+                    intersection_node_index += 1
 
-	# === remove duplicates and sort results table
-	results = pre_processing.cleanup_result_list(results)
-	results = sorted(results, key=lambda k: k["process_equipment_id"])
+                # === Change order of graph [intersection + 1] as starting node
+                new_order = []
+                for node in go.starting_with(cycle, intersection_node_index):
+                    new_order.append(node)
+    
+                infer.propagation_based_analysis(process_plant_model,
+                                                 new_order,
+                                                 stack_elements)
+    
+        elif graph_type == algorithm.GraphType.JunctionSystem or \
+                graph_type == algorithm.GraphType.ComplexSystem or \
+                graph_type == algorithm.GraphType.RecycleFlowSystem:
+            for stream in newly_arranged_graphs:
+                infer.propagation_based_analysis(process_plant_model, stream, stack_elements)
+        else:
+            print("Case not covered by any strategy!")
 
-	# === Hazop table
-	if results:
-		counter = 0
-		for row in results:
-			if row["cause"] or row["effect"] or row["consequence"]:
-				output.hazop_table.add_row([counter,
-											row["process_equipment"],
-											row["process_equipment_id"],
-											', '.join(row["operation_mode"]),
-											row["substance"],
-											', '.join(row["deviation"]),
-											', '.join(row["super_cause"]),
-											', '.join(row["cause"]),
-											', '.join(row["effect"]),
-											', '.join(row["consequence"]),
-											', '.join(row["safeguard"]),
-											row["propagated"],
-											', '.join(row["risk"]),
-											])
-			counter += 1
-	
-	print(output.hazop_table)
-	
-	output.create_output()
-	
-	elapsed_time = time.time() - start_time
-	print(elapsed_time)
-	
-	ontology_operations.save_ontology()
+    # === remove duplicates and sort results table
+    results = pre_processing.cleanup_result_list(results)
+    results = sorted(results, key=lambda k: k["process_equipment_id"])
 
-	# === Get errors
-	print(list(default_world.inconsistent_classes()))
+    # === Hazop table
+    if results:
+        counter = 0
+        for row in results:
+            if row["cause"] or row["effect"] or row["consequence"]:
+                output.hazop_table.add_row([counter,
+                                            row["process_equipment"],
+                                            row["process_equipment_id"],
+                                            ', '.join(row["operation_mode"]),
+                                            row["substance"],
+                                            ', '.join(row["deviation"]),
+                                            ', '.join(row["super_cause"]),
+                                            ', '.join(row["cause"]),
+                                            ', '.join(row["effect"]),
+                                            ', '.join(row["consequence"]),
+                                            ', '.join(row["safeguard"]),
+                                            row["propagated"],
+                                            ', '.join(row["risk"]),
+                                            ])
+            counter += 1
+            
+    print(output.hazop_table)
+
+    output.create_output()
+    
+    elapsed_time = time.time() - start_time
+    print(elapsed_time)
+
+    ontology_operations.save_ontology()
+
+    # === Get errors
+    print(list(default_world.inconsistent_classes()))
     
     
         
