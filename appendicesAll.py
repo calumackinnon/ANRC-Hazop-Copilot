@@ -12,6 +12,10 @@ Presently fixing a bug at the first #TODO, I believe it is to do with NetworkX.
 Could it be this? https://sdopt-tearing.readthedocs.io/en/latest/
 It is to do with p 118 in the dissertation.
 
+Generally speaking, this code has to be trusted to do what it says on the tin, 
+but it is opaque and not structured in a readable manner. Many of the functions
+could be subdivided and commented. It appears some global variables are in use.
+
 @author: qrb15201 Calum Mackinnon
 """
 
@@ -21,8 +25,10 @@ from owlready2 import *
 import itertools
 import unittest
 
+equipment_onto = None
 
-#%% Appendix R
+
+#%% Appendix R - Graph Manipulation
 
 import networkx as nx
 from tearing import graph_operations as go #TODO Is this tensorflow?
@@ -40,19 +46,43 @@ class GraphType(Enum):
  
 # === Function to identify ratio pattern [0, 1, .., 1, 0]
 def identify_single_line(out_in_ratios):
-    if isinstance(out_in_ratios, list):
-        if len(out_in_ratios) > 2:
-            if out_in_ratios[0] == 0 and out_in_ratios[-1] == 0:
-                for i in out_in_ratios[1:-1]:
-                    if i == 1:
-                        continue
-                    else:
-                        return False
-                return True
-            else:
-                return False
-        else:
-            return True
+    """
+    Check if a list of 1s and 0s takes the form [0,1,1,...,1,1,0] nomatter its
+    overall length.
+
+    Parameters
+    ----------
+    out_in_ratios : list
+        A list of 0 and 1 digits.
+
+    Returns
+    -------
+    boolean
+        Whether or not the out_in_ratios matches the expected pattern.
+
+    """
+    if not isinstance(out_in_ratios, list): return False
+    
+    if len(out_in_ratios) > 2:
+        
+        if out_in_ratios[0] != 0 or out_in_ratios[-1] != 0: return False
+        
+        for i in out_in_ratios[1:-1]:
+            if i!=1: return False
+        
+        return True # the sequence definitely matches the expected pattern.
+    
+        # The code was previously as follows before Calum got his paws on it.
+        # if out_in_ratios[0] == 0 and out_in_ratios[-1] == 0:
+        #     for i in out_in_ratios[1:-1]:
+        #         if i != 1: return False
+                
+        #     return True # the sequence definitely matches the expected pattern
+        
+        # else:
+        #     return False
+    else:
+        return True #TODO not sure! [1,1] would return True here.
 
 def identify_and_add_predecessors_to_list(graph, current_node, tmp_list):
     end_reached = False
@@ -136,6 +166,7 @@ def determine_cycle_intersections(list_of_cycles):
     list_of_intersections = []
     
     for a, b in itertools.combinations(list_of_cycles, 2):
+        
         # find intersections
         intersection = list(set(list_of_cycles.get(a)).intersection(list_of_cycles.get(b)))
         list_of_intersections.append({"cycles": [a, b], "intersection": intersection})
@@ -153,19 +184,21 @@ def determine_propagation_strategy(graph):
     new_graph = []
     type_of_graph = None
     intersection_node = None
+    
     # === Cycle detection
     cycles = nx.simple_cycles(graph)
     cycles = list(cycles)
     
     # === Determine recycle streams
     recycle = go.determine_recycles(graph)
+    
     # === Calculate outflow - inflow ratio
     ratios = go.calc_out_in_flow_ratio(graph)
     
     # === Identify single line pattern
     single_line = identify_single_line(ratios)
+    
     # === identify roots and potential leaves === see documentation:
-        
     # https://networkx.org/documentation/stable/reference/algorithms/generated/networkx.algorithms
     # .simple_paths.all_simple_paths.html
     roots = list(v for v, d in graph.in_degree() if d == 0)
@@ -173,6 +206,7 @@ def determine_propagation_strategy(graph):
     
     if len(cycles) > 1 and isinstance(cycles[0], list): # check dimensions
         list_of_cycles = {}
+        
         # Loop over cycles and assign a letter to each cycle (unambiguous identification)
         for idx, cycle in enumerate(cycles):
             list_of_cycles.update({ascii_lowercase[idx]: cycle})
@@ -202,7 +236,8 @@ def determine_propagation_strategy(graph):
         type_of_graph = GraphType.SingleCycleSystem
     
     elif (recycle or cycles) and len(leaves) == 1:
-        # === Tearing procedure in case of recycles
+        
+        # === Tearing procedure in case of recycles #TODO Tearing is mentioned. 
         H = graph.copy()
         
         # === Calculate outflow - inflow ratio
@@ -359,7 +394,7 @@ def determine_propagation_strategy(graph):
         
     return type_of_graph, new_graph, intersection_node 
 
-#%% Appendix S
+#%% Appendix S - Unit Tests
 
 
 class TestUnderlyingCauses(unittest.TestCase):
@@ -390,7 +425,7 @@ class TestUnderlyingCauses(unittest.TestCase):
                          "Should be ['BlockedPipingAndHeatInput']")
 
 
-#%% Appendix A
+#%% Appendix A - Equipment and Port Classes
 
 class MyPort:
     
@@ -514,18 +549,18 @@ class MyEquipmentEntity:
         self.max_operating_pressure_in_barg = max_operating_pressure 
         
         
-#%% Appendix B
+#%% Appendix B - Substance Class
 
 class MySubstance:
     
-    def __init__(self,
-        substance_name,
-        cas_number,
-        freezing_point,
-        boiling_point,
-        flash_point,
-        lower_explosion_limit,
-        upper_explosion_limit):
+    def __init__(   self,
+                    substance_name,
+                    cas_number,
+                    freezing_point,
+                    boiling_point,
+                    flash_point,
+                    lower_explosion_limit,
+                    upper_explosion_limit):
         
         self.name = substance_name
         self.cas_number = cas_number
@@ -541,7 +576,6 @@ class MySubstance:
         self.stability_reactivity_information = []
     
     def add_hazard_class(self, hazard_class):
-        
         if hazard_class:
             for haz_c in hazard_class:
                 self.hazard_class.append(haz_c(None))
@@ -2379,6 +2413,7 @@ propagation_case_base = [
      CaseAttributes.IntendedFunction: (None, intended_function_weight),
      CaseAttributes.SubstancePhase: (None, phase_weight),
      CaseAttributes.InferredDeviation: [deviation_onto.OtherThanComposition]},
+    
     # === Settling tank
     {CaseAttributes.No: 176,
      CaseAttributes.EquipmentEntity: (None, equipment_weight),
@@ -2453,29 +2488,32 @@ def calculate_similarity(new_case, old_case):
     if new_case is None or old_case is None:
         print("Similarity could not be calculated because of None")
         return 0
-    else:
-        attr_list = [   CaseAttributes.EquipmentEntity,
-                        CaseAttributes.Event,
-                        CaseAttributes.Apparatus,
-                        CaseAttributes.IntendedFunction,
-                        CaseAttributes.SubstancePhase
-                    ]
-        similarities = []
-        weights = []
-        sum_of_weights = 0
-        for attr in attr_list:
-            if old_case.get(attr)[0]:
-                similarities.append(similar(new_case.get(attr), old_case.get(attr)[0]))
-            else:
-                similarities.append(0)
-                weights.append(old_case.get(attr)[1])
-                sum_of_weights += old_case.get(attr)[1]
-        similarity_products = [a * b for a, b in zip(similarities, weights)]
-        sum_ = sum(similarity_products)
-        # Overall similarity
-        similarity = 1 / sum_of_weights * sum_
+    # else:
         
-        return similarity
+    attr_list = [   CaseAttributes.EquipmentEntity,
+                    CaseAttributes.Event,
+                    CaseAttributes.Apparatus,
+                    CaseAttributes.IntendedFunction,
+                    CaseAttributes.SubstancePhase
+                ]
+    similarities = []
+    weights = []
+    sum_of_weights = 0
+    
+    for attr in attr_list:
+        if old_case.get(attr)[0]:
+            similarities.append(similar(new_case.get(attr), old_case.get(attr)[0]))
+        else:
+            similarities.append(0)
+            weights.append(old_case.get(attr)[1])
+            sum_of_weights += old_case.get(attr)[1]
+    similarity_products = [a * b for a, b in zip(similarities, weights)]
+    sum_ = sum(similarity_products)
+    
+    # Overall similarity
+    similarity = 1 / sum_of_weights * sum_
+    
+    return similarity
 
 def match_case_with_cb(current_case, case_base):
     list_similarities = []
@@ -2497,7 +2535,7 @@ def match_case_with_cb(current_case, case_base):
 
 
 
-#%% Appendix G
+#%% Appendix G - Ontology for Causes
 
 
 
@@ -2629,7 +2667,7 @@ class hasParameter(Deviation >> Parameter):
 
 
 
-#%% Appendix H
+#%% Appendix H - Ontology for Deviations
 
 # === Guideword ========================================
 class Guideword(Thing):
@@ -2738,7 +2776,7 @@ AllDisjoint([HighVibration, HighTemperature, HighCorrosion, LowTemperature, High
 
 
 
-#%% Appendix I
+#%% Appendix I - Ontology for Equipment
 
 # === HIGHER-LEVEL STRUCTURE
 class PlantItem(Thing):
@@ -3133,7 +3171,7 @@ class DeliverConstantVolumeFlow(IntendedFunction):
  pass
 
 
-#%% Appendix J
+#%% Appendix J - Ontology for Chemicals
 
 class Substance(Thing):
  pass
@@ -3385,7 +3423,7 @@ class hasStateOfAggregation(Substance >> StateOfAggregation):
 
 
 
-#%% Appendix K
+#%% Appendix K - Ontology for Causes
 
 
 class UtilityFailure(UnderlyingCause):
@@ -3755,7 +3793,7 @@ class WrongElectricSignal(causes_onto.UnderlyingCause):
  
  
  
-#%% Appendix L
+#%% Appendix L - Ontology for Causes
 
 class ReducedFlowArea(Cause):
  equivalent_to = [Cause &
@@ -4653,7 +4691,7 @@ class IncorrectFilling(causes_onto.Cause):
 
 
 
-#%% Appendix M
+#%% Appendix M - Ontology for Effects
 
 class BackContaminationOfSupply(Effect):
  equivalent_to = [Effect &
@@ -5326,7 +5364,7 @@ class AbnormalOperationCondition(effect_onto.Effect):
 
 
 
-#%% Appendix N
+#%% Appendix N - Ontology for Effects
 
 class PumpBreakdown(Consequence):
  equivalent_to = [Consequence &
@@ -5594,7 +5632,7 @@ class ReductionOfCoolingCapacity(consequence_onto.Consequence):
 
 
 
-#%% Appendix O
+#%% Appendix O - Ontology for Risks
 
 class Likelihood(Thing):
  pass
@@ -6023,7 +6061,7 @@ class D(RiskCategory):
 
 
 
-#%% Appendix P
+#%% Appendix P - Ontology for Safeguards
 
 class AddCorrosionInhibitor(Safeguard):
  equivalent_to = [Safeguard &
@@ -6451,7 +6489,7 @@ class EmergencyStabilization(safeguard_onto.Safeguard):
 
 
 
-#%% Appendix Q
+#%% Appendix Q - Inference and Analysis
 
 def equipment_based_hazard_specific_deviation(deviation, args):
     # === Input
@@ -7049,11 +7087,13 @@ def propagation_based_hazard(devex, process_unit, substance, last_equipment_enti
         for effect in scenario[prep.DictName.effect].is_a:
             if effect.is_a != [owl.Thing]:
                 for consequence in scenario[prep.DictName.consequence].is_a:
+                    
                     # === inspecting individual
                     for prop in scenario[prep.DictName.consequence].get_properties():
                         if prop == consequence_onto.isConsequenceOfEffect:
                             for value in prop[scenario[prep.DictName.consequence]]:
                                 for effect_ in value.is_a:
+                                    
                                     # === Effect of consequence matches overall effect
                                     if effect_ == effect and scenario[prep.DictName.cause] and effect:
                                         scenario_list.append({prep.DictName.cause: scenario[prep.DictName.cause],
@@ -7062,6 +7102,7 @@ def propagation_based_hazard(devex, process_unit, substance, last_equipment_enti
                                                               prep.DictName.consequence: consequence(),
                                                               prep.DictName.likelihood: scenario[prep.DictName.likelihood]}
                                                              )
+                                        
                                         # Consume deviation in case full scenario is found
                                         consumed_flag = True
     
@@ -7072,24 +7113,29 @@ def propagation_based_hazard(devex, process_unit, substance, last_equipment_enti
         isConsequenceOfDeviation=deviation,
         isSubsequentConsequence=[scenario[prep.DictName.consequence]],
         consequenceRequiresBoundaryCondition=process_unit.boundary_condition)
+        
         scenario[prep.DictName.consequence_3rd] = consequence_onto.Consequence(
         consequenceInvolvesSubstance=[substance.onto_object],
         consequenceInvolvesEquipmentEntity=[process_unit.onto_object],
         isConsequenceOfDeviation=deviation,
         isSubsequentConsequence=[scenario[prep.DictName.consequence_2nd]],
         consequenceRequiresBoundaryCondition=process_unit.boundary_condition)
+        
         consequences = [scenario[prep.DictName.consequence],
         scenario[prep.DictName.consequence_2nd],
         scenario[prep.DictName.consequence_3rd]]
+        
         scenario[prep.DictName.severity] = risk_assessment_onto.SeverityCategory(
         isSeverityOfConsequence=consequences,
         isSeverityOfEffect=[scenario[prep.DictName.effect]],
         severityInvolvesSubstance=[substance.onto_object],
         severityInvolvesEquipment=[process_unit.onto_object],
         severityRequiresBoundaryCondition=process_unit.boundary_condition)
+        
         scenario[prep.DictName.risk] = risk_assessment_onto.RiskCategory(
         involvesSeverity=[scenario[prep.DictName.severity]],
         involvesLikelihood=scenario[prep.DictName.likelihood])
+        
         if isinstance(scenario[prep.DictName.cause], ThingClass):
             cause_argument = [scenario[prep.DictName.cause]]
         elif isinstance(scenario[prep.DictName.cause], list):
@@ -7127,12 +7173,14 @@ def propagation_based_hazard(devex, process_unit, substance, last_equipment_enti
     # === Pass results
     for scenario in scenario_list:
         consequence_list = [scenario[prep.DictName.consequence], scenario[prep.DictName.consequence_2nd], scenario[prep.DictName.consequence_3rd]]
+        
         # Somehow it is not always set above
         if not prep.DictName.safeguard in scenario:
             if devex[prep.DictName.safeguard]:
                 scenario[prep.DictName.safeguard] = devex[prep.DictName.safeguard]
             else:
                 scenario[prep.DictName.safeguard] = []
+                
         if not do_not_consider:
             prep.log_scenario(0,
             process_unit,
@@ -7155,6 +7203,7 @@ def propagation_based_hazard(devex, process_unit, substance, last_equipment_enti
         cbr.CaseAttributes.SubstancePhase:
         substance.onto_object.hasStateOfAggregation[0].is_a[0]}
         match = cbr.match_case_with_cb(current_case, cbr.propagation_case_base)
+        
         # === make sure there is a match and match is not the same as the last one
         # (prevent infinite run due to recursion)
         if match and current_case != previous_case:
@@ -7178,9 +7227,19 @@ def propagation_based_hazard(devex, process_unit, substance, last_equipment_enti
                 previous_case = current_case
 
 
-#%% Appendix W
+#%% Appendix W - Specific case studies
 
 def create_process_plant_hexane_storage_tank():
+    """
+    Create a specific case study about a hexane storage tank.
+
+    Returns
+    -------
+    graph : NetworkX.Digraph
+        A graph of 4 components linked by 3 edges in a direct sequence.
+
+    """
+    
     hazard_classes = [substance_onto.FlammableLiquidCategory2, substance_onto.SkinCorrosionIrritationCategory2,
                       substance_onto.ReproductiveToxicityCategory2, substance_onto.SpecificTargetOrganToxicityRepeatedExposureCategory2,
                       substance_onto.SpecificTargetOrganToxicitySingleExposureCategory3, substance_onto.AspirationHazardCategory1]
@@ -7217,6 +7276,7 @@ def create_process_plant_hexane_storage_tank():
                            boundary_onto.ExternalFirePossible]
     set_further_boundary_conditions(boundary_conditions, upper_onto.lowest_ambient_temperature)
     boundary_conditions = instantiate_boundary_conditions(boundary_conditions)
+    
     tank_truck = equipment_entities.tank_truck("TT100",
                                                boundary_conditions,
                                                equipment_onto.Operator(),
@@ -7271,12 +7331,12 @@ def create_process_plant_hexane_storage_tank():
                    substances=[substances[0]],
                    environment=ambient_information)
     graph.add_node(1,
-                       data=transfer_pump,
-                       ports=dict(p1=equipment_entities.MyPort('p1', equipment_onto.InletValve(), equipment_onto.Inlet()),
-                                  p2=equipment_entities.MyPort('p2', equipment_onto.OutletValve(),
-                                                               equipment_onto.Outlet())),
-                       substances=[substances[0]],
-                       environment=ambient_information)
+                   data=transfer_pump,
+                   ports=dict(p1=equipment_entities.MyPort('p1', equipment_onto.InletValve(), equipment_onto.Inlet()),
+                              p2=equipment_entities.MyPort('p2', equipment_onto.OutletValve(),
+                                                           equipment_onto.Outlet())),
+                   substances=[substances[0]],
+                   environment=ambient_information)
     graph.add_node(2,
                    data=pipe,
                    ports=dict(p1=equipment_entities.MyPort('p1', equipment_onto.InletValve(), equipment_onto.Inlet()),
@@ -7302,6 +7362,16 @@ def create_process_plant_hexane_storage_tank():
 
 
 def create_olefin_feed_section():
+    """
+    Create a specific case study about an olefin feed section.
+
+    Returns
+    -------
+    graph : NetworkX.Digraph
+        A graph with 6 nodes and 5 edges, but not all in a linear sequence.
+
+    """
+    
     # Mixture of Hexane/Hexene and water
     hazard_classes = [substance_onto.FlammableLiquidCategory2,
                       substance_onto.SkinCorrosionIrritationCategory2,
@@ -7312,6 +7382,7 @@ def create_olefin_feed_section():
     stability_reactivity_information = [substance_onto.PolymerizesExothermicallyWithoutInhibitor,
                                         substance_onto.PolymerizesExothermicallyWhenExposedToHeat,
                                         substance_onto.FormsExplosiveMixtureWithAir]
+    
     substances = [
         substance.substance("Olefin&Water",
                             "",
@@ -7484,7 +7555,7 @@ def create_olefin_feed_section():
 
 
 
-#%% Appendix C
+#%% Appendix C - Main
 
 
 if __name__ == '__main__':
@@ -7495,6 +7566,7 @@ if __name__ == '__main__':
 	upper_onto.determine_onto()
 
 	start_time = time.time()
+    
 	# === Process model
 	process_plant_model = model.create_hazid_benchmark_1()
 	
@@ -7512,6 +7584,7 @@ if __name__ == '__main__':
 			equipment_specific_prop_scenarios = []
 			
 			equipment_entity = process_plant_model.nodes[index]["data"]
+            
 			# Add port information to equipment entity
 			for key, value in process_plant_model.nodes[index]["ports"].items():
 				equipment_entity.onto_object.hasPort.append(value.onto_object)
