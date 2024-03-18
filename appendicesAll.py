@@ -22,11 +22,27 @@ It is to do with p 118 in the dissertation.
 
 
 # from enum import Enum
+from owlready2 import Thing
 from owlready2 import *
 import itertools
 import unittest
 
-# equipment_onto = None #TODO Is this a global variable?
+
+
+#TODO Are these to be global variables?
+# equipment_onto = None 
+# effect_onto = None
+# process_onto = None
+# substance_onto = None
+# deviation_onto = None
+# causes_onto = None
+# risk_assessment_onto = None
+# upper_onto = None
+# consequence_onto = None
+# safeguard_onto = None
+# boundary_onto = None
+# site_information = None
+# results = None
 
 
 #%% Appendix R - Graph Manipulation # Tearing
@@ -163,12 +179,12 @@ def determine_recycles(graph):
         
         # I think the code below is simpler as
         # return not comparison and cycles # untested
-        # if not comparison and cycles:
+        # if not comparison and cycles: #TODO Always True as comparison is False
         #     return True
         # else:
         #     return False
         
-        return not comparison and cycles
+        return not comparison and cycles #TODO Always True as comparison is False
 
 def determine_cycle_intersections(list_of_cycles):
     
@@ -340,6 +356,7 @@ def replicate(graph, graph_type):
                             current_node = next_successor
                     except IndexError:
                         end_reached = True
+                        
                 successor_streams.append(node_list)
             
             # sort nodes according to numbers (nodes with highest numbers last)
@@ -428,10 +445,10 @@ def replicate(graph, graph_type):
                     paths = nx.all_simple_paths(graph, root, leaf)
                     all_paths.extend(paths)
                     
-            all_paths2 = []
-            for root in roots:
-                paths = nx.all_simple_paths(graph, root, leaves)
-                all_paths2.extend(paths)
+            # all_paths2 = []
+            # for root in roots:
+            #     paths = nx.all_simple_paths(graph, root, leaves)
+            #     all_paths2.extend(paths)
                 
             new_graph = all_paths
             
@@ -1410,6 +1427,7 @@ def crude_stabilizer_column(identifier, circumstances, control_instance, transpo
     return equipment_entity 
 
 
+
 #%% Appendix E
 
 phase_weight = 0.15
@@ -1459,20 +1477,20 @@ propagation_case_base = [
     CaseAttributes.InferredDeviation:   [deviation_onto.HighPressure]},
     
     {CaseAttributes.No: 4,
-    CaseAttributes.EquipmentEntity: (equipment_onto.PumpEntity, equipment_weight),
-    CaseAttributes.Event: (effect_onto.FluidCirculatesInsidePump, event_weight),
-    CaseAttributes.Apparatus: (equipment_onto.PumpCasing, apparatus_weight),
-    CaseAttributes.IntendedFunction: (process_onto.MaterialTransfer, intended_function_weight),
-    CaseAttributes.SubstancePhase: (substance_onto.Liquid, phase_weight),
-    CaseAttributes.InferredDeviation: [deviation_onto.HighTemperature]},
+    CaseAttributes.EquipmentEntity:     (equipment_onto.PumpEntity, equipment_weight),
+    CaseAttributes.Event:               (effect_onto.FluidCirculatesInsidePump, event_weight),
+    CaseAttributes.Apparatus:           (equipment_onto.PumpCasing, apparatus_weight),
+    CaseAttributes.IntendedFunction:    (process_onto.MaterialTransfer, intended_function_weight),
+    CaseAttributes.SubstancePhase:      (substance_onto.Liquid, phase_weight),
+    CaseAttributes.InferredDeviation:   [deviation_onto.HighTemperature]},
     
     {CaseAttributes.No: 5,
-    CaseAttributes.EquipmentEntity: (None, equipment_weight),
-    CaseAttributes.Event: (effect_onto.Overfilling, event_weight),
-    CaseAttributes.Apparatus: (equipment_onto.PressureVessel, apparatus_weight),
-    CaseAttributes.IntendedFunction: (None, intended_function_weight),
-    CaseAttributes.SubstancePhase: (substance_onto.Multiphase, phase_weight),
-    CaseAttributes.InferredDeviation: [deviation_onto.HighPressure]},
+    CaseAttributes.EquipmentEntity:     (None, equipment_weight),
+    CaseAttributes.Event:               (effect_onto.Overfilling, event_weight),
+    CaseAttributes.Apparatus:           (equipment_onto.PressureVessel, apparatus_weight),
+    CaseAttributes.IntendedFunction:    (None, intended_function_weight),
+    CaseAttributes.SubstancePhase:      (substance_onto.Multiphase, phase_weight),
+    CaseAttributes.InferredDeviation:   [deviation_onto.HighPressure]},
     
     {CaseAttributes.No: 6,
     CaseAttributes.EquipmentEntity: (equipment_onto.PumpEntity, equipment_weight),
@@ -2868,8 +2886,8 @@ class UnderlyingCause(Thing):
     pass
 UnderlyingCause.label = ["underlying cause"]
 UnderlyingCause.comment = ["Underlying event in the sequence of events of a scenario",
- "represents ambient conditions, systemic and organizational causes, "
- "and causes arising from latent human errors"]
+                           "represents ambient conditions, systemic and organizational causes, "
+                           "and causes arising from latent human errors"]
 class causeInvolvesEquipmentEntity(Cause >> equipment_onto.EquipmentEntity):
     pass
 class causeInvolvesSubstance(Cause >> substance_onto.Substance):
@@ -6952,35 +6970,39 @@ def infer_follow_up(process_unit,
         
         if not subsequent_deviation_loop:
             scenario[prep.DictName.likelihood_cause] = risk_assessment_onto.Likelihood(
-            likelihoodInvolvesUnderlyingcause=[scenario[prep.DictName.underlying_cause]],
-            likelihoodInvolvesCause=[scenario[prep.DictName.cause]],
-            likelihoodInvolvesEquipment=[process_unit.onto_object],
-            likelihoodInvolvesSiteInformation=[environment.onto_object],
-            likelihoodInvolvesDeviation=deviation1,
-            likelihoodRequiresBoundaryCondition=process_unit.boundary_condition)
+                likelihoodInvolvesUnderlyingcause=[scenario[prep.DictName.underlying_cause]],
+                likelihoodInvolvesCause=[scenario[prep.DictName.cause]],
+                likelihoodInvolvesEquipment=[process_unit.onto_object],
+                likelihoodInvolvesSiteInformation=[environment.onto_object],
+                likelihoodInvolvesDeviation=deviation1,
+                likelihoodRequiresBoundaryCondition=process_unit.boundary_condition
+            )
             scenario[prep.DictName.likelihood_effect] = risk_assessment_onto.Likelihood(
-            likelihoodInvolvesEffect=[scenario[prep.DictName.effect]],
-            likelihoodInvolvesCause=[scenario[prep.DictName.cause]],
-            likelihoodInvolvesEquipment=[process_unit.onto_object],
-            likelihoodInvolvesSiteInformation=[environment.onto_object],
-            likelihoodInvolvesDeviation=deviation1,
-            likelihoodRequiresBoundaryCondition=process_unit.boundary_condition)
+                likelihoodInvolvesEffect=[scenario[prep.DictName.effect]],
+                likelihoodInvolvesCause=[scenario[prep.DictName.cause]],
+                likelihoodInvolvesEquipment=[process_unit.onto_object],
+                likelihoodInvolvesSiteInformation=[environment.onto_object],
+                likelihoodInvolvesDeviation=deviation1,
+                likelihoodRequiresBoundaryCondition=process_unit.boundary_condition
+            )
         else:
             if likelihood_:
                 scenario[prep.DictName.likelihood_cause] = likelihood_
             else:
                 scenario[prep.DictName.likelihood_cause] = risk_assessment_onto.Likelihood(
-                likelihoodInvolvesUnderlyingcause=underlying_cause_,
-                likelihoodInvolvesEquipment=[process_unit.onto_object],
-                likelihoodInvolvesDeviation=deviation1,
-                likelihoodRequiresBoundaryCondition=process_unit.boundary_condition)
+                    likelihoodInvolvesUnderlyingcause=underlying_cause_,
+                    likelihoodInvolvesEquipment=[process_unit.onto_object],
+                    likelihoodInvolvesDeviation=deviation1,
+                    likelihoodRequiresBoundaryCondition=process_unit.boundary_condition
+                )
             if underlying_cause_:
                 scenario[prep.DictName.underlying_cause] = underlying_cause_
                 scenario[prep.DictName.likelihood_effect] = risk_assessment_onto.Likelihood(
-                likelihoodInvolvesEffect=[scenario[prep.DictName.effect]],
-                likelihoodInvolvesEquipment=[process_unit.onto_object],
-                likelihoodInvolvesDeviation=deviation1,
-                likelihoodRequiresBoundaryCondition=process_unit.boundary_condition)
+                    likelihoodInvolvesEffect=[scenario[prep.DictName.effect]],
+                    likelihoodInvolvesEquipment=[process_unit.onto_object],
+                    likelihoodInvolvesDeviation=deviation1,
+                    likelihoodRequiresBoundaryCondition=process_unit.boundary_condition
+                )
         
         # Fix for excluding delayed ignition in case of external fire, makes not sense
         if scenario[prep.DictName.underlying_cause]:
@@ -7109,17 +7131,17 @@ def infer_follow_up(process_unit,
             )
             
         if propagated_consequence_found and not actual_consequence_found:
-            data = {prep.DictName.equipment: process_unit,
-                    prep.DictName.substance: substance,
-                    prep.DictName.deviation: deviation,
-                    prep.DictName.cause: scenario[prep.DictName.cause],
-                    prep.DictName.effect: scenario[prep.DictName.effect],
+            data = {prep.DictName.equipment:        process_unit,
+                    prep.DictName.substance:        substance,
+                    prep.DictName.deviation:        deviation,
+                    prep.DictName.cause:            scenario[prep.DictName.cause],
+                    prep.DictName.effect:           scenario[prep.DictName.effect],
                     prep.DictName.underlying_cause: scenario[prep.DictName.underlying_cause],
-                    prep.DictName.likelihood: scenario[prep.DictName.likelihood],
-                    prep.DictName.consequence: consequence_list,
-                    prep.DictName.safeguard: [scenario[prep.DictName.safeguard], scenario[prep.DictName.safeguard_2nd]],
-                    prep.DictName.id: process_unit.identifier
-            }
+                    prep.DictName.likelihood:       scenario[prep.DictName.likelihood],
+                    prep.DictName.consequence:      consequence_list,
+                    prep.DictName.safeguard:        [scenario[prep.DictName.safeguard], scenario[prep.DictName.safeguard_2nd]],
+                    prep.DictName.id:               process_unit.identifier
+                    }
         
         # Catch duplicate in relevant propagation stack
         if isinstance(data[prep.DictName.cause], str):
@@ -7159,12 +7181,13 @@ def infer_follow_up(process_unit,
             # === Infer subsequent deviations based on effect
             if scenario[prep.DictName.effect]:
                 for effect in scenario[prep.DictName.effect].is_a:
-                    current_case = {cbr.CaseAttributes.EquipmentEntity: process_unit.onto_object.is_a[0],
-                    cbr.CaseAttributes.Event: effect,
-                    cbr.CaseAttributes.Apparatus: apparatus,
-                    cbr.CaseAttributes.IntendedFunction: process_unit.intended_function[0].is_a[0],
-                    cbr.CaseAttributes.SubstancePhase:
-                    substance.onto_object.hasStateOfAggregation[0].is_a[0]}
+                    
+                    current_case = {cbr.CaseAttributes.EquipmentEntity:     process_unit.onto_object.is_a[0],
+                                    cbr.CaseAttributes.Event:               effect,
+                                    cbr.CaseAttributes.Apparatus:           apparatus,
+                                    cbr.CaseAttributes.IntendedFunction:    process_unit.intended_function[0].is_a[0],
+                                    cbr.CaseAttributes.SubstancePhase:      substance.onto_object.hasStateOfAggregation[0].is_a[0]}
+                        
                     match = cbr.match_case_with_cb(current_case, cbr.propagation_case_base)
                     if match:
                         for m in match:
@@ -7183,12 +7206,13 @@ def infer_follow_up(process_unit,
             # === Infer subsequent deviations based on cause
             if scenario[prep.DictName.cause]:
                 for cause in scenario[prep.DictName.cause].is_a:
-                    current_case = {cbr.CaseAttributes.EquipmentEntity: process_unit.onto_object.is_a[0],
-                    cbr.CaseAttributes.Event: cause,
-                    cbr.CaseAttributes.Apparatus: apparatus,
-                    cbr.CaseAttributes.IntendedFunction: process_unit.intended_function[0].is_a[0],
-                    cbr.CaseAttributes.SubstancePhase:
-                    substance.onto_object.hasStateOfAggregation[0].is_a[0]}
+                    
+                    current_case = {cbr.CaseAttributes.EquipmentEntity:     process_unit.onto_object.is_a[0],
+                                    cbr.CaseAttributes.Event:               cause,
+                                    cbr.CaseAttributes.Apparatus:           apparatus,
+                                    cbr.CaseAttributes.IntendedFunction:    process_unit.intended_function[0].is_a[0],
+                                    cbr.CaseAttributes.SubstancePhase:      substance.onto_object.hasStateOfAggregation[0].is_a[0]}
+                    
                     match = cbr.match_case_with_cb(current_case, cbr.propagation_case_base)
                     if match:
                         for m in match:
@@ -7220,8 +7244,8 @@ def infer_follow_up(process_unit,
             fmt_phase = str(substance.onto_object.hasStateOfAggregation[0].is_a[0]).split('.', 1)[1]
             for m in match:
                 dev = {prep.DictName.subsequent_deviation: m,
-                prep.DictName.explanation: process_unit.identifier + ": " + current_deviation.name + " -> " + m.name + " " + "(" + fmt_phase + ")",
-                prep.DictName.likelihood: scenario[prep.DictName.likelihood].is_a[0]} # cannot really be estimated
+                       prep.DictName.explanation: process_unit.identifier + ": " + current_deviation.name + " -> " + m.name + " " + "(" + fmt_phase + ")",
+                       prep.DictName.likelihood: scenario[prep.DictName.likelihood].is_a[0]} # cannot really be estimated
                 subsequent_deviations.append(dev)
 
 
@@ -7232,6 +7256,7 @@ def propagation_based_analysis(plant_graph, order, propagation_stacks):
     for node in plant_graph.nodes(data=True):
         if node[0] not in order:
             graph.remove_node(node[0])
+            
     # === Attach a placeholder
     for stack in propagation_stacks:
         stack[prep.DictName.passed_scenarios] = []
@@ -7252,9 +7277,11 @@ def propagation_based_analysis(plant_graph, order, propagation_stacks):
     # for index in range(len(plant_graph.nodes)):
     for index, node_pos in enumerate(rel_order):
         process_unit = plant_graph.nodes[node_pos]["data"]
+        
         # Do not assume propagation in case the sink has been reached
         if process_unit == equipment_onto.SinkEntity:
             break
+        
         substances = plant_graph.nodes[node_pos]["substances"]
         # === Loop over substances
         for s, substance in enumerate(substances):
@@ -7281,7 +7308,7 @@ def propagation_based_analysis(plant_graph, order, propagation_stacks):
                     consumed_flag = False
                     # === Loop over propagating scenarios
                     for scenario in scenario_list:
-                        # === Create input object from scenario, TODO: use scenario object directly
+                        # === Create input object from scenario, #TODO: use scenario object directly
                         subsequent_deviation = assemble_input_object(scenario)
                         # === infer scenarios
                         propagation_based_hazard(subsequent_deviation,
@@ -7306,6 +7333,7 @@ def propagation_based_analysis(plant_graph, order, propagation_stacks):
                                     previous_case,
                                     consumed_flag
                                 )
+                            
                             # === Propagate partial scenario in case no effect have been identified
                             if not consumed_flag:
                                 propagation_stacks[pos + 1][prep.DictName.passed_scenarios].append(propagation)
@@ -7318,6 +7346,7 @@ def propagation_based_analysis(plant_graph, order, propagation_stacks):
                         # Catch duplicate in relevant propagation stack
                         if propagation[prep.DictName.explanation] not in list_of_all_values and propagation[prep.DictName.underlying_cause] not in list_of_all_values:
                             propagation_stacks[pos + 1][prep.DictName.passed_scenarios].append(propagation)
+                            
                 elif index == len(rel_order) - 1:
                     pos = rel_order[index - 1]
                     if propagation_stacks[pos][prep.DictName.passed_scenarios]:
@@ -7359,7 +7388,10 @@ def propagation_based_analysis(plant_graph, order, propagation_stacks):
 
 
 def propagation_based_hazard(devex, process_unit, substance, last_equipment_entity, previous_case, consumed_flag):
+    
+    
     global results
+    
     try:
         if isinstance(devex[prep.DictName.initiating_event].is_a[0], ThingClass):
             cause = [devex[prep.DictName.initiating_event]]
@@ -7375,6 +7407,7 @@ def propagation_based_hazard(devex, process_unit, substance, last_equipment_enti
     cause_list = [devex[prep.DictName.explanation]]
     deviation = devex[prep.DictName.subsequent_deviation]
     underlying_cause = devex[prep.DictName.underlying_cause]
+    
     # catch the case where by mistake no safeguard is provided
     if not devex[prep.DictName.safeguard]:
         devex[prep.DictName.safeguard] = []
@@ -7392,12 +7425,13 @@ def propagation_based_hazard(devex, process_unit, substance, last_equipment_enti
         else:
             likelihood = []
             
-        scenario = {prep.DictName.cause: cause_list,
-        prep.DictName.underlying_cause: underlying_causes,
-        prep.DictName.effect: effect,
-        prep.DictName.consequence: consequence,
-        prep.DictName.likelihood: likelihood
-        }
+        scenario = {prep.DictName.cause:            cause_list,
+                    prep.DictName.underlying_cause: underlying_causes,
+                    prep.DictName.effect:           effect,
+                    prep.DictName.consequence:      consequence,
+                    prep.DictName.likelihood:       likelihood
+                    }
+        
         inferred_effects.append(effect)
         preliminary_scenario_list.append(scenario)
         
@@ -7416,11 +7450,11 @@ def propagation_based_hazard(devex, process_unit, substance, last_equipment_enti
                                     
                                     # === Effect of consequence matches overall effect
                                     if effect_ == effect and scenario[prep.DictName.cause] and effect:
-                                        scenario_list.append({prep.DictName.cause: scenario[prep.DictName.cause],
-                                                              prep.DictName.underlying_cause: scenario[prep.DictName.underlying_cause],
-                                                              prep.DictName.effect: effect(),
-                                                              prep.DictName.consequence: consequence(),
-                                                              prep.DictName.likelihood: scenario[prep.DictName.likelihood]}
+                                        scenario_list.append({prep.DictName.cause:              scenario[prep.DictName.cause],
+                                                              prep.DictName.underlying_cause:   scenario[prep.DictName.underlying_cause],
+                                                              prep.DictName.effect:             effect(),
+                                                              prep.DictName.consequence:        consequence(),
+                                                              prep.DictName.likelihood:         scenario[prep.DictName.likelihood]}
                                                              )
                                         
                                         # Consume deviation in case full scenario is found
@@ -7428,33 +7462,38 @@ def propagation_based_hazard(devex, process_unit, substance, last_equipment_enti
     
     for scenario in scenario_list:
         scenario[prep.DictName.consequence_2nd] = consequence_onto.Consequence(
-        consequenceInvolvesSubstance=[substance.onto_object],
-        consequenceInvolvesEquipmentEntity=[process_unit.onto_object],
-        isConsequenceOfDeviation=deviation,
-        isSubsequentConsequence=[scenario[prep.DictName.consequence]],
-        consequenceRequiresBoundaryCondition=process_unit.boundary_condition)
+            consequenceInvolvesSubstance=[substance.onto_object],
+            consequenceInvolvesEquipmentEntity=[process_unit.onto_object],
+            isConsequenceOfDeviation=deviation,
+            isSubsequentConsequence=[scenario[prep.DictName.consequence]],
+            consequenceRequiresBoundaryCondition=process_unit.boundary_condition
+        )
         
         scenario[prep.DictName.consequence_3rd] = consequence_onto.Consequence(
-        consequenceInvolvesSubstance=[substance.onto_object],
-        consequenceInvolvesEquipmentEntity=[process_unit.onto_object],
-        isConsequenceOfDeviation=deviation,
-        isSubsequentConsequence=[scenario[prep.DictName.consequence_2nd]],
-        consequenceRequiresBoundaryCondition=process_unit.boundary_condition)
+            consequenceInvolvesSubstance=[substance.onto_object],
+            consequenceInvolvesEquipmentEntity=[process_unit.onto_object],
+            isConsequenceOfDeviation=deviation,
+            isSubsequentConsequence=[scenario[prep.DictName.consequence_2nd]],
+            consequenceRequiresBoundaryCondition=process_unit.boundary_condition
+        )
         
         consequences = [scenario[prep.DictName.consequence],
-        scenario[prep.DictName.consequence_2nd],
-        scenario[prep.DictName.consequence_3rd]]
+            scenario[prep.DictName.consequence_2nd],
+            scenario[prep.DictName.consequence_3rd]
+        ]
         
         scenario[prep.DictName.severity] = risk_assessment_onto.SeverityCategory(
-        isSeverityOfConsequence=consequences,
-        isSeverityOfEffect=[scenario[prep.DictName.effect]],
-        severityInvolvesSubstance=[substance.onto_object],
-        severityInvolvesEquipment=[process_unit.onto_object],
-        severityRequiresBoundaryCondition=process_unit.boundary_condition)
+            isSeverityOfConsequence=consequences,
+            isSeverityOfEffect=[scenario[prep.DictName.effect]],
+            severityInvolvesSubstance=[substance.onto_object],
+            severityInvolvesEquipment=[process_unit.onto_object],
+            severityRequiresBoundaryCondition=process_unit.boundary_condition
+        )
         
         scenario[prep.DictName.risk] = risk_assessment_onto.RiskCategory(
-        involvesSeverity=[scenario[prep.DictName.severity]],
-        involvesLikelihood=scenario[prep.DictName.likelihood])
+            involvesSeverity=[scenario[prep.DictName.severity]],
+            involvesLikelihood=scenario[prep.DictName.likelihood]
+        )
         
         if isinstance(scenario[prep.DictName.cause], ThingClass):
             cause_argument = [scenario[prep.DictName.cause]]
@@ -7464,13 +7503,14 @@ def propagation_based_hazard(devex, process_unit, substance, last_equipment_enti
             cause_argument = []
             
         safeguard = safeguard_onto.Safeguard(safeguardOfDeviation=deviation,
-        safeguardPreventsEffect=[scenario[prep.DictName.effect]],
-        safeguardPreventsCause=cause_argument,
-        safeguardPreventsUnderlyingCause=[scenario[prep.DictName.underlying_cause]],
-        safeguardMitigatesConsequence=consequences,
-        safeguardDependsOnRiskCategory=[scenario[prep.DictName.risk]],
-        safeguardInvolvesEquipmentEntity=[process_unit.onto_object],
-        safeguardInvolvesSubstance=[substance.onto_object])
+                                             safeguardPreventsEffect=[scenario[prep.DictName.effect]],
+                                             safeguardPreventsCause=cause_argument,
+                                             safeguardPreventsUnderlyingCause=[scenario[prep.DictName.underlying_cause]],
+                                             safeguardMitigatesConsequence=consequences,
+                                             safeguardDependsOnRiskCategory=[scenario[prep.DictName.risk]],
+                                             safeguardInvolvesEquipmentEntity=[process_unit.onto_object],
+                                             safeguardInvolvesSubstance=[substance.onto_object]
+                                             )
         
         if devex[prep.DictName.safeguard]:
             if safeguard:
@@ -7503,25 +7543,26 @@ def propagation_based_hazard(devex, process_unit, substance, last_equipment_enti
                 
         if not do_not_consider:
             prep.log_scenario(0,
-            process_unit,
-            substance.name,
-            deviation,
-            scenario[prep.DictName.cause],
-            scenario[prep.DictName.effect],
-            scenario[prep.DictName.underlying_cause],
-            consequence_list,
-            scenario[prep.DictName.safeguard],
-            True, # propagated
-            scenario[prep.DictName.risk]
-            )
+                              process_unit,
+                              substance.name,
+                              deviation,
+                              scenario[prep.DictName.cause],
+                              scenario[prep.DictName.effect],
+                              scenario[prep.DictName.underlying_cause],
+                              consequence_list,
+                              scenario[prep.DictName.safeguard],
+                              True, # propagated
+                              scenario[prep.DictName.risk]
+                              )
         
         # === Infer subsequent deviations
-        current_case = {cbr.CaseAttributes.EquipmentEntity: process_unit.onto_object.is_a[0],
-        cbr.CaseAttributes.Event: scenario[prep.DictName.effect].is_a[0],
-        cbr.CaseAttributes.Apparatus: process_unit.apparatus[0].is_a[0],
-        cbr.CaseAttributes.IntendedFunction: process_unit.intended_function[0].is_a[0],
-        cbr.CaseAttributes.SubstancePhase:
-        substance.onto_object.hasStateOfAggregation[0].is_a[0]}
+        current_case = {cbr.CaseAttributes.EquipmentEntity:     process_unit.onto_object.is_a[0],
+                        cbr.CaseAttributes.Event:               scenario[prep.DictName.effect].is_a[0],
+                        cbr.CaseAttributes.Apparatus:           process_unit.apparatus[0].is_a[0],
+                        cbr.CaseAttributes.IntendedFunction:    process_unit.intended_function[0].is_a[0],
+                        cbr.CaseAttributes.SubstancePhase:      substance.onto_object.hasStateOfAggregation[0].is_a[0]
+                        }
+        
         match = cbr.match_case_with_cb(current_case, cbr.propagation_case_base)
         
         # === make sure there is a match and match is not the same as the last one
@@ -7530,13 +7571,15 @@ def propagation_based_hazard(devex, process_unit, substance, last_equipment_enti
             for m in match:
                 explanation = process_unit.identifier + ": " + cause[0].is_a[0].name + " -> " + scenario[prep.DictName.effect].is_a[0].name + " -> " + \
                 m.name + " " + "(" + substance.onto_object.hasStateOfAggregation[0].is_a[0].name + ")"
-                subsequent_deviation = {prep.DictName.explanation: explanation,
-                prep.DictName.underlying_cause: scenario[prep.DictName.underlying_cause],
-                prep.DictName.safeguard: scenario[prep.DictName.safeguard],
-                prep.DictName.subsequent_deviation: m(),
-                prep.DictName.initiating_event: [], # empty because effects cannot be passed
-                prep.DictName.likelihood: scenario[prep.DictName.likelihood],
-                }
+                
+                subsequent_deviation = {prep.DictName.explanation:          explanation,
+                                        prep.DictName.underlying_cause:     scenario[prep.DictName.underlying_cause],
+                                        prep.DictName.safeguard:            scenario[prep.DictName.safeguard],
+                                        prep.DictName.subsequent_deviation: m(),
+                                        prep.DictName.initiating_event:     [], # empty because effects cannot be passed
+                                        prep.DictName.likelihood:           scenario[prep.DictName.likelihood],
+                                        }
+                
                 propagation_based_hazard(subsequent_deviation,
                                          process_unit,
                                          substance,
@@ -7544,6 +7587,7 @@ def propagation_based_hazard(devex, process_unit, substance, last_equipment_enti
                                          current_case,
                                          consumed_flag
                                          )
+                
                 previous_case = current_case
 
 
