@@ -10,6 +10,8 @@ https://www.geeksforgeeks.org/how-to-embed-matplotlib-charts-in-tkinter-gui/
 
 
 from tkinter import *
+from tkinter import ttk
+
 from matplotlib.figure import Figure 
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, 
 NavigationToolbar2Tk) 
@@ -39,55 +41,78 @@ def plot():
     # the figure that will contain the plot 
     fig = Figure(figsize = (5, 5), 
                  dpi = 100) 
-
+    
     # list of squares 
     y = [i**2 for i in range(101)] 
-
-    # adding the subplot 
-    plot1 = fig.add_subplot(111) 
-
-    # plotting the graph 
-    # 	plot1.plot(y) 
-    tG = nx.tutte_graph()
     
-    # subax1 = plt.subplot(121)
+    # adding the subplot 
+    plot1 = fig.add_subplot(111) # https://matplotlib.org/stable/api/figure_api.html#matplotlib.figure.Figure.add_subplot
+    
+    # plotting the graph 
+    # plot3 = fig.add_subplot(2,1,1)
+    # plot3.plot(y)
+    
+    tG = nx.tutte_graph()
     nx.draw(tG, ax=plot1, with_labels='True', font_weight='bold')
-    # plt.draw()
+
+
+    # pG = nx.petersen_graph()
+    # subax1 = fig.add_subplot(121) #plt.subplot(121)
+    # nx.draw(pG, ax=subax1, with_labels='True', font_weight='bold')
     
     # creating the Tkinter canvas 
     # containing the Matplotlib figure 
     canvas = FigureCanvasTkAgg(fig, master = window) 
     canvas.draw() 
-
+    
     # placing the canvas on the Tkinter window 
     canvas.get_tk_widget().pack() 
-
+    
     # creating the Matplotlib toolbar 
     toolbar = NavigationToolbar2Tk(canvas, window) 
     toolbar.update() 
-
+    
     # placing the toolbar on the Tkinter window 
     canvas.get_tk_widget().pack() 
 
 # the main Tkinter window 
-window = Tk() 
+window = Tk(screenName='HAZOP Copilot') 
 
 # setting the title 
-window.title('Plotting in Tkinter') 
+window.title('HAZOP Copilot') 
 
 # dimensions of the main window 
-window.geometry("500x500") 
+window.geometry("1000x800") 
+
+frame = ttk.Frame(window, padding=10, borderwidth=1, relief='groove')
+
+frame.pack()
+
+
+plotFrame = ttk.Frame(window, padding=20, borderwidth=1, relief='groove')
+plotFrame.pack()
 
 # button that displays the plot 
-plot_button = Button(master = window, 
+plot_button = Button(master = frame, 
                      command = plot, 
                      height = 2, 
-                     width = 10, 
-                     text = "Plot") 
+                     width = 15, 
+                     text = "Plot Graph") 
+# plot_button.grid(column=0, row=0)
+
+exit_button = Button(master = frame,
+                     command = window.destroy,
+                     height = 2,
+                     width = 15, 
+                     text = "Exit")
+# exit_button.grid(column=1, row=0)
+
 
 # place the button 
 # in main window 
 plot_button.pack() 
+exit_button.pack()
+
 
 # run the gui 
 window.mainloop() 
