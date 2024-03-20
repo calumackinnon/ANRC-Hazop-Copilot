@@ -32,17 +32,25 @@ import unittest
 #TODO Are these to be global variables?
 equipment_onto = get_ontology("http://webprotege.stanford.edu/RDWdOfos2Exb6enOKUgeBQu")
 effect_onto = get_ontology("http://webprotege.stanford.edu/RC1ogh5ITJZqiSxPilU34kX")
-# process_onto = None
-# substance_onto = None
-# deviation_onto = None
-# causes_onto = None
+process_onto = get_ontology("http://webprotege.stanford.edu/R8hyyklGYBKTNXVxiG1bd1R") # the IntendedFunction OWL2 class
+substance_onto = get_ontology("http://webprotege.stanford.edu/RBmrmRPMEoUC51a1J5IYQ2m")
+deviation_onto = get_ontology("http://webprotege.stanford.edu/RCjlgfXA8ageBNXi7Os4Wa7")
+causes_onto = get_ontology("http://webprotege.stanford.edu/R80WoqaEII5lpmBpdbnPkNI")
 # risk_assessment_onto = None
 # upper_onto = None
 # consequence_onto = None
 # safeguard_onto = None
 # boundary_onto = None
+# pse_onto = None
 # site_information = None
+
+
+# #TODO The following are variables and modules referenced elsewhere in the code.
 # results = None
+# prep = None
+# cbr = None # case based reasoner (I think)
+# sync_reasoner = None 
+
 
 
 #%% Appendix R - Graph Manipulation # Tearing
@@ -3453,7 +3461,7 @@ class hasMaximumOperatingTemperatureInKelvin(EquipmentEntity >> float, Functiona
  pass
 class entityControlledBy(EquipmentEntity >> ControlInstance):
  pass
-class hasOperationMode(EquipmentEntity >> OperationMode):
+class hasAnOperationMode(EquipmentEntity >> OperationMode):
  pass
 class formsControlLoopWith(Instrumentation >> Instrumentation):
  pass
@@ -3762,7 +3770,7 @@ class hasStateOfAggregation(Substance >> StateOfAggregation):
 
 
 
-#%% Appendix K - Ontology for Causes
+#%% Appendix K - Ontology for Underlying Causes
 
 
 class UtilityFailure(UnderlyingCause):
@@ -6911,18 +6919,6 @@ def equipment_based_hazard_specific_deviation(deviation, args):
         preliminary_scenario_list.append(scenario)
     sync_reasoner(debug=0)
     
-infer_follow_up(process_unit,   #TODO
-    substance,
-    deviation,
-    environment,
-    subsequent_deviation_loop,
-    likelihood_,
-    underlying_cause_,
-    stack_elements,
-    preliminary_scenario_list,
-    extended_scenarion_list
-    ) 
-
 def infer_follow_up(process_unit,
                     substance,
                     deviation,
@@ -7249,6 +7245,18 @@ def infer_follow_up(process_unit,
                        prep.DictName.likelihood: scenario[prep.DictName.likelihood].is_a[0]} # cannot really be estimated
                 subsequent_deviations.append(dev)
 
+
+infer_follow_up(process_unit,
+                substance,
+                deviation,
+                environment,
+                subsequent_deviation_loop,
+                likelihood_,
+                underlying_cause_,
+                stack_elements,
+                preliminary_scenario_list,
+                extended_scenarion_list
+    ) 
 
 def propagation_based_analysis(plant_graph, order, propagation_stacks):
     # create copy of original plant layout and remove edges that are not in 'order' list
