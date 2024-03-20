@@ -24,17 +24,22 @@ It is to do with p 118 in the dissertation.
 # from enum import Enum
 from owlready2 import Thing, FunctionalProperty, AllDisjoint, AsymmetricProperty
 from owlready2 import ThingClass
-from owlready2 import *
+from owlready2 import get_ontology
+import owlready2 as owl
+
 import itertools
 import unittest
 import time
 
-
+import networkx as nx
+# from tearing import graph_operations as go # Is this tensorflow?
+from string import ascii_lowercase 
+from enum import Enum
 
 #TODO Are these to be global variables?
-# upper_onto = None
-# pse_onto = None
-# environment_information = None
+upper_onto = None
+pse_onto = None
+environment_information = None
 equipment_onto = get_ontology("http://webprotege.stanford.edu/RDWdOfos2Exb6enOKUgeBQu")
 effect_onto = get_ontology("http://webprotege.stanford.edu/RC1ogh5ITJZqiSxPilU34kX")
 process_onto = get_ontology("http://webprotege.stanford.edu/R8hyyklGYBKTNXVxiG1bd1R") # the IntendedFunction OWL2 class
@@ -54,34 +59,59 @@ substance = get_ontology("http://webprotege.stanford.edu/RBmrmRPMEoUC51a1J5IYQ2m
 # #TODO The following are variables and modules referenced elsewhere in the code.
 results = None
 default_world = None
-# prep = None
-# cbr = None # case based reasoner (I think)
-# sync_reasoner = None 
-# model = None
-# pre_processing = None
+prep = None
+cbr = None # case based reasoner (I think)
+sync_reasoner = None 
+model = None
+pre_processing = None
+subsequent_deviations = []
+    
 
-def stringify_cleanup_inferred_res(someSuperCause):           pass
-def assemble_concept_instance(a, b, c):                       pass
-def add_edge_port(G, nodeindex, label1, node2index, label2):  pass
-def assemble_deviation(deviation):                            pass
+def stringify_cleanup_inferred_res(someSuperCause):             pass
+def assemble_concept_instance(a, b, c):                         pass
+def assemble_deviation(deviation):                              pass         # Equipment Based Hazard Specific Deviation
+def assemble_input_object(scenario):                            pass         # Propagation analysis
+def complete_propagated_scenario(propagation, process_unit, substance): pass # Propagation analysis
+
+def add_edge_port(G, nodeindex, label1, node2index, label2):
+    
+    assert isinstance(G, nx.DiGraph), 'Graph is not the expected type.'
+        
+    G.add_edge(nodeindex, node2index)
+    
+class Configuration(Enum):
+    
+    CONSIDER_DEV_2_DEV_PROPAGATION = False
+
 
 # A local ontology for BoundaryConditions
-class BoundaryCondition(Thing):                         pass
-class IntroductionOfAir(BoundaryCondition):             pass
-class IntroductionOfImpurities(BoundaryCondition):      pass
-class IntroductionOfWater(BoundaryCondition):           pass
-class ExternalFirePossible(BoundaryCondition):          pass
-class LocatedOutside(BoundaryCondition):                pass
-class UpstreamProcessInvolved(BoundaryCondition):       pass
-class SubstanceContainsStabilizer(BoundaryCondition):   pass
-class FoundationCanBeAffected(BoundaryCondition):       pass
+class BoundaryCondition(Thing):                                 pass
+class IntroductionOfAir(BoundaryCondition):                     pass
+class IntroductionOfImpurities(BoundaryCondition):              pass
+class IntroductionOfWater(BoundaryCondition):                   pass
+class ExternalFirePossible(BoundaryCondition):                  pass
+class LocatedOutside(BoundaryCondition):                        pass
+class UpstreamProcessInvolved(BoundaryCondition):               pass
+class SubstanceContainsStabilizer(BoundaryCondition):           pass
+class FoundationCanBeAffected(BoundaryCondition):               pass
+
+
+# modules inferred from namespace calls, unnecessary in this single script .py.
+# go - graph operations
+# infer
+# pre_processing
+# output
+# model
+config = Configuration()
+# ontology_operations
+
+go = None
+
+
 
 #%% Appendix R - Graph Manipulation # Tearing
 
-import networkx as nx
-# from tearing import graph_operations as go # Is this tensorflow?
-from string import ascii_lowercase 
-from enum import Enum
+
 
 class GraphType(Enum):
     SingleLineSystem = 0
@@ -2911,8 +2941,10 @@ def match_case_with_cb(current_case, case_base):
 # ===Cause ========================================
 class Cause(Thing):
     pass
-Cause.label = ["cause"] #TODO
+
+Cause.label = ["cause"] #TODO This is where there is a bug.
 Cause.comment = ["Initiating event in the sequence of events of a scenario", "represents an event or situation"]
+
 class UnderlyingCause(Thing):
     pass
 UnderlyingCause.label = ["underlying cause"]
@@ -6880,7 +6912,6 @@ class EmergencyStabilization(safeguard_onto.Safeguard):
 
 def equipment_based_hazard_specific_deviation(deviation, args):
     
-    
     # === Input
     process_unit = args[0]
     substance = args[1]
@@ -6921,6 +6952,7 @@ def equipment_based_hazard_specific_deviation(deviation, args):
                 underlying_cause_ = deviation[prep.DictName.underlying_cause]()
                 likelihood_ = deviation[prep.DictName.likelihood]()
                 deviation = deviation[prep.DictName.subsequent_deviation]()
+                
     if cause and cause.is_a:
         cause_lst = prep.get_inferred_results(cause)
         for idx, cause_ in enumerate(cause_lst):
@@ -6931,10 +6963,10 @@ def equipment_based_hazard_specific_deviation(deviation, args):
                                                                             cause_,
                                                                             False)
             # if likelihood_cause and likelihood_overall:
-            scenario = {prep.DictName.cause: cause_(),
-            prep.DictName.underlying_cause: underlying_causes,
-            prep.DictName.effect: effect,
-            prep.DictName.consequence: consequence}
+            scenario = {prep.DictName.cause:            cause_(),
+                        prep.DictName.underlying_cause: underlying_causes,
+                        prep.DictName.effect:           effect,
+                        prep.DictName.consequence:      consequence}
             preliminary_scenario_list.append(scenario)
     elif cause_list:
         underlying_causes, effect, consequence, = assemble_concept_instance(substance,
@@ -6943,10 +6975,10 @@ def equipment_based_hazard_specific_deviation(deviation, args):
                                                                     underlying_cause_,
                                                                     [],
                                                                     True)
-        scenario = {prep.DictName.cause: cause_list,
-        prep.DictName.underlying_cause: underlying_causes,
-        prep.DictName.effect: effect,
-        prep.DictName.consequence: consequence}
+        scenario = {prep.DictName.cause:            cause_list,
+                    prep.DictName.underlying_cause: underlying_causes,
+                    prep.DictName.effect:           effect,
+                    prep.DictName.consequence:      consequence}
         preliminary_scenario_list.append(scenario)
     else:
         underlying_causes, effect, consequence = assemble_concept_instance(substance,
@@ -6955,11 +6987,10 @@ def equipment_based_hazard_specific_deviation(deviation, args):
                                                                     [],
                                                                     [],
                                                                     False)
-        scenario = {prep.DictName.cause: [],
-        prep.DictName.underlying_cause: underlying_causes,
-        prep.DictName.effect: effect,
-        prep.DictName.consequence: consequence,
-        }
+        scenario = {prep.DictName.cause:            [],
+                    prep.DictName.underlying_cause: underlying_causes,
+                    prep.DictName.effect:           effect,
+                    prep.DictName.consequence:      consequence}
         preliminary_scenario_list.append(scenario)
     sync_reasoner(debug=0)
     
@@ -7281,27 +7312,31 @@ def infer_follow_up(process_unit,
                                 dev[prep.DictName.underlying_cause] = scenario[prep.DictName.underlying_cause].is_a[0]
                                 dev[prep.DictName.likelihood] = scenario[prep.DictName.likelihood].is_a[0]
                                 dev[prep.DictName.explanation] = process_unit.identifier + ": " + cause.name + " -> " + dev[
-                                prep.DictName.subsequent_deviation].name + " " + "(" + fmt_phase + ")"
+                                    prep.DictName.subsequent_deviation].name + " " + "(" + fmt_phase + ")"
                                 subsequent_deviations.append(dev)
     
     # === Infer dev -> dev
     if config.CONSIDER_DEV_2_DEV_PROPAGATION:
+        
         if process_unit.intended_function:
             intended_function = process_unit.intended_function[0].is_a[0]
         else:
             intended_function = None
-        current_case = {cbr.CaseAttributes.EquipmentEntity: process_unit.onto_object.is_a[0],
-        cbr.CaseAttributes.Event: current_deviation,
-        cbr.CaseAttributes.Apparatus: apparatus,
-        cbr.CaseAttributes.IntendedFunction: intended_function,
-        cbr.CaseAttributes.SubstancePhase: substance.onto_object.hasStateOfAggregation[0].is_a[0]}
+        current_case = {cbr.CaseAttributes.EquipmentEntity:     process_unit.onto_object.is_a[0],
+                        cbr.CaseAttributes.Event:               current_deviation,
+                        cbr.CaseAttributes.Apparatus:           apparatus,
+                        cbr.CaseAttributes.IntendedFunction:    intended_function,
+                        cbr.CaseAttributes.SubstancePhase:      substance.onto_object.hasStateOfAggregation[0].is_a[0]}
         match = cbr.match_case_with_cb(current_case, cbr.propagation_case_base)
+        
         if match and match != current_deviation:
             fmt_phase = str(substance.onto_object.hasStateOfAggregation[0].is_a[0]).split('.', 1)[1]
+            
             for m in match:
                 dev = {prep.DictName.subsequent_deviation: m,
                        prep.DictName.explanation: process_unit.identifier + ": " + current_deviation.name + " -> " + m.name + " " + "(" + fmt_phase + ")",
                        prep.DictName.likelihood: scenario[prep.DictName.likelihood].is_a[0]} # cannot really be estimated
+                
                 subsequent_deviations.append(dev)
 
 
@@ -7341,6 +7376,7 @@ def propagation_based_analysis(plant_graph, order, propagation_stacks):
             break
         
         substances = plant_graph.nodes[node_pos]["substances"]
+        
         # === Loop over substances
         for s, substance in enumerate(substances):
             print("========= Substance: {} = {} of {} =========".format(substance.name, s + 1, len(substances)))
@@ -7359,11 +7395,13 @@ def propagation_based_analysis(plant_graph, order, propagation_stacks):
                 
                 if 1 <= index < last_element:
                     pos = rel_order[index - 1]
+                    
                     # === Remove duplicates
                     scenario_list = [i for n, i in enumerate(propagation_stacks[pos][prep.DictName.scenario]) if i not in propagation_stacks[pos][prep.DictName.scenario][n + 1:]]
                     # === Set flag
                     no_passed_scenario_flag = False
                     consumed_flag = False
+                    
                     # === Loop over propagating scenarios
                     for scenario in scenario_list:
                         # === Create input object from scenario, #TODO: use scenario object directly
@@ -7376,6 +7414,7 @@ def propagation_based_analysis(plant_graph, order, propagation_stacks):
                                                  previous_case,
                                                  consumed_flag
                         )
+                        
                         # === Propagate partial scenario in case no effect have been identified
                         if not consumed_flag:
                             considered_deviations.append(subsequent_deviation)
@@ -7423,15 +7462,18 @@ def propagation_based_analysis(plant_graph, order, propagation_stacks):
                     
                     # Reached in case no scenarios are passed but the end is already reached
                     if no_passed_scenario_flag:
+                        
                         # === Remove duplicates
                         scenario_list = [i for n, i in enumerate(propagation_stacks[pos][prep.DictName.scenario]) if
                                          i not in propagation_stacks[pos][prep.DictName.scenario][n + 1:]]
                         
                         for p, propagation in enumerate(scenario_list):
                             print("=== LAST NODE: {} of {} scenarios ===".format(p, len(scenario_list)))
+                            
                             # === is case there is an effect means that no consequence was found for the equipment previously
                             if propagation[prep.DictName.effect].is_a[0] != effect_onto.Effect:
                                 complete_propagated_scenario(propagation, process_unit, substance)
+                                
                             else:
                                 # === Create input object from scenario,
                                 propagation = assemble_input_object(propagation)
@@ -7978,13 +8020,6 @@ def create_olefin_feed_section():
 
 
 #%% Appendix C - Main
-
-#infer
-#model
-#config
-#ontology_operations
-#pre_processing
-#output
 
 if __name__ == '__main__':
     
