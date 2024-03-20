@@ -32,38 +32,49 @@ import time
 
 
 #TODO Are these to be global variables?
+# upper_onto = None
+# pse_onto = None
+# environment_information = None
 equipment_onto = get_ontology("http://webprotege.stanford.edu/RDWdOfos2Exb6enOKUgeBQu")
 effect_onto = get_ontology("http://webprotege.stanford.edu/RC1ogh5ITJZqiSxPilU34kX")
 process_onto = get_ontology("http://webprotege.stanford.edu/R8hyyklGYBKTNXVxiG1bd1R") # the IntendedFunction OWL2 class
 substance_onto = get_ontology("http://webprotege.stanford.edu/RBmrmRPMEoUC51a1J5IYQ2m")
 deviation_onto = get_ontology("http://webprotege.stanford.edu/RCjlgfXA8ageBNXi7Os4Wa7")
 causes_onto = get_ontology("http://webprotege.stanford.edu/R80WoqaEII5lpmBpdbnPkNI")
-# risk_assessment_onto = None
-# upper_onto = None
-# consequence_onto = None
-# safeguard_onto = None
-# boundary_onto = None
-# pse_onto = None
-# site_information = None
-# equipment_entities = None
-# substance = None
-# environment_information = None
+risk_assessment_onto = get_ontology("http://webprotege.stanford.edu/RiVveZWVdMFw3hLYX1Jlqu")
+consequence_onto = get_ontology("http://webprotege.stanford.edu/RBAZPnEf855RzuTRUD8wlAb")
+safeguard_onto = get_ontology("http://webprotege.stanford.edu/RIk4RgRVqPyiipkmsWBYiQ")
+boundary_onto = get_ontology("http://webprotege.stanford.edu/RCzUYGx2DiiEIWsQUit4HYz")
+site_information = get_ontology("http://webprotege.stanford.edu/RDNF2eoUAQsJ8KREYE1uejT")
+equipment_entities = get_ontology("http://webprotege.stanford.edu/RDWdOfos2Exb6enOKUgeBQu")
+substance = get_ontology("http://webprotege.stanford.edu/RBmrmRPMEoUC51a1J5IYQ2m")
 
 
 
 # #TODO The following are variables and modules referenced elsewhere in the code.
-# results = None
-# default_world = None
+results = None
+default_world = None
 # prep = None
 # cbr = None # case based reasoner (I think)
 # sync_reasoner = None 
+# model = None
+# pre_processing = None
 
+def stringify_cleanup_inferred_res(someSuperCause):           pass
+def assemble_concept_instance(a, b, c):                       pass
+def add_edge_port(G, nodeindex, label1, node2index, label2):  pass
+def assemble_deviation(deviation):                            pass
 
-# def assemble_concept_instance(a, b, c):
-#     pass
-# def add_edge_port(G, nodeindex, label1, node2index, label2):
-#     pass
-
+# A local ontology for BoundaryConditions
+class BoundaryCondition(Thing):                         pass
+class IntroductionOfAir(BoundaryCondition):             pass
+class IntroductionOfImpurities(BoundaryCondition):      pass
+class IntroductionOfWater(BoundaryCondition):           pass
+class ExternalFirePossible(BoundaryCondition):          pass
+class LocatedOutside(BoundaryCondition):                pass
+class UpstreamProcessInvolved(BoundaryCondition):       pass
+class SubstanceContainsStabilizer(BoundaryCondition):   pass
+class FoundationCanBeAffected(BoundaryCondition):       pass
 
 #%% Appendix R - Graph Manipulation # Tearing
 
@@ -2860,7 +2871,7 @@ def calculate_similarity(new_case, old_case):
     
     for attr in attr_list:
         if old_case.get(attr)[0]:
-            similarities.append(similar(new_case.get(attr), old_case.get(attr)[0]))
+            similarities.append(similar(new_case.get(attr), old_case.get(attr)[0])) #TODO Recursion ?
         else:
             similarities.append(0)
             weights.append(old_case.get(attr)[1])
@@ -3145,6 +3156,7 @@ class FunctionalPlantItem(PlantItem):
 class StructuralPlantItem(PlantItem):
  pass
 AllDisjoint([FunctionalPlantItem, StructuralPlantItem])
+
 # === Ports
 class Port(Thing):
  pass
@@ -3158,8 +3170,9 @@ class hasConnectionType(Port >> ConnectionType, FunctionalProperty):
  pass
 class hasName(Port >> str, FunctionalProperty):
  pass
-class portEquippedWithInstrumentation(Port >> PlantItem, FunctionalProperty):
- pass
+# class portEquippedWithInstrumentation(Port >> PlantItem, FunctionalProperty):
+#  pass
+
 # === Control instance
 class ControlInstance(Thing):
  pass
@@ -3173,6 +3186,7 @@ class NotControlled(ControlInstance):
  pass
 
 AllDisjoint([Operator, ProgrammableLogicController, NotControlled]) #TODO
+
 # === FailSafePosition
 class FailSafePosition(Thing):
  pass
@@ -3180,6 +3194,7 @@ class FailOpen(FailSafePosition):
  pass
 class FailClosed(FailSafePosition):
  pass
+
 # === OperatingConditions
 class OperationMode(Thing):
  pass
@@ -3191,6 +3206,7 @@ class ShutDownOperation(OperationMode):
  pass
 class Maintenance(OperationMode):
  pass
+
 # === Piping
 class Piping(StructuralPlantItem):
  pass
@@ -3208,6 +3224,7 @@ class TankTruckHose(Pipe):
  pass
 class Fitting(Piping):
  pass
+
 # === Material transfer equipment
 class MaterialTransferEquipment(FunctionalPlantItem):
  pass
@@ -4674,6 +4691,16 @@ class IncorrectFilling(causes_onto.Cause):
  deviation_onto.HighFlow))]
 
 
+#%% Causes Missing from Local Ontology
+
+
+class AbnormalVaporIntake(Cause):                       pass
+class EquipmentFailure(Cause):                          pass
+class HeatInputByRecirculationPump(Cause):              pass
+class OpenedInletValve(Cause):                          pass
+class OpenedOutletValve(Cause):                         pass
+class ConnectionsFaultyConnected(Cause):                pass
+class FailureOfControlSystem(Cause):                    pass
 
 
 #%% Appendix K - Ontology for Underlying Causes
@@ -4788,10 +4815,10 @@ class AbnormallyHotIntake(UnderlyingCause):
  )] 
  
  
-class DepositionOfImpurities(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- isUnderlyingcauseOfCause.some(BlockedInflowLine |
- ReducedFlowArea)]
+# class DepositionOfImpurities(UnderlyingCause):
+#  equivalent_to = [UnderlyingCause &
+#  isUnderlyingcauseOfCause.some(BlockedInflowLine |
+#  ReducedFlowArea)]
 class LevelIndicatorControllerFailure(UnderlyingCause):
  equivalent_to = [UnderlyingCause &
  (isUnderlyingcauseOfCause.some(ValveWronglyClosed |
@@ -5768,10 +5795,10 @@ class ProductionDowntime(Consequence):
  (isConsequenceOfEffect.some(effect_onto.LossOfHeatTransfer) &
  consequenceInvolvesEquipmentEntity.some(equipment_onto.SteamDrivenReboilerEntity)))]
 ProductionDowntime.comment = ["There is also specific definition of the concept in compressor_onto"]
-class ReductionOfCoolingCapacity(Consequence):
- equivalent_to = [Consequence &
- (isConsequenceOfEffect.some(effect_onto.LossOfHeatTransfer) &
- consequenceInvolvesSubstance.some(substance_onto.hasSpecificTask.some(substance_onto.Refrigerant)))]
+# class ReductionOfCoolingCapacity(Consequence):
+#  equivalent_to = [Consequence &
+#  (isConsequenceOfEffect.some(effect_onto.LossOfHeatTransfer) &
+#  consequenceInvolvesSubstance.some(substance_onto.hasSpecificTask.some(substance_onto.Refrigerant)))]
 class PROPAGATED_CONSEQUENCE(Consequence):
  equivalent_to = [Consequence &
  ((consequenceImpliedByCause.some(causes_onto.IncorrectSetPointControlValve | causes_onto.ConfusionOfSubstances |
@@ -6700,7 +6727,7 @@ class EmergencyPressureReliefValve(Safeguard):
  safeguardInvolvesEquipmentEntity.some(equipment_onto.hasApparatus.some(
  equipment_onto.AtmosphericStorageTank |
  equipment_onto.OpenVessel)))]
-EmergencyPressureReliefValve = ["Located on low pressure storage tanks"]
+EmergencyPressureReliefValve.comment = ["Located on low pressure storage tanks"] # Here I have added the .comment, this was not in the original code.
 class AddStabilizer(Safeguard):
  equivalent_to = [Safeguard &
  safeguardPreventsEffect.some(effect_onto.UnintendedExothermicPolymerization)]
@@ -6861,6 +6888,7 @@ def equipment_based_hazard_specific_deviation(deviation, args):
     subsequent_deviation_loop = args[3]
     subsequent_deviations = args[4]
     stack_elements = args[5]
+    
     # === Loop over causes =====================================================================================
     preliminary_scenario_list = []
     extended_scenarion_list = []
