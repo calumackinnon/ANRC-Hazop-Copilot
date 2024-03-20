@@ -72,7 +72,12 @@ def assemble_concept_instance(a, b, c):                         pass
 def assemble_deviation(deviation):                              pass         # Equipment Based Hazard Specific Deviation
 def assemble_input_object(scenario):                            pass         # Propagation analysis
 def complete_propagated_scenario(propagation, process_unit, substance): pass # Propagation analysis
-
+def set_further_boundary_conditions(boundaryConditions, temp):  pass
+def instantiate_boundary_conditions(boundaryConditions):        pass
+def equipment_based_analysis(equipmentEntity, deviations, 
+                             substances, environment, 
+                             equipmentSpecificPropScenarios):   pass
+    
 def add_edge_port(G, nodeindex, label1, node2index, label2):
     
     assert isinstance(G, nx.DiGraph), 'Graph is not the expected type.'
@@ -81,7 +86,8 @@ def add_edge_port(G, nodeindex, label1, node2index, label2):
     
 class Configuration(Enum):
     
-    CONSIDER_DEV_2_DEV_PROPAGATION = False
+    CONSIDER_DEV_2_DEV_PROPAGATION = 0
+    EQUIPMENT_BASED_EVALUATION = 1
 
 
 # A local ontology for BoundaryConditions
@@ -102,10 +108,54 @@ class FoundationCanBeAffected(BoundaryCondition):               pass
 # pre_processing
 # output
 # model
-config = Configuration()
+config = Configuration.EQUIPMENT_BASED_EVALUATION
 # ontology_operations
 
 go = None
+
+#%% Missing ontology_operations
+
+""" At the link below there is an emphasis on using the 'with onto:' statement
+     https://owlready2.readthedocs.io/en/latest/mixing_python_owl.html
+     which would help resolve the apparent indentation confusion with a method
+     infer_follow_up(...) and which would delineate where ontology definitions
+     begin and end within the rest of this code.
+     """ #TODO This also means I have to undo commenting the duplicates out, as these intentionally build upon one another as described via the webpage.
+
+class OntologyOperations():
+    
+    
+    filename = 'onto.owl'
+    onto = None
+    
+    def __init__(self):
+        
+        pass 
+        
+    def save_ontology(self):
+        """
+        https://owlready2.readthedocs.io/en/latest/onto.html#saving-an-ontology-to-an-owl-file
+
+        Returns
+        -------
+        None.
+
+        """
+        self.onto.save(file=self.filename)
+        
+    def save_ontology_as_sql(self):
+        
+        pass #TODO
+        
+class Output(): #TODO This class definition needs a lot of further definition.
+    
+    hazop_table = None
+    
+    def create_output(self):
+        pass
+
+ontology_operations = OntologyOperations()
+output = Output()
 
 
 
@@ -2937,6 +2987,7 @@ def match_case_with_cb(current_case, case_base):
 #%% Appendix G - Ontology for Causes
 
 
+# with causes_onto:         #TODO
 
 # ===Cause ========================================
 class Cause(Thing):
@@ -2971,6 +3022,12 @@ class causeInvolvesSiteInformation(Cause >> site_information.AmbientInformation)
     pass
 class underlyingcauseRequiresBoundaryCondition(UnderlyingCause >> boundary_onto.BoundaryCondition):
     pass
+
+
+
+#TODO
+# with effect_onto:
+
 # === Effect ========================================
 class Effect(Thing):
     pass
@@ -8016,9 +8073,6 @@ def create_olefin_feed_section():
 
 
 
-
-
-
 #%% Appendix C - Main
 
 if __name__ == '__main__':
@@ -8074,7 +8128,7 @@ if __name__ == '__main__':
             deviations = config.deviation_selector(process_unit_obj)
             
             # === Infer hazards
-            infer.equipment_based_analysis( equipment_entity,
+            equipment_based_analysis( equipment_entity,
                                             deviations,
                                             substances,
                                             environment,
@@ -8087,7 +8141,7 @@ if __name__ == '__main__':
     if config.PROPAGATION_BASED_EVALUATION:
         
         if graph_type == GraphType.SingleLineSystem:
-            infer.propagation_based_analysis(process_plant_model, 
+            propagation_based_analysis(process_plant_model, 
                                              newly_arranged_graphs, 
                                              stack_elements)
             
@@ -8106,7 +8160,7 @@ if __name__ == '__main__':
                 for node in go.starting_with(cycle, intersection_node_index):
                     new_order.append(node)
     
-                infer.propagation_based_analysis(process_plant_model,
+                propagation_based_analysis(process_plant_model,
                                                  new_order,
                                                  stack_elements)
     
@@ -8114,7 +8168,7 @@ if __name__ == '__main__':
                 graph_type == GraphType.ComplexSystem or \
                 graph_type == GraphType.RecycleFlowSystem:
             for stream in newly_arranged_graphs:
-                infer.propagation_based_analysis(process_plant_model, 
+                propagation_based_analysis(process_plant_model, 
                                                  stream, 
                                                  stack_elements)
         else:
