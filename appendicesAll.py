@@ -22,10 +22,12 @@ It is to do with p 118 in the dissertation.
 
 
 # from enum import Enum
-from owlready2 import Thing
+from owlready2 import Thing, FunctionalProperty, AllDisjoint, AsymmetricProperty
+from owlready2 import ThingClass
 from owlready2 import *
 import itertools
 import unittest
+import time
 
 
 
@@ -43,14 +45,24 @@ causes_onto = get_ontology("http://webprotege.stanford.edu/R80WoqaEII5lpmBpdbnPk
 # boundary_onto = None
 # pse_onto = None
 # site_information = None
+# equipment_entities = None
+# substance = None
+# environment_information = None
+
 
 
 # #TODO The following are variables and modules referenced elsewhere in the code.
 # results = None
+# default_world = None
 # prep = None
 # cbr = None # case based reasoner (I think)
 # sync_reasoner = None 
 
+
+# def assemble_concept_instance(a, b, c):
+#     pass
+# def add_edge_port(G, nodeindex, label1, node2index, label2):
+#     pass
 
 
 #%% Appendix R - Graph Manipulation # Tearing
@@ -3159,7 +3171,7 @@ class OperatorAndProcessControlSystem(ControlInstance):
  pass
 class NotControlled(ControlInstance):
  pass
-#TODO
+
 AllDisjoint([Operator, ProgrammableLogicController, NotControlled]) #TODO
 # === FailSafePosition
 class FailSafePosition(Thing):
@@ -3769,377 +3781,6 @@ class hasStateOfAggregation(Substance >> StateOfAggregation):
 
 
 
-
-#%% Appendix K - Ontology for Underlying Causes
-
-
-class UtilityFailure(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- isUnderlyingcauseOfCause.some(NoInertgasSupply | NoSteamFlow)
- ]
-class MalfunctionUpstreamProcess(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- isUnderlyingcauseOfCause.some(DeliveryOfHighVolatilityComponents)
- ]
-class IntroductionOfRainwater(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- (isUnderlyingcauseOfCause.some(ContaminationInUnloadingLines) &
- underlyingcauseRequiresBoundaryCondition.some(boundary_onto.LocatedOutside))
- ]
-class MalfunctionFlowController(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- (isUnderlyingcauseOfCause.some(ExcessiveInflow |
- LossOfInflow) &
- underlyingcauseInvolvesEquipmentEntity.some(
- equipment_onto.hasInstrumentation.some(equipment_onto.FlowControlValve) |
- equipment_onto.hasInstrumentation.some(
- equipment_onto.LevelIndicatorController |
- equipment_onto.FlowIndicatorController)))]
-class MalfunctionPressureController(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- (isUnderlyingcauseOfCause.some(IncreasedInletPressure |
- IncorrectPressureAdjustment) &
- underlyingcauseInvolvesEquipmentEntity.some(
- equipment_onto.hasInstrumentation.some(equipment_onto.PressureControlValve)))]
-class AmbientTemperatureChange(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- isUnderlyingcauseOfCause.some(InsufficientThermalInbreathing)]
-class VehicleCollision(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- isUnderlyingcauseOfCause.some(PhysicalImpact)]
-class IncorrectCrossConnection(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- isUnderlyingcauseOfCause.some(AbnormalVaporIntake)]
-class ImproperProcessHeatInput(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- (isUnderlyingcauseOfCause.some(ThermalExpansion) &
- underlyingcauseInvolvesEquipmentEntity.some(
- equipment_onto.hasSubunit.some(equipment_onto.HeatingSystem)))]
-class FastGasRelaxation(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- isUnderlyingcauseOfCause.some(AbruptReliefOfContent)]
-class ExternalFire(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- ((isUnderlyingcauseOfCause.some(AbnormalHeatInput) &
- underlyingcauseRequiresBoundaryCondition.some(boundary_onto.ExternalFirePossible))
- |
- (underlyingcauseInvolvesEquipmentEntity.some(
- equipment_onto.hasApparatus.some(equipment_onto.PressureVessel)) &
- isUnderlyingcauseOfCause.some(ThermalExpansion) &
- underlyingcauseRequiresBoundaryCondition.some(boundary_onto.ExternalFirePossible)
- )
- |
- (isUnderlyingcauseOfCause.some(AbnormalHeatInput) &
- underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.Storing)) &
- underlyingcauseRequiresBoundaryCondition.some(boundary_onto.ExternalFirePossible)))
- ]
-class SolarRadiation(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
-                  ((isUnderlyingcauseOfCause.some(AbnormalHeatInput) &
-                    underlyingcauseInvolvesSubstance.some(
-                        (substance_onto.hasFlashpointInKelvin <= 348.15) &
-                        substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium)) &
-                    underlyingcauseRequiresBoundaryCondition.some(boundary_onto.LocatedOutside))
-                   |
-                   (isUnderlyingcauseOfCause.some(InsufficientThermalOutbreathing) &
-                    underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity) &
-                    underlyingcauseRequiresBoundaryCondition.some(boundary_onto.LocatedOutside))
-                   )
-                  ]
- 
-SolarRadiation.comment = ["Assumption behind surface temperature of tank/vessel can rise to 75 °C, flash point is compared to it"]
-
-class RapidlyClosingValve(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
-                  (isUnderlyingcauseOfCause.some(WaterHammer) &
-                   underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.ConnectionPipeEntity))
-                  ]
- 
-class BlockedPipingAndHeatInput(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
-                  (isUnderlyingcauseOfCause.some(ThermalExpansion) &
-                   underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.ConnectionPipeEntity) &
-                   underlyingcauseRequiresBoundaryCondition.some(boundary_onto.ExternalFirePossible |
-                                                                 boundary_onto.LocatedOutside)
-                   )
-                  ]
-BlockedPipingAndHeatInput.comment = ["Requires external heat, therefore the boundary conditions"]
-
-class AbnormallyHotIntake(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- ((isUnderlyingcauseOfCause.some(AbnormalHeatInput |
- ThermalExpansion) &
- underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.SteamReceiverEntity |
- equipment_onto.PressureReceiverEntity |
- equipment_onto.ReactorEntity))
- |
- (isUnderlyingcauseOfCause.some(AbnormalHeatInput) &
- underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.Filling)))
- )] 
- 
- 
-class DepositionOfImpurities(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- isUnderlyingcauseOfCause.some(BlockedInflowLine |
- ReducedFlowArea)]
-class LevelIndicatorControllerFailure(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- (isUnderlyingcauseOfCause.some(ValveWronglyClosed |
- ValveWronglyOpened |
- IncorrectSetPointControlValve) &
- underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.hasInstrumentation.some(equipment_onto.LevelIndicatorController) |
- equipment_onto.hasConnectionToAdjacentPlantItem.some(equipment_onto.LevelIndicatorController)))]
-class ControlValveFailsOpen(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- (isUnderlyingcauseOfCause.some(ValveWronglyOpened) &
- underlyingcauseInvolvesEquipmentEntity.some(
- equipment_onto.hasInstrumentation.some(equipment_onto.FlowControlValve |
- equipment_onto.PressureControlValve)))
- ]
-class ControlValveFailsClosed(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- (isUnderlyingcauseOfCause.some(ValveWronglyClosed) &
- underlyingcauseInvolvesEquipmentEntity.some(
- equipment_onto.hasInstrumentation.some(equipment_onto.FlowControlValve |
- equipment_onto.PressureControlValve)))
- ]
-class PressureIndicatorControllerFailure(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- (isUnderlyingcauseOfCause.some(ValveWronglyClosed |
- ValveWronglyOpened |
- IncorrectPressureAdjustment |
- IncorrectSetPointControlValve) &
- underlyingcauseInvolvesEquipmentEntity.some(
- equipment_onto.hasInstrumentation.some(equipment_onto.PressureIndicatorController) |
- equipment_onto.hasConnectionToAdjacentPlantItem.some(equipment_onto.PressureIndicatorController)))
- ]
-class FlowIndicatorControllerFailure(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- (isUnderlyingcauseOfCause.some(ValveWronglyClosed |
- ValveWronglyOpened |
- IncorrectSetPointControlValve) &
- underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.SteamDrivenReboilerEntity &
- (equipment_onto.hasInstrumentation.some(
- equipment_onto.PressureIndicatorController) |
-equipment_onto.hasConnectionToAdjacentPlantItem.some(
- equipment_onto.PressureIndicatorController)))
- )]
-class AbnormalHeatRemoval(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- isUnderlyingcauseOfCause.some(FreezeUp)]
-class LowAmbientTemperature(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- (underlyingcauseRequiresBoundaryCondition.some(boundary_onto.LocatedOutside) &
- isUnderlyingcauseOfCause.some(FreezeUp))]
- 
-class DefectiveSeal(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- (underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.hasSubunit.some(equipment_onto.SealingSystem)) &
- isUnderlyingcauseOfCause.some(ExternalLeakage))]
-DefectiveSeal.comment = ["Called 'seal failure' in Lees' Loss Prevention ... pp. 12/40"]
-
-class DepositionOfImpurities(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- isUnderlyingcauseOfCause.some(BlockedOutflowLine)]
- 
-class MechanicalDamage(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- isUnderlyingcauseOfCause.some(EquipmentFailure |
- HeatInputByRecirculationPump)]
- 
-class WearDown(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- (isUnderlyingcauseOfCause.some(PumpSealFailure) &
- underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.PumpEntity))
- |
- (isUnderlyingcauseOfCause.some(InternalLeakage) &
- underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.SteamDrivenReboilerEntity))
- ]
- 
-class LossOfLeakTightness(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- isUnderlyingcauseOfCause.some(ExternalLeakage | LeakingDrainValve)
- ]
- 
-class SuddenStartingPump(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- (underlyingcauseInvolvesEquipmentEntity.some(
- equipment_onto.hasMaterialTransferEquipment.some(equipment_onto.ReciprocatingPump)) &
- isUnderlyingcauseOfCause.some(WaterHammer))]
- 
-class SuddenlyStoppingPump(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- (underlyingcauseInvolvesEquipmentEntity.some(
- equipment_onto.hasMaterialTransferEquipment.some(equipment_onto.ReciprocatingPump)) &
- isUnderlyingcauseOfCause.some(WaterHammer))]
-
-class PowerFailure(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- ((underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.hasSubunit.some(equipment_onto.ElectricalEnergySupply)) &
- isUnderlyingcauseOfCause.some(EquipmentFailure))
- |
- (isUnderlyingcauseOfCause.some(WaterHammer) &
- underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.ValveEntity &
- equipment_onto.hasSubunit.some(equipment_onto.ElectricalEnergySupply))
- )
- |
- (isUnderlyingcauseOfCause.some(WaterHammer) &
- underlyingcauseInvolvesEquipmentEntity.some(
- (equipment_onto.hasMaterialTransferEquipment.some(equipment_onto.ReciprocatingPump)) &
- equipment_onto.hasSubunit.some(equipment_onto.ElectricalEnergySupply))
- ))]
- 
-class MalfunctionSpeedControl(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- (underlyingcauseInvolvesEquipmentEntity.some(
- equipment_onto.hasInstrumentation.some(equipment_onto.SpeedController)) &
- isUnderlyingcauseOfCause.some(WrongRotatingSpeed |
- EquipmentFailure))]
- 
- 
-class BreakdownOfActuator(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- (underlyingcauseInvolvesEquipmentEntity.some(
- equipment_onto.hasInstrumentation.some(equipment_onto.ElectricalActuator |
- equipment_onto.ManualActuator |
- equipment_onto.HydraulicActuator |
- equipment_onto.PneumaticActuator)) &
- (isUnderlyingcauseOfCause.some(EquipmentFailure)))]
- 
-class FailureControlLoop(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- ((underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.hasInstrumentation.some(equipment_onto.Controller) &
- equipment_onto.entityControlledBy.some(equipment_onto.ProgrammableLogicController)) &
- isUnderlyingcauseOfCause.some(EquipmentFailure |
- DeadHeadingOfPump))
- |
- (underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.hasInstrumentation.some(equipment_onto.Controller) &
- equipment_onto.entityControlledBy.some(equipment_onto.ProgrammableLogicController)) &
- isUnderlyingcauseOfCause.some(CoolingFailure))
- |
- isUnderlyingcauseOfCause.some(IncorrectIndicationOfFillingLevel)
- |
- isUnderlyingcauseOfCause.some(NoSteamFlow))]
- 
-class ValveFailure(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- (isUnderlyingcauseOfCause.some(ClosedInletValve) |
- isUnderlyingcauseOfCause.some(ClosedOutletValve) |
- isUnderlyingcauseOfCause.some(OpenedInletValve) |
- isUnderlyingcauseOfCause.some(OpenedOutletValve))]
- 
-class MaintenanceError(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- isUnderlyingcauseOfCause.some(WrongMountingOfNonReturnValve | LeakingDrainValve | MissingImpeller)]
-
-class OperationalError(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- ((underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.entityControlledBy.some(equipment_onto.Operator)) &
- isUnderlyingcauseOfCause.some(ConfusionOfSubstances | WrongTankLinedUp))
- |
- ((isUnderlyingcauseOfCause.some(ClosedInletValve) |
- isUnderlyingcauseOfCause.some(ClosedOutletValve) |
- isUnderlyingcauseOfCause.some(OpenedInletValve) |
- isUnderlyingcauseOfCause.some(OpenedOutletValve) |
- isUnderlyingcauseOfCause.some(PumpIncorrectlySet) |
- isUnderlyingcauseOfCause.some(ValveClosedPressureBuildUpInPiping) |
- isUnderlyingcauseOfCause.some(ExcessiveInflow) |
- isUnderlyingcauseOfCause.some(DeadHeadingOfPump) |
- isUnderlyingcauseOfCause.some(ConnectionsFaultyConnected) |
- isUnderlyingcauseOfCause.some(BypassOpened) |
- isUnderlyingcauseOfCause.some(ValveWronglyClosed) |
- isUnderlyingcauseOfCause.some(ValveWronglyOpened) |
- isUnderlyingcauseOfCause.some(IncorrectFilling) |
- isUnderlyingcauseOfCause.some(ValveIntactUnintentionallyClosed) |
- isUnderlyingcauseOfCause.some(DrainValveInadvertentlyOpened) |
- isUnderlyingcauseOfCause.some(IncorrectSetPointControlValve)
- )))]
-class ContaminationInTankTruck(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- (underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.TankTruckEntity) &
- isUnderlyingcauseOfCause.some(InadvertentContamination))]
-class CondensationAirHumidity(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- isUnderlyingcauseOfCause.some(ContaminationByWater) &
- underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
- equipment_onto.hasIntendedFunction.some(process_onto.Storing))]
-class EntryDuringFilling(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- isUnderlyingcauseOfCause.some(ContaminationByWater) &
- underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
- equipment_onto.hasIntendedFunction.some(process_onto.Filling))]
-class LongStorageTimeOfStabilizer(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- isUnderlyingcauseOfCause.some(TooLittleStabilizer)]
-class PersistentMechanicalStresses(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- isUnderlyingcauseOfCause.some(MaterialDegradation)]
-class HoseIncorrectlyConnected(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- (isUnderlyingcauseOfCause.some(ExternalLeakage) &
- underlyingcauseInvolvesEquipmentEntity.some(
- equipment_onto.hasPiping.some(equipment_onto.TankTruckHose) &
- equipment_onto.entityControlledBy.some(equipment_onto.Operator)))]
-class BrokenHose(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- (isUnderlyingcauseOfCause.some(ExternalLeakage) &
- underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.hasPiping.some(equipment_onto.TankTruckHose)))]
-class MalfunctionOilTemperatureControl(causes_onto.UnderlyingCause):
- equivalent_to = [causes_onto.UnderlyingCause &
- causes_onto.isUnderlyingcauseOfCause.some(MalfunctionLubricationSystem)]
-class FailureOilCoolingFan(causes_onto.UnderlyingCause):
- equivalent_to = [causes_onto.UnderlyingCause &
- causes_onto.isUnderlyingcauseOfCause.some(MalfunctionLubricationSystem)]
-class CloggingOilCoolingLine(causes_onto.UnderlyingCause):
- equivalent_to = [causes_onto.UnderlyingCause &
- causes_onto.isUnderlyingcauseOfCause.some(MalfunctionLubricationSystem)]
-class CloggingOilFilter(causes_onto.UnderlyingCause):
- equivalent_to = [causes_onto.UnderlyingCause &
- causes_onto.isUnderlyingcauseOfCause.some(MalfunctionLubricationSystem)]
-class LowCompressorOilLevel(causes_onto.UnderlyingCause):
- equivalent_to = [causes_onto.UnderlyingCause &
- causes_onto.isUnderlyingcauseOfCause.some(MalfunctionLubricationSystem)]
-class EntryOfForeignGases(causes_onto.UnderlyingCause):
- equivalent_to = [causes_onto.UnderlyingCause &
- (causes_onto.isUnderlyingcauseOfCause.some(causes_onto.NonCondensables) &
- causes_onto.underlyingcauseRequiresBoundaryCondition.some(boundary_onto.IntroductionOfAir))]
-class Sediments(causes_onto.UnderlyingCause):
- equivalent_to = [causes_onto.UnderlyingCause &
- (causes_onto.isUnderlyingcauseOfCause.some(causes_onto.Fouling) &
- causes_onto.underlyingcauseRequiresBoundaryCondition.some(boundary_onto.IntroductionOfImpurities))]
- 
- 
-class GrowthOfOrganisms(causes_onto.UnderlyingCause):
- equivalent_to = [causes_onto.UnderlyingCause &
- (causes_onto.isUnderlyingcauseOfCause.some(causes_onto.Fouling)
- )]
-class MalfunctionControlAir(causes_onto.UnderlyingCause):
- equivalent_to = [causes_onto.UnderlyingCause &
- (causes_onto.isUnderlyingcauseOfCause.some(causes_onto.ValveWronglyClosed |
- causes_onto.ValveWronglyOpened |
- causes_onto.ValveClosedPressureBuildUpInPiping |
- FailureOfControlSystem) &
- causes_onto.underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.ValveEntity &
- equipment_onto.hasSubunit.some(equipment_onto.CompressedAirSupply) &
- equipment_onto.hasInstrumentation.some(equipment_onto.PneumaticActuator)))]
-class WrongElectricSignal(causes_onto.UnderlyingCause):
- equivalent_to = [causes_onto.UnderlyingCause &
- (causes_onto.isUnderlyingcauseOfCause.some(causes_onto.ValveWronglyClosed |
- causes_onto.ValveWronglyOpened |
- causes_onto.ValveClosedPressureBuildUpInPiping |
- FailureOfControlSystem) &
- causes_onto.underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.ValveEntity &
- equipment_onto.hasSubunit.some(equipment_onto.ElectricalEnergySupply) &
- equipment_onto.hasInstrumentation.some(equipment_onto.ElectricalActuator)
- ))] 
- 
- 
- 
- 
 #%% Appendix L - Ontology for Causes
 
 class ReducedFlowArea(Cause):
@@ -5033,6 +4674,378 @@ class IncorrectFilling(causes_onto.Cause):
  deviation_onto.HighFlow))]
 
 
+
+
+#%% Appendix K - Ontology for Underlying Causes
+
+
+class UtilityFailure(UnderlyingCause):
+ equivalent_to = [UnderlyingCause &
+ isUnderlyingcauseOfCause.some(NoInertgasSupply | NoSteamFlow)
+ ]
+class MalfunctionUpstreamProcess(UnderlyingCause):
+ equivalent_to = [UnderlyingCause &
+ isUnderlyingcauseOfCause.some(DeliveryOfHighVolatilityComponents)
+ ]
+class IntroductionOfRainwater(UnderlyingCause):
+ equivalent_to = [UnderlyingCause &
+ (isUnderlyingcauseOfCause.some(ContaminationInUnloadingLines) &
+ underlyingcauseRequiresBoundaryCondition.some(boundary_onto.LocatedOutside))
+ ]
+class MalfunctionFlowController(UnderlyingCause):
+ equivalent_to = [UnderlyingCause &
+ (isUnderlyingcauseOfCause.some(ExcessiveInflow |
+ LossOfInflow) &
+ underlyingcauseInvolvesEquipmentEntity.some(
+ equipment_onto.hasInstrumentation.some(equipment_onto.FlowControlValve) |
+ equipment_onto.hasInstrumentation.some(
+ equipment_onto.LevelIndicatorController |
+ equipment_onto.FlowIndicatorController)))]
+class MalfunctionPressureController(UnderlyingCause):
+ equivalent_to = [UnderlyingCause &
+ (isUnderlyingcauseOfCause.some(IncreasedInletPressure |
+ IncorrectPressureAdjustment) &
+ underlyingcauseInvolvesEquipmentEntity.some(
+ equipment_onto.hasInstrumentation.some(equipment_onto.PressureControlValve)))]
+class AmbientTemperatureChange(UnderlyingCause):
+ equivalent_to = [UnderlyingCause &
+ isUnderlyingcauseOfCause.some(InsufficientThermalInbreathing)]
+class VehicleCollision(UnderlyingCause):
+ equivalent_to = [UnderlyingCause &
+ isUnderlyingcauseOfCause.some(PhysicalImpact)]
+class IncorrectCrossConnection(UnderlyingCause):
+ equivalent_to = [UnderlyingCause &
+ isUnderlyingcauseOfCause.some(AbnormalVaporIntake)]
+class ImproperProcessHeatInput(UnderlyingCause):
+ equivalent_to = [UnderlyingCause &
+ (isUnderlyingcauseOfCause.some(ThermalExpansion) &
+ underlyingcauseInvolvesEquipmentEntity.some(
+ equipment_onto.hasSubunit.some(equipment_onto.HeatingSystem)))]
+class FastGasRelaxation(UnderlyingCause):
+ equivalent_to = [UnderlyingCause &
+ isUnderlyingcauseOfCause.some(AbruptReliefOfContent)]
+class ExternalFire(UnderlyingCause):
+ equivalent_to = [UnderlyingCause &
+ ((isUnderlyingcauseOfCause.some(AbnormalHeatInput) &
+ underlyingcauseRequiresBoundaryCondition.some(boundary_onto.ExternalFirePossible))
+ |
+ (underlyingcauseInvolvesEquipmentEntity.some(
+ equipment_onto.hasApparatus.some(equipment_onto.PressureVessel)) &
+ isUnderlyingcauseOfCause.some(ThermalExpansion) &
+ underlyingcauseRequiresBoundaryCondition.some(boundary_onto.ExternalFirePossible)
+ )
+ |
+ (isUnderlyingcauseOfCause.some(AbnormalHeatInput) &
+ underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
+ equipment_onto.hasIntendedFunction.some(
+ process_onto.Storing)) &
+ underlyingcauseRequiresBoundaryCondition.some(boundary_onto.ExternalFirePossible)))
+ ]
+class SolarRadiation(UnderlyingCause):
+ equivalent_to = [UnderlyingCause &
+                  ((isUnderlyingcauseOfCause.some(AbnormalHeatInput) &
+                    underlyingcauseInvolvesSubstance.some(
+                        (substance_onto.hasFlashpointInKelvin <= 348.15) &
+                        substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium)) &
+                    underlyingcauseRequiresBoundaryCondition.some(boundary_onto.LocatedOutside))
+                   |
+                   (isUnderlyingcauseOfCause.some(InsufficientThermalOutbreathing) &
+                    underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity) &
+                    underlyingcauseRequiresBoundaryCondition.some(boundary_onto.LocatedOutside))
+                   )
+                  ]
+ 
+SolarRadiation.comment = ["Assumption behind surface temperature of tank/vessel can rise to 75 °C, flash point is compared to it"]
+
+class RapidlyClosingValve(UnderlyingCause):
+ equivalent_to = [UnderlyingCause &
+                  (isUnderlyingcauseOfCause.some(WaterHammer) &
+                   underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.ConnectionPipeEntity))
+                  ]
+ 
+class BlockedPipingAndHeatInput(UnderlyingCause):
+ equivalent_to = [UnderlyingCause &
+                  (isUnderlyingcauseOfCause.some(ThermalExpansion) &
+                   underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.ConnectionPipeEntity) &
+                   underlyingcauseRequiresBoundaryCondition.some(boundary_onto.ExternalFirePossible |
+                                                                 boundary_onto.LocatedOutside)
+                   )
+                  ]
+BlockedPipingAndHeatInput.comment = ["Requires external heat, therefore the boundary conditions"]
+
+class AbnormallyHotIntake(UnderlyingCause):
+ equivalent_to = [UnderlyingCause &
+ ((isUnderlyingcauseOfCause.some(AbnormalHeatInput |
+ ThermalExpansion) &
+ underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.SteamReceiverEntity |
+ equipment_onto.PressureReceiverEntity |
+ equipment_onto.ReactorEntity))
+ |
+ (isUnderlyingcauseOfCause.some(AbnormalHeatInput) &
+ underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
+ equipment_onto.hasIntendedFunction.some(
+ process_onto.Filling)))
+ )] 
+ 
+ 
+class DepositionOfImpurities(UnderlyingCause):
+ equivalent_to = [UnderlyingCause &
+ isUnderlyingcauseOfCause.some(BlockedInflowLine |
+ ReducedFlowArea)]
+class LevelIndicatorControllerFailure(UnderlyingCause):
+ equivalent_to = [UnderlyingCause &
+ (isUnderlyingcauseOfCause.some(ValveWronglyClosed |
+ ValveWronglyOpened |
+ IncorrectSetPointControlValve) &
+ underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.hasInstrumentation.some(equipment_onto.LevelIndicatorController) |
+ equipment_onto.hasConnectionToAdjacentPlantItem.some(equipment_onto.LevelIndicatorController)))]
+class ControlValveFailsOpen(UnderlyingCause):
+ equivalent_to = [UnderlyingCause &
+ (isUnderlyingcauseOfCause.some(ValveWronglyOpened) &
+ underlyingcauseInvolvesEquipmentEntity.some(
+ equipment_onto.hasInstrumentation.some(equipment_onto.FlowControlValve |
+ equipment_onto.PressureControlValve)))
+ ]
+class ControlValveFailsClosed(UnderlyingCause):
+ equivalent_to = [UnderlyingCause &
+ (isUnderlyingcauseOfCause.some(ValveWronglyClosed) &
+ underlyingcauseInvolvesEquipmentEntity.some(
+ equipment_onto.hasInstrumentation.some(equipment_onto.FlowControlValve |
+ equipment_onto.PressureControlValve)))
+ ]
+class PressureIndicatorControllerFailure(UnderlyingCause):
+ equivalent_to = [UnderlyingCause &
+ (isUnderlyingcauseOfCause.some(ValveWronglyClosed |
+ ValveWronglyOpened |
+ IncorrectPressureAdjustment |
+ IncorrectSetPointControlValve) &
+ underlyingcauseInvolvesEquipmentEntity.some(
+ equipment_onto.hasInstrumentation.some(equipment_onto.PressureIndicatorController) |
+ equipment_onto.hasConnectionToAdjacentPlantItem.some(equipment_onto.PressureIndicatorController)))
+ ]
+class FlowIndicatorControllerFailure(UnderlyingCause):
+ equivalent_to = [UnderlyingCause &
+ (isUnderlyingcauseOfCause.some(ValveWronglyClosed |
+ ValveWronglyOpened |
+ IncorrectSetPointControlValve) &
+ underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.SteamDrivenReboilerEntity &
+ (equipment_onto.hasInstrumentation.some(
+ equipment_onto.PressureIndicatorController) |
+equipment_onto.hasConnectionToAdjacentPlantItem.some(
+ equipment_onto.PressureIndicatorController)))
+ )]
+class AbnormalHeatRemoval(UnderlyingCause):
+ equivalent_to = [UnderlyingCause &
+ isUnderlyingcauseOfCause.some(FreezeUp)]
+class LowAmbientTemperature(UnderlyingCause):
+ equivalent_to = [UnderlyingCause &
+ (underlyingcauseRequiresBoundaryCondition.some(boundary_onto.LocatedOutside) &
+ isUnderlyingcauseOfCause.some(FreezeUp))]
+ 
+class DefectiveSeal(UnderlyingCause):
+ equivalent_to = [UnderlyingCause &
+ (underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.hasSubunit.some(equipment_onto.SealingSystem)) &
+ isUnderlyingcauseOfCause.some(ExternalLeakage))]
+DefectiveSeal.comment = ["Called 'seal failure' in Lees' Loss Prevention ... pp. 12/40"]
+
+class DepositionOfImpurities(UnderlyingCause):
+ equivalent_to = [UnderlyingCause &
+ isUnderlyingcauseOfCause.some(BlockedOutflowLine)]
+ 
+class MechanicalDamage(UnderlyingCause):
+ equivalent_to = [UnderlyingCause &
+ isUnderlyingcauseOfCause.some(EquipmentFailure |
+ HeatInputByRecirculationPump)]
+ 
+class WearDown(UnderlyingCause):
+ equivalent_to = [UnderlyingCause &
+ (isUnderlyingcauseOfCause.some(PumpSealFailure) &
+ underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.PumpEntity))
+ |
+ (isUnderlyingcauseOfCause.some(InternalLeakage) &
+ underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.SteamDrivenReboilerEntity))
+ ]
+ 
+class LossOfLeakTightness(UnderlyingCause):
+ equivalent_to = [UnderlyingCause &
+ isUnderlyingcauseOfCause.some(ExternalLeakage | LeakingDrainValve)
+ ]
+ 
+class SuddenStartingPump(UnderlyingCause):
+ equivalent_to = [UnderlyingCause &
+ (underlyingcauseInvolvesEquipmentEntity.some(
+ equipment_onto.hasMaterialTransferEquipment.some(equipment_onto.ReciprocatingPump)) &
+ isUnderlyingcauseOfCause.some(WaterHammer))]
+ 
+class SuddenlyStoppingPump(UnderlyingCause):
+ equivalent_to = [UnderlyingCause &
+ (underlyingcauseInvolvesEquipmentEntity.some(
+ equipment_onto.hasMaterialTransferEquipment.some(equipment_onto.ReciprocatingPump)) &
+ isUnderlyingcauseOfCause.some(WaterHammer))]
+
+class PowerFailure(UnderlyingCause):
+ equivalent_to = [UnderlyingCause &
+ ((underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.hasSubunit.some(equipment_onto.ElectricalEnergySupply)) &
+ isUnderlyingcauseOfCause.some(EquipmentFailure))
+ |
+ (isUnderlyingcauseOfCause.some(WaterHammer) &
+ underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.ValveEntity &
+ equipment_onto.hasSubunit.some(equipment_onto.ElectricalEnergySupply))
+ )
+ |
+ (isUnderlyingcauseOfCause.some(WaterHammer) &
+ underlyingcauseInvolvesEquipmentEntity.some(
+ (equipment_onto.hasMaterialTransferEquipment.some(equipment_onto.ReciprocatingPump)) &
+ equipment_onto.hasSubunit.some(equipment_onto.ElectricalEnergySupply))
+ ))]
+ 
+class MalfunctionSpeedControl(UnderlyingCause):
+ equivalent_to = [UnderlyingCause &
+ (underlyingcauseInvolvesEquipmentEntity.some(
+ equipment_onto.hasInstrumentation.some(equipment_onto.SpeedController)) &
+ isUnderlyingcauseOfCause.some(WrongRotatingSpeed |
+ EquipmentFailure))]
+ 
+ 
+class BreakdownOfActuator(UnderlyingCause):
+ equivalent_to = [UnderlyingCause &
+ (underlyingcauseInvolvesEquipmentEntity.some(
+ equipment_onto.hasInstrumentation.some(equipment_onto.ElectricalActuator |
+ equipment_onto.ManualActuator |
+ equipment_onto.HydraulicActuator |
+ equipment_onto.PneumaticActuator)) &
+ (isUnderlyingcauseOfCause.some(EquipmentFailure)))]
+ 
+class FailureControlLoop(UnderlyingCause):
+ equivalent_to = [UnderlyingCause &
+ ((underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.hasInstrumentation.some(equipment_onto.Controller) &
+ equipment_onto.entityControlledBy.some(equipment_onto.ProgrammableLogicController)) &
+ isUnderlyingcauseOfCause.some(EquipmentFailure |
+ DeadHeadingOfPump))
+ |
+ (underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.hasInstrumentation.some(equipment_onto.Controller) &
+ equipment_onto.entityControlledBy.some(equipment_onto.ProgrammableLogicController)) &
+ isUnderlyingcauseOfCause.some(CoolingFailure))
+ |
+ isUnderlyingcauseOfCause.some(IncorrectIndicationOfFillingLevel)
+ |
+ isUnderlyingcauseOfCause.some(NoSteamFlow))]
+ 
+class ValveFailure(UnderlyingCause):
+ equivalent_to = [UnderlyingCause &
+ (isUnderlyingcauseOfCause.some(ClosedInletValve) |
+ isUnderlyingcauseOfCause.some(ClosedOutletValve) |
+ isUnderlyingcauseOfCause.some(OpenedInletValve) |
+ isUnderlyingcauseOfCause.some(OpenedOutletValve))]
+ 
+class MaintenanceError(UnderlyingCause):
+ equivalent_to = [UnderlyingCause &
+ isUnderlyingcauseOfCause.some(WrongMountingOfNonReturnValve | LeakingDrainValve | MissingImpeller)]
+
+class OperationalError(UnderlyingCause):
+ equivalent_to = [UnderlyingCause &
+ ((underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.entityControlledBy.some(equipment_onto.Operator)) &
+ isUnderlyingcauseOfCause.some(ConfusionOfSubstances | WrongTankLinedUp))
+ |
+ ((isUnderlyingcauseOfCause.some(ClosedInletValve) |
+ isUnderlyingcauseOfCause.some(ClosedOutletValve) |
+ isUnderlyingcauseOfCause.some(OpenedInletValve) |
+ isUnderlyingcauseOfCause.some(OpenedOutletValve) |
+ isUnderlyingcauseOfCause.some(PumpIncorrectlySet) |
+ isUnderlyingcauseOfCause.some(ValveClosedPressureBuildUpInPiping) |
+ isUnderlyingcauseOfCause.some(ExcessiveInflow) |
+ isUnderlyingcauseOfCause.some(DeadHeadingOfPump) |
+ isUnderlyingcauseOfCause.some(ConnectionsFaultyConnected) |
+ isUnderlyingcauseOfCause.some(BypassOpened) |
+ isUnderlyingcauseOfCause.some(ValveWronglyClosed) |
+ isUnderlyingcauseOfCause.some(ValveWronglyOpened) |
+ isUnderlyingcauseOfCause.some(IncorrectFilling) |
+ isUnderlyingcauseOfCause.some(ValveIntactUnintentionallyClosed) |
+ isUnderlyingcauseOfCause.some(DrainValveInadvertentlyOpened) |
+ isUnderlyingcauseOfCause.some(IncorrectSetPointControlValve)
+ )))]
+class ContaminationInTankTruck(UnderlyingCause):
+ equivalent_to = [UnderlyingCause &
+ (underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.TankTruckEntity) &
+ isUnderlyingcauseOfCause.some(InadvertentContamination))]
+class CondensationAirHumidity(UnderlyingCause):
+ equivalent_to = [UnderlyingCause &
+ isUnderlyingcauseOfCause.some(ContaminationByWater) &
+ underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
+ equipment_onto.hasIntendedFunction.some(process_onto.Storing))]
+class EntryDuringFilling(UnderlyingCause):
+ equivalent_to = [UnderlyingCause &
+ isUnderlyingcauseOfCause.some(ContaminationByWater) &
+ underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
+ equipment_onto.hasIntendedFunction.some(process_onto.Filling))]
+class LongStorageTimeOfStabilizer(UnderlyingCause):
+ equivalent_to = [UnderlyingCause &
+ isUnderlyingcauseOfCause.some(TooLittleStabilizer)]
+class PersistentMechanicalStresses(UnderlyingCause):
+ equivalent_to = [UnderlyingCause &
+ isUnderlyingcauseOfCause.some(MaterialDegradation)]
+class HoseIncorrectlyConnected(UnderlyingCause):
+ equivalent_to = [UnderlyingCause &
+ (isUnderlyingcauseOfCause.some(ExternalLeakage) &
+ underlyingcauseInvolvesEquipmentEntity.some(
+ equipment_onto.hasPiping.some(equipment_onto.TankTruckHose) &
+ equipment_onto.entityControlledBy.some(equipment_onto.Operator)))]
+class BrokenHose(UnderlyingCause):
+ equivalent_to = [UnderlyingCause &
+ (isUnderlyingcauseOfCause.some(ExternalLeakage) &
+ underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.hasPiping.some(equipment_onto.TankTruckHose)))]
+class MalfunctionOilTemperatureControl(causes_onto.UnderlyingCause):
+ equivalent_to = [causes_onto.UnderlyingCause &
+ causes_onto.isUnderlyingcauseOfCause.some(MalfunctionLubricationSystem)]
+class FailureOilCoolingFan(causes_onto.UnderlyingCause):
+ equivalent_to = [causes_onto.UnderlyingCause &
+ causes_onto.isUnderlyingcauseOfCause.some(MalfunctionLubricationSystem)]
+class CloggingOilCoolingLine(causes_onto.UnderlyingCause):
+ equivalent_to = [causes_onto.UnderlyingCause &
+ causes_onto.isUnderlyingcauseOfCause.some(MalfunctionLubricationSystem)]
+class CloggingOilFilter(causes_onto.UnderlyingCause):
+ equivalent_to = [causes_onto.UnderlyingCause &
+ causes_onto.isUnderlyingcauseOfCause.some(MalfunctionLubricationSystem)]
+class LowCompressorOilLevel(causes_onto.UnderlyingCause):
+ equivalent_to = [causes_onto.UnderlyingCause &
+ causes_onto.isUnderlyingcauseOfCause.some(MalfunctionLubricationSystem)]
+class EntryOfForeignGases(causes_onto.UnderlyingCause):
+ equivalent_to = [causes_onto.UnderlyingCause &
+ (causes_onto.isUnderlyingcauseOfCause.some(causes_onto.NonCondensables) &
+ causes_onto.underlyingcauseRequiresBoundaryCondition.some(boundary_onto.IntroductionOfAir))]
+class Sediments(causes_onto.UnderlyingCause):
+ equivalent_to = [causes_onto.UnderlyingCause &
+ (causes_onto.isUnderlyingcauseOfCause.some(causes_onto.Fouling) &
+ causes_onto.underlyingcauseRequiresBoundaryCondition.some(boundary_onto.IntroductionOfImpurities))]
+ 
+ 
+class GrowthOfOrganisms(causes_onto.UnderlyingCause):
+ equivalent_to = [causes_onto.UnderlyingCause &
+ (causes_onto.isUnderlyingcauseOfCause.some(causes_onto.Fouling)
+ )]
+class MalfunctionControlAir(causes_onto.UnderlyingCause):
+ equivalent_to = [causes_onto.UnderlyingCause &
+ (causes_onto.isUnderlyingcauseOfCause.some(causes_onto.ValveWronglyClosed |
+ causes_onto.ValveWronglyOpened |
+ causes_onto.ValveClosedPressureBuildUpInPiping |
+ FailureOfControlSystem) &
+ causes_onto.underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.ValveEntity &
+ equipment_onto.hasSubunit.some(equipment_onto.CompressedAirSupply) &
+ equipment_onto.hasInstrumentation.some(equipment_onto.PneumaticActuator)))]
+class WrongElectricSignal(causes_onto.UnderlyingCause):
+ equivalent_to = [causes_onto.UnderlyingCause &
+ (causes_onto.isUnderlyingcauseOfCause.some(causes_onto.ValveWronglyClosed |
+ causes_onto.ValveWronglyOpened |
+ causes_onto.ValveClosedPressureBuildUpInPiping |
+ FailureOfControlSystem) &
+ causes_onto.underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.ValveEntity &
+ equipment_onto.hasSubunit.some(equipment_onto.ElectricalEnergySupply) &
+ equipment_onto.hasInstrumentation.some(equipment_onto.ElectricalActuator)
+ ))] 
+ 
+ 
+ 
+ 
 
 
 
@@ -6839,6 +6852,8 @@ class EmergencyStabilization(safeguard_onto.Safeguard):
 #%% Appendix Q - Inference and Analysis
 
 def equipment_based_hazard_specific_deviation(deviation, args):
+    
+    
     # === Input
     process_unit = args[0]
     substance = args[1]
@@ -6853,17 +6868,18 @@ def equipment_based_hazard_specific_deviation(deviation, args):
     cause = None
     likelihood_ = None
     underlying_cause_ = None
+    
     if not subsequent_deviation_loop:
         # = Cause =========================================================================================
         # =================================================================================================
         deviation1, deviation2 = assemble_deviation(deviation)
         cause = causes_onto.Cause(isCauseOfDeviation=deviation1,
-                causeInvolvesSecondDeviation=deviation2,
-                causeInvolvesEquipmentEntity=[process_unit.onto_object],
-                causeRequiresBoundaryCondition=process_unit.boundary_condition,
-                causeInvolvesSiteInformation=[environment.onto_object],
-                causeInvolvesSubstance=[substance.onto_object]
-            ) # functional, nur 1 substanz übergeben
+                                  causeInvolvesSecondDeviation=deviation2,
+                                  causeInvolvesEquipmentEntity=[process_unit.onto_object],
+                                  causeRequiresBoundaryCondition=process_unit.boundary_condition,
+                                  causeInvolvesSiteInformation=[environment.onto_object],
+                                  causeInvolvesSubstance=[substance.onto_object]
+                                  ) # functional, nur 1 substanz übergeben
         sync_reasoner(debug=0)
     else:
         if isinstance(deviation, dict):
@@ -6881,11 +6897,11 @@ def equipment_based_hazard_specific_deviation(deviation, args):
         cause_lst = prep.get_inferred_results(cause)
         for idx, cause_ in enumerate(cause_lst):
             underlying_causes, effect, consequence, = assemble_concept_instance(substance,
-            process_unit,
-            deviation,
-            [],
-            cause_,
-            False)
+                                                                            process_unit,
+                                                                            deviation,
+                                                                            [],
+                                                                            cause_,
+                                                                            False)
             # if likelihood_cause and likelihood_overall:
             scenario = {prep.DictName.cause: cause_(),
             prep.DictName.underlying_cause: underlying_causes,
@@ -6894,11 +6910,11 @@ def equipment_based_hazard_specific_deviation(deviation, args):
             preliminary_scenario_list.append(scenario)
     elif cause_list:
         underlying_causes, effect, consequence, = assemble_concept_instance(substance,
-        process_unit,
-        deviation,
-        underlying_cause_,
-        [],
-        True)
+                                                                    process_unit,
+                                                                    deviation,
+                                                                    underlying_cause_,
+                                                                    [],
+                                                                    True)
         scenario = {prep.DictName.cause: cause_list,
         prep.DictName.underlying_cause: underlying_causes,
         prep.DictName.effect: effect,
@@ -6906,11 +6922,11 @@ def equipment_based_hazard_specific_deviation(deviation, args):
         preliminary_scenario_list.append(scenario)
     else:
         underlying_causes, effect, consequence = assemble_concept_instance(substance,
-        process_unit,
-        deviation,
-        [],
-        [],
-        False)
+                                                                    process_unit,
+                                                                    deviation,
+                                                                    [],
+                                                                    [],
+                                                                    False)
         scenario = {prep.DictName.cause: [],
         prep.DictName.underlying_cause: underlying_causes,
         prep.DictName.effect: effect,
@@ -6918,6 +6934,21 @@ def equipment_based_hazard_specific_deviation(deviation, args):
         }
         preliminary_scenario_list.append(scenario)
     sync_reasoner(debug=0)
+    
+    #TODO CHECK indentation on statement below.
+    infer_follow_up(process_unit,
+                    substance,
+                    deviation,
+                    environment,
+                    subsequent_deviation_loop,
+                    likelihood_,
+                    underlying_cause_,
+                    stack_elements,
+                    preliminary_scenario_list,
+                    extended_scenarion_list
+        ) 
+
+    
     
 def infer_follow_up(process_unit,
                     substance,
@@ -7246,18 +7277,8 @@ def infer_follow_up(process_unit,
                 subsequent_deviations.append(dev)
 
 
-infer_follow_up(process_unit,
-                substance,
-                deviation,
-                environment,
-                subsequent_deviation_loop,
-                likelihood_,
-                underlying_cause_,
-                stack_elements,
-                preliminary_scenario_list,
-                extended_scenarion_list
-    ) 
 
+# infer.py
 def propagation_based_analysis(plant_graph, order, propagation_stacks):
     # create copy of original plant layout and remove edges that are not in 'order' list
     # therefore a graph is created according to order
@@ -7930,6 +7951,12 @@ def create_olefin_feed_section():
 
 #%% Appendix C - Main
 
+#infer
+#model
+#config
+#ontology_operations
+#pre_processing
+#output
 
 if __name__ == '__main__':
     
@@ -7950,7 +7977,7 @@ if __name__ == '__main__':
     if len(process_plant_model.nodes) > 1:
         
         # The following single method is now subdivided into 3 for clarity.
-        # graph_type, newly_arranged_graphs, intersections = algorithm.determine_propagation_strategy(process_plant_model)
+        # graph_type, newly_arranged_graphs, intersections = determine_propagation_strategy(process_plant_model)
         graph_type = findTypeOf(process_plant_model)
         newly_arranged_graphs = replicate(process_plant_model, graph_type)
         intersections = getIntersectionNode(process_plant_model, graph_type)
@@ -7996,10 +8023,12 @@ if __name__ == '__main__':
     # === Entry point for hazard/malfunction propagation
     if config.PROPAGATION_BASED_EVALUATION:
         
-        if graph_type == algorithm.GraphType.SingleLineSystem:
-            infer.propagation_based_analysis(process_plant_model, newly_arranged_graphs, stack_elements)
+        if graph_type == GraphType.SingleLineSystem:
+            infer.propagation_based_analysis(process_plant_model, 
+                                             newly_arranged_graphs, 
+                                             stack_elements)
             
-        elif graph_type == algorithm.GraphType.MultiCycleSystem:
+        elif graph_type == GraphType.MultiCycleSystem:
             
             for index, cycle in enumerate(newly_arranged_graphs):
                 # intersection of cycles
@@ -8018,11 +8047,13 @@ if __name__ == '__main__':
                                                  new_order,
                                                  stack_elements)
     
-        elif graph_type == algorithm.GraphType.JunctionSystem or \
-                graph_type == algorithm.GraphType.ComplexSystem or \
-                graph_type == algorithm.GraphType.RecycleFlowSystem:
+        elif graph_type == GraphType.JunctionSystem or \
+                graph_type == GraphType.ComplexSystem or \
+                graph_type == GraphType.RecycleFlowSystem:
             for stream in newly_arranged_graphs:
-                infer.propagation_based_analysis(process_plant_model, stream, stack_elements)
+                infer.propagation_based_analysis(process_plant_model, 
+                                                 stream, 
+                                                 stack_elements)
         else:
             print("Case not covered by any strategy!")
 
