@@ -30,8 +30,8 @@ import unittest
 
 
 #TODO Are these to be global variables?
-# equipment_onto = None 
-# effect_onto = None
+equipment_onto = get_ontology("http://webprotege.stanford.edu/RDWdOfos2Exb6enOKUgeBQu")
+effect_onto = get_ontology("http://webprotege.stanford.edu/RC1ogh5ITJZqiSxPilU34kX")
 # process_onto = None
 # substance_onto = None
 # deviation_onto = None
@@ -2989,16 +2989,17 @@ AllDisjoint([deviation_onto.Deviation,
  risk_assessment_onto.SeverityCategory,
  risk_assessment_onto.RiskCategory])
 # === Deviation ========================================
-class Deviation(Thing):
- pass
-Deviation.label = ["deviation"]
-Deviation.comment = ["describes (process) deviation from intention",
- "CCPS glossary: 'process condition outside of established design limits'",
-"describes fault event in the sequence of events of a scenario"]
-class hasGuideword(Deviation >> Guideword):
- pass
-class hasParameter(Deviation >> Parameter):
- pass
+
+# class Deviation(Thing):
+#  pass
+# Deviation.label = ["deviation"]
+# Deviation.comment = ["describes (process) deviation from intention",
+#  "CCPS glossary: 'process condition outside of established design limits'",
+# "describes fault event in the sequence of events of a scenario"]
+# class hasGuideword(Deviation >> Guideword):
+#  pass
+# class hasParameter(Deviation >> Parameter):
+#  pass
 
 
 
