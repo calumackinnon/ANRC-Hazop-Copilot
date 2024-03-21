@@ -91,15 +91,16 @@ class Configuration(Enum):
 
 
 # A local ontology for BoundaryConditions
-class BoundaryCondition(Thing):                                 pass
-class IntroductionOfAir(BoundaryCondition):                     pass
-class IntroductionOfImpurities(BoundaryCondition):              pass
-class IntroductionOfWater(BoundaryCondition):                   pass
-class ExternalFirePossible(BoundaryCondition):                  pass
-class LocatedOutside(BoundaryCondition):                        pass
-class UpstreamProcessInvolved(BoundaryCondition):               pass
-class SubstanceContainsStabilizer(BoundaryCondition):           pass
-class FoundationCanBeAffected(BoundaryCondition):               pass
+with boundary_onto:
+    class BoundaryCondition(Thing):                                 pass
+    class IntroductionOfAir(BoundaryCondition):                     pass
+    class IntroductionOfImpurities(BoundaryCondition):              pass
+    class IntroductionOfWater(BoundaryCondition):                   pass
+    class ExternalFirePossible(BoundaryCondition):                  pass
+    class LocatedOutside(BoundaryCondition):                        pass
+    class UpstreamProcessInvolved(BoundaryCondition):               pass
+    class SubstanceContainsStabilizer(BoundaryCondition):           pass
+    class FoundationCanBeAffected(BoundaryCondition):               pass
 
 
 # modules inferred from namespace calls, unnecessary in this single script .py.
@@ -2987,142 +2988,132 @@ def match_case_with_cb(current_case, case_base):
 #%% Appendix G - Ontology for Causes
 
 
-# with causes_onto:         #TODO
+with causes_onto:
 
-# ===Cause ========================================
-class Cause(Thing):
-    pass
+    # ===Cause ========================================
+    class Cause(Thing):
+        pass
+    
+    Cause.label = ["cause"] #TODO This is where there is a bug.
+    Cause.comment = ["Initiating event in the sequence of events of a scenario", "represents an event or situation"]
+    
+    class UnderlyingCause(Thing):
+        pass
+    UnderlyingCause.label = ["underlying cause"]
+    UnderlyingCause.comment = ["Underlying event in the sequence of events of a scenario",
+                               "represents ambient conditions, systemic and organizational causes, "
+                               "and causes arising from latent human errors"]
+    class causeInvolvesEquipmentEntity(Cause >> equipment_onto.EquipmentEntity):
+        pass
+    class causeInvolvesSubstance(Cause >> substance_onto.Substance):
+        pass
+    class underlyingcauseInvolvesEquipmentEntity(UnderlyingCause >> equipment_onto.EquipmentEntity):
+        pass
+    class underlyingcauseInvolvesSubstance(UnderlyingCause >> substance_onto.Substance):
+        pass
+    class isCauseOfDeviation(Cause >> deviation_onto.Deviation):
+        pass
+    class causeInvolvesSecondDeviation(Cause >> deviation_onto.Deviation):
+        pass
+    class isUnderlyingcauseOfCause(UnderlyingCause >> Cause):
+        pass
+    class causeRequiresBoundaryCondition(Cause >> boundary_onto.BoundaryCondition):
+        pass
+    class causeInvolvesSiteInformation(Cause >> site_information.AmbientInformation):
+        pass
+    class underlyingcauseRequiresBoundaryCondition(UnderlyingCause >> boundary_onto.BoundaryCondition):
+        pass
 
-Cause.label = ["cause"] #TODO This is where there is a bug.
-Cause.comment = ["Initiating event in the sequence of events of a scenario", "represents an event or situation"]
-
-class UnderlyingCause(Thing):
-    pass
-UnderlyingCause.label = ["underlying cause"]
-UnderlyingCause.comment = ["Underlying event in the sequence of events of a scenario",
-                           "represents ambient conditions, systemic and organizational causes, "
-                           "and causes arising from latent human errors"]
-class causeInvolvesEquipmentEntity(Cause >> equipment_onto.EquipmentEntity):
-    pass
-class causeInvolvesSubstance(Cause >> substance_onto.Substance):
-    pass
-class underlyingcauseInvolvesEquipmentEntity(UnderlyingCause >> equipment_onto.EquipmentEntity):
-    pass
-class underlyingcauseInvolvesSubstance(UnderlyingCause >> substance_onto.Substance):
-    pass
-class isCauseOfDeviation(Cause >> deviation_onto.Deviation):
-    pass
-class causeInvolvesSecondDeviation(Cause >> deviation_onto.Deviation):
-    pass
-class isUnderlyingcauseOfCause(UnderlyingCause >> Cause):
-    pass
-class causeRequiresBoundaryCondition(Cause >> boundary_onto.BoundaryCondition):
-    pass
-class causeInvolvesSiteInformation(Cause >> site_information.AmbientInformation):
-    pass
-class underlyingcauseRequiresBoundaryCondition(UnderlyingCause >> boundary_onto.BoundaryCondition):
-    pass
 
 
 
-#TODO
-# with effect_onto:
+with effect_onto:
 
-# === Effect ========================================
-class Effect(Thing):
-    pass
-Effect.label = ["effect"]
-Effect.comment = ["describe intermediate events that lie in the event sequence between"
- "the fault event (deviation) and hazardous event (consequence)"]
-class effectInvolvesEquipmentEntity(Effect >> equipment_onto.EquipmentEntity):
- pass
-class effectInvolvesSiteInformation(Effect >> site_information.AmbientInformation):
- pass
-class isEffectOfDeviation(Effect >> deviation_onto.Deviation):
- pass
-class effectInvolvesSecondDeviation(Effect >> deviation_onto.Deviation):
- pass
-class effectInvolvesSubstance(Effect >> substance_onto.Substance):
- pass
-class effectRequiresBoundaryCondition(Effect >> boundary_onto.BoundaryCondition):
- pass
-class effectImpliedByCause(Effect >> causes_onto.Cause):
- pass
-class effectOfPropagatedCause(Effect >> bool, FunctionalProperty):
- pass
-class effectImpliedByUnderlyingcause(Effect >> causes_onto.UnderlyingCause):
- pass
+    # === Effect ========================================
+    class Effect(Thing):
+        pass
+    Effect.label = ["effect"]
+    Effect.comment = ["describe intermediate events that lie in the event sequence between"
+     "the fault event (deviation) and hazardous event (consequence)"]
+    class effectInvolvesEquipmentEntity(Effect >> equipment_onto.EquipmentEntity):
+     pass
+    class effectInvolvesSiteInformation(Effect >> site_information.AmbientInformation):
+     pass
+    class isEffectOfDeviation(Effect >> deviation_onto.Deviation):
+     pass
+    class effectInvolvesSecondDeviation(Effect >> deviation_onto.Deviation):
+     pass
+    class effectInvolvesSubstance(Effect >> substance_onto.Substance):
+     pass
+    class effectRequiresBoundaryCondition(Effect >> boundary_onto.BoundaryCondition):
+     pass
+    class effectImpliedByCause(Effect >> causes_onto.Cause):
+     pass
+    class effectOfPropagatedCause(Effect >> bool, FunctionalProperty):
+     pass
+    class effectImpliedByUnderlyingcause(Effect >> causes_onto.UnderlyingCause):
+     pass
+    
+with consequence_onto:
+    
+    # === Consequence ========================================
+    class Consequence(Thing):
+     pass
+    Consequence.label = ["consequence"]
+    Consequence.comment = ["a consequence represents a hazardous event which is synonymous with a loss event"]
+    class consequenceInvolvesEquipmentEntity(Consequence >> equipment_onto.EquipmentEntity):
+     pass
+    class consequenceInvolvesSubstance(Consequence >> substance_onto.Substance):
+     pass
+    class isConsequenceOfDeviation(Consequence >> deviation_onto.Deviation):
+     pass
+    class isConsequenceOfEffect(Consequence >> effect_onto.Effect):
+     pass
+    class consequenceImpliedByCause(Consequence >> causes_onto.Cause):
+     pass
+    class isSubsequentConsequence(Consequence >> Consequence, AsymmetricProperty):
+     pass
+    class consequenceRequiresBoundaryCondition(Consequence >> boundary_onto.BoundaryCondition):
+     pass
 
-# === Consequence ========================================
-class Consequence(Thing):
- pass
-Consequence.label = ["consequence"]
-Consequence.comment = ["a consequence represents a hazardous event which is synonymous with a loss event"]
-class consequenceInvolvesEquipmentEntity(Consequence >> equipment_onto.EquipmentEntity):
- pass
-class consequenceInvolvesSubstance(Consequence >> substance_onto.Substance):
- pass
-class isConsequenceOfDeviation(Consequence >> deviation_onto.Deviation):
- pass
-class isConsequenceOfEffect(Consequence >> effect_onto.Effect):
- pass
-class consequenceImpliedByCause(Consequence >> causes_onto.Cause):
- pass
-class isSubsequentConsequence(Consequence >> Consequence, AsymmetricProperty):
- pass
-class consequenceRequiresBoundaryCondition(Consequence >> boundary_onto.BoundaryCondition):
- pass
-
-# === Safeguard ========================================
-class Safeguard(Thing):
- pass
-Safeguard.label = ["safeguard"]
-Safeguard.comment = ["CCPS glossary: 'Any device, system, or action that interrupts the chain of events "
- "following an initiating event or that mitigates the consequences.'"]
-class safeguardOfDeviation(Safeguard >> deviation_onto.Deviation):
- pass
-class safeguardPreventsCause(Safeguard >> causes_onto.Cause):
- pass
-class safeguardPreventsUnderlyingCause(Safeguard >> causes_onto.UnderlyingCause):
- pass
-class safeguardMitigatesConsequence(Safeguard >> consequence_onto.Consequence):
- pass
-class safeguardInvolvesSubstance(Safeguard >> substance_onto.Substance):
- pass
-class safeguardPreventsEffect(Safeguard >> effect_onto.Effect):
- pass
-class safeguardInvolvesEquipmentEntity(Safeguard >> equipment_onto.EquipmentEntity):
- pass
-class safeguardInvolvesBoundaryCondition(Safeguard >> boundary_onto.BoundaryCondition):
- pass
-class safeguardDependsOnRiskCategory(Safeguard >> risk_assessment_onto.RiskCategory):
- pass
-class impliesSafeguard(Safeguard >> Safeguard, AsymmetricProperty):
- pass
-
-# === Disjoint statement
-AllDisjoint([deviation_onto.Deviation,
- causes_onto.Cause,
- causes_onto.UnderlyingCause,
- effect_onto.Effect,
- consequence_onto.Consequence,
- Safeguard,
- risk_assessment_onto.Likelihood,
- risk_assessment_onto.SeverityCategory,
- risk_assessment_onto.RiskCategory])
-
-# === Deviation ========================================
-# class Deviation(Thing):
-#   pass
-# Deviation.label = ["deviation"]
-# Deviation.comment = ["describes (process) deviation from intention",
-#   "CCPS glossary: 'process condition outside of established design limits'",
-# "describes fault event in the sequence of events of a scenario"]
-# class hasGuideword(Deviation >> Guideword):
-#   pass
-# class hasParameter(Deviation >> Parameter):
-#   pass
-
+with safeguard_onto:
+    # === Safeguard ========================================
+    class Safeguard(Thing):
+     pass
+    Safeguard.label = ["safeguard"]
+    Safeguard.comment = ["CCPS glossary: 'Any device, system, or action that interrupts the chain of events "
+     "following an initiating event or that mitigates the consequences.'"]
+    class safeguardOfDeviation(Safeguard >> deviation_onto.Deviation):
+     pass
+    class safeguardPreventsCause(Safeguard >> causes_onto.Cause):
+     pass
+    class safeguardPreventsUnderlyingCause(Safeguard >> causes_onto.UnderlyingCause):
+     pass
+    class safeguardMitigatesConsequence(Safeguard >> consequence_onto.Consequence):
+     pass
+    class safeguardInvolvesSubstance(Safeguard >> substance_onto.Substance):
+     pass
+    class safeguardPreventsEffect(Safeguard >> effect_onto.Effect):
+     pass
+    class safeguardInvolvesEquipmentEntity(Safeguard >> equipment_onto.EquipmentEntity):
+     pass
+    class safeguardInvolvesBoundaryCondition(Safeguard >> boundary_onto.BoundaryCondition):
+     pass
+    class safeguardDependsOnRiskCategory(Safeguard >> risk_assessment_onto.RiskCategory):
+     pass
+    class impliesSafeguard(Safeguard >> Safeguard, AsymmetricProperty):
+     pass
+    
+    # === Disjoint statement
+    AllDisjoint([deviation_onto.Deviation,
+     causes_onto.Cause,
+     causes_onto.UnderlyingCause,
+     effect_onto.Effect,
+     consequence_onto.Consequence,
+     Safeguard,
+     risk_assessment_onto.Likelihood,
+     risk_assessment_onto.SeverityCategory,
+     risk_assessment_onto.RiskCategory])
 
 
 
@@ -3130,111 +3121,129 @@ AllDisjoint([deviation_onto.Deviation,
 
 #%% Appendix H - Ontology for Deviations
 
-# === Guideword ========================================
-class Guideword(Thing):
- pass
-class More(Guideword):
- pass
-class Less(Guideword):
- pass
-class No(Guideword):
- pass
-class PartOf(Guideword):
- pass
-class AsWellAs(Guideword):
- pass
-class WhereElse(Guideword):
- pass
-class OtherThan(Guideword):
- pass
-class Reverse(Guideword):
- pass
 
-# === Parameters ========================================
-class Parameter(Thing):
- pass
-class Pressure(Parameter):
- pass
-class Temperature(Parameter):
- pass
-class Level(Parameter):
- pass
-class Flow(Parameter):
- pass
-class Material(Parameter):
- pass
-class Vibration(Parameter):
- pass
-class Composition(Parameter):
- pass
-class Corrosion(Parameter):
- pass
-class Time(Parameter):
- pass
-
-# === Deviation ========================================
-class Deviation(Thing):
- pass
-Deviation.label = ["deviation"]
-Deviation.comment = ["describes (process) deviation from intention", 
-    "CCPS glossary: 'process condition outside of established design limits'",
-    "describes fault event in the sequence of events of a scenario"]
-class hasGuideword(Deviation >> Guideword):
- pass
-class hasParameter(Deviation >> Parameter):
- pass
-class HighCorrosion(Deviation):
- equivalent_to = [Deviation & (hasGuideword.some(More) & hasParameter.some(Corrosion))]
-HighCorrosion.label = ["high corrosion"]
-class HighVibration(Deviation):
- equivalent_to = [Deviation & (hasGuideword.some(More) & hasParameter.some(Vibration))]
-HighVibration.label = ["high vibration"]
-class HighTemperature(Deviation):
- equivalent_to = [Deviation &
- (hasGuideword.some(More) & hasParameter.some(Temperature))]
-HighTemperature.label = ["high temperature"]
-class LowTemperature(Deviation):
- equivalent_to = [Deviation & (hasGuideword.some(Less) & hasParameter.some(Temperature))]
-LowTemperature.label = ["low temperature"]
-class HighPressure(Deviation):
- equivalent_to = [Deviation & (hasGuideword.some(More) & hasParameter.some(Pressure))]
-HighPressure.label = ["high pressure"]
-class LowPressure(Deviation):
- equivalent_to = [Deviation & (hasGuideword.some(Less) & hasParameter.some(Pressure))]
-LowPressure.label = ["low pressure"]
-class NoFlow(Deviation):
- equivalent_to = [Deviation & (hasGuideword.some(No) & hasParameter.some(Flow))]
-NoFlow.label = ["no flow"]
-class HighFlow(Deviation):
- equivalent_to = [Deviation & (hasGuideword.some(More) & hasParameter.some(Flow))]
-HighFlow.label = ["high flow"]
-class LowFlow(Deviation):
- equivalent_to = [Deviation & (hasGuideword.only(Less) & hasParameter.only(Flow))]
-LowFlow.label = ["low flow"]
-class ElsewhereFlow(Deviation):
- equivalent_to = [Deviation & (hasGuideword.some(WhereElse) & hasParameter.some(Flow))]
-ElsewhereFlow.label = ["elsewhere flow"]
-class ReverseFlow(Deviation):
- equivalent_to = [Deviation & (hasGuideword.some(Reverse) & hasParameter.some(Flow))]
-ReverseFlow.label = ["reverse flow"]
-class OtherSequence(Deviation):
- equivalent_to = [Deviation & (hasGuideword.some(OtherThan) & hasParameter.some(Time))]
-OtherSequence.label = ["other sequence"]
-# === Also used for contamination
-class OtherThanComposition(Deviation):
- equivalent_to = [Deviation & (hasGuideword.some(OtherThan) & hasParameter.some(Composition))]
-OtherThanComposition.comment = ["Used for 'Contamination', 'Changed concentration', 'Different phase' etc."]
-OtherThanComposition.label = ["other than composition"]
-class HighLevel(Deviation):
- equivalent_to = [Deviation & (hasGuideword.some(More) & hasParameter.some(Level))]
-HighLevel.label = ["high level"]
-
-class LowLevel(Deviation):
- equivalent_to = [Deviation & (hasGuideword.some(Less) & hasParameter.some(Level))]
-LowLevel.label = ["low level"]
-AllDisjoint([HighVibration, HighTemperature, HighCorrosion, LowTemperature, HighCorrosion, HighPressure,
- LowPressure, NoFlow, HighFlow, LowFlow, ElsewhereFlow, OtherSequence, ReverseFlow,
- OtherThanComposition, HighLevel, LowLevel])
+with deviation_onto:
+    # === Deviation ========================================
+    # class Deviation(Thing):
+    #   pass
+    # Deviation.label = ["deviation"]
+    # Deviation.comment = ["describes (process) deviation from intention",
+    #   "CCPS glossary: 'process condition outside of established design limits'",
+    # "describes fault event in the sequence of events of a scenario"]
+    # class hasGuideword(Deviation >> Guideword):
+    #   pass
+    # class hasParameter(Deviation >> Parameter):
+    #   pass
+    
+    
+    
+    
+    
+    # === Guideword ========================================
+    class Guideword(Thing):
+     pass
+    class More(Guideword):
+     pass
+    class Less(Guideword):
+     pass
+    class No(Guideword):
+     pass
+    class PartOf(Guideword):
+     pass
+    class AsWellAs(Guideword):
+     pass
+    class WhereElse(Guideword):
+     pass
+    class OtherThan(Guideword):
+     pass
+    class Reverse(Guideword):
+     pass
+    
+    # === Parameters ========================================
+    class Parameter(Thing):
+     pass
+    class Pressure(Parameter):
+     pass
+    class Temperature(Parameter):
+     pass
+    class Level(Parameter):
+     pass
+    class Flow(Parameter):
+     pass
+    class Material(Parameter):
+     pass
+    class Vibration(Parameter):
+     pass
+    class Composition(Parameter):
+     pass
+    class Corrosion(Parameter):
+     pass
+    class Time(Parameter):
+     pass
+    
+    # === Deviation ========================================
+    class Deviation(Thing):
+     pass
+    Deviation.label = ["deviation"]
+    Deviation.comment = ["describes (process) deviation from intention", 
+        "CCPS glossary: 'process condition outside of established design limits'",
+        "describes fault event in the sequence of events of a scenario"]
+    class hasGuideword(Deviation >> Guideword):
+     pass
+    class hasParameter(Deviation >> Parameter):
+     pass
+    class HighCorrosion(Deviation):
+     equivalent_to = [Deviation & (hasGuideword.some(More) & hasParameter.some(Corrosion))]
+    HighCorrosion.label = ["high corrosion"]
+    class HighVibration(Deviation):
+     equivalent_to = [Deviation & (hasGuideword.some(More) & hasParameter.some(Vibration))]
+    HighVibration.label = ["high vibration"]
+    class HighTemperature(Deviation):
+     equivalent_to = [Deviation &
+     (hasGuideword.some(More) & hasParameter.some(Temperature))]
+    HighTemperature.label = ["high temperature"]
+    class LowTemperature(Deviation):
+     equivalent_to = [Deviation & (hasGuideword.some(Less) & hasParameter.some(Temperature))]
+    LowTemperature.label = ["low temperature"]
+    class HighPressure(Deviation):
+     equivalent_to = [Deviation & (hasGuideword.some(More) & hasParameter.some(Pressure))]
+    HighPressure.label = ["high pressure"]
+    class LowPressure(Deviation):
+     equivalent_to = [Deviation & (hasGuideword.some(Less) & hasParameter.some(Pressure))]
+    LowPressure.label = ["low pressure"]
+    class NoFlow(Deviation):
+     equivalent_to = [Deviation & (hasGuideword.some(No) & hasParameter.some(Flow))]
+    NoFlow.label = ["no flow"]
+    class HighFlow(Deviation):
+     equivalent_to = [Deviation & (hasGuideword.some(More) & hasParameter.some(Flow))]
+    HighFlow.label = ["high flow"]
+    class LowFlow(Deviation):
+     equivalent_to = [Deviation & (hasGuideword.only(Less) & hasParameter.only(Flow))]
+    LowFlow.label = ["low flow"]
+    class ElsewhereFlow(Deviation):
+     equivalent_to = [Deviation & (hasGuideword.some(WhereElse) & hasParameter.some(Flow))]
+    ElsewhereFlow.label = ["elsewhere flow"]
+    class ReverseFlow(Deviation):
+     equivalent_to = [Deviation & (hasGuideword.some(Reverse) & hasParameter.some(Flow))]
+    ReverseFlow.label = ["reverse flow"]
+    class OtherSequence(Deviation):
+     equivalent_to = [Deviation & (hasGuideword.some(OtherThan) & hasParameter.some(Time))]
+    OtherSequence.label = ["other sequence"]
+    # === Also used for contamination
+    class OtherThanComposition(Deviation):
+     equivalent_to = [Deviation & (hasGuideword.some(OtherThan) & hasParameter.some(Composition))]
+    OtherThanComposition.comment = ["Used for 'Contamination', 'Changed concentration', 'Different phase' etc."]
+    OtherThanComposition.label = ["other than composition"]
+    class HighLevel(Deviation):
+     equivalent_to = [Deviation & (hasGuideword.some(More) & hasParameter.some(Level))]
+    HighLevel.label = ["high level"]
+    
+    class LowLevel(Deviation):
+     equivalent_to = [Deviation & (hasGuideword.some(Less) & hasParameter.some(Level))]
+    LowLevel.label = ["low level"]
+    AllDisjoint([HighVibration, HighTemperature, HighCorrosion, LowTemperature, HighCorrosion, HighPressure,
+     LowPressure, NoFlow, HighFlow, LowFlow, ElsewhereFlow, OtherSequence, ReverseFlow,
+     OtherThanComposition, HighLevel, LowLevel])
 
 
 
@@ -3242,1550 +3251,1557 @@ AllDisjoint([HighVibration, HighTemperature, HighCorrosion, LowTemperature, High
 
 #%% Appendix I - Ontology for Equipment
 
-# === HIGHER-LEVEL STRUCTURE
-class PlantItem(Thing):
- pass
-class FunctionalPlantItem(PlantItem):
- pass
-class StructuralPlantItem(PlantItem):
- pass
-AllDisjoint([FunctionalPlantItem, StructuralPlantItem])
 
-# === Ports
-class Port(Thing):
- pass
-class ConnectionType(Thing):
- pass
-class Inlet(ConnectionType):
- pass
-class Outlet(ConnectionType):
- pass
-class hasConnectionType(Port >> ConnectionType, FunctionalProperty):
- pass
-class hasName(Port >> str, FunctionalProperty):
- pass
-class portEquippedWithInstrumentation(Port >> PlantItem, FunctionalProperty):
-  pass
-
-# === Control instance
-class ControlInstance(Thing):
- pass
-class Operator(ControlInstance):
- pass
-class ProgrammableLogicController(ControlInstance):
- pass
-class OperatorAndProcessControlSystem(ControlInstance):
- pass
-class NotControlled(ControlInstance):
- pass
-
-AllDisjoint([Operator, ProgrammableLogicController, NotControlled]) #TODO
-
-# === FailSafePosition
-class FailSafePosition(Thing):
- pass
-class FailOpen(FailSafePosition):
- pass
-class FailClosed(FailSafePosition):
- pass
-
-# === OperatingConditions
-class OperationMode(Thing):
- pass
-class NormalOperation(OperationMode):
- pass
-class StartUpOperation(OperationMode):
- pass
-class ShutDownOperation(OperationMode):
- pass
-class Maintenance(OperationMode):
- pass
-
-# === Piping
-class Piping(StructuralPlantItem):
- pass
-class Pipe(Piping):
- pass
-class BlanketingGasline(Pipe):
- pass
-class TubeCoil(Pipe):
- pass
-class TubeBundle(Pipe):
- pass
-class VentPipe(Pipe):
- pass
-class TankTruckHose(Pipe):
- pass
-class Fitting(Piping):
- pass
-
-# === Material transfer equipment
-class MaterialTransferEquipment(FunctionalPlantItem):
- pass
-class Pump(MaterialTransferEquipment):
- pass
-class Fan(MaterialTransferEquipment):
- pass
-class CentrifugalPump(Pump):
- pass
-
-class ReciprocatingPump(Pump):
- pass
-ReciprocatingPump.comment = ["is a positive displacement pump"]
-class VacuumPump(Pump):
- pass
-class Compressor(MaterialTransferEquipment):
- pass
-class ScrewCompressor(Compressor):
- pass
-class PistonCompressor(Compressor):
- pass
-PistonCompressor.comment = ["piston compressor", "positive-displacement compressor"]
-
-# ==== APPARATUS
-class Apparatus(StructuralPlantItem):
- pass
-class NoApparatus(Apparatus):
- pass
-class AtmosphericStorageTank(Apparatus):
- pass
-class PressureVessel(Apparatus):
- pass
-class OpenVessel(Apparatus):
- pass
-OpenVessel.comment = ["e.g. cooling tower"]
-class Casing(Apparatus):
- pass
-class Body(Apparatus):
- pass
-Body.comment = ["e.g. valve body"]
-class PumpCasing(Casing):
- pass
-class CompressorCasing(Casing):
- pass
-
-# === INSTRUMENTATION
-class Instrumentation(FunctionalPlantItem):
- pass
-# Trivial case
-class NoInstrumentation(Instrumentation):
- pass
-class FrequencyConverter(Instrumentation):
- pass
-FrequencyConverter.comment = ["speed control pump/compressor"]
-class Controller(Instrumentation):
- pass
-class SpeedController(Controller):
- pass
-class LevelIndicatorController(Controller):
- pass
-class QualityIndicatorController(Controller):
- pass
-class LevelIndicator(Instrumentation):
- pass
-class PressureIndicatorController(Controller):
- pass
-class FlowIndicatorController(Controller):
- pass
-class Transmitter(Instrumentation):
- pass
-class MonitoringSystem(Instrumentation):
- pass
-class Alarm(MonitoringSystem):
- pass
-class HighLevelAlarm(MonitoringSystem):
- pass
-class FlashingLight(MonitoringSystem):
- pass
-class Actuator(Instrumentation):
- pass
-class ElectricalActuator(Actuator):
- pass
-class ElectricMotor(ElectricalActuator):
- pass
-class Solenoid(ElectricalActuator):
- pass
-class HydraulicActuator(Actuator):
- pass
-class PneumaticActuator(Actuator):
- pass
-class ManualActuator(Actuator):
- pass
-
-# === FIXTURE
-class Fixture(StructuralPlantItem):
- pass
-class NoFixture(Fixture):
- pass
-class Jacket(Fixture):
- pass
-class Tray(Fixture):
- pass
-class ChimneyTray(Fixture):
- pass
-class LiquidDistributor(Fixture):
- pass
-LiquidDistributor.comment = ["Used in Cooling tower or wet scrubber", "can be spray system etc."]
-class PackedBed(Fixture):
- pass
-PackedBed.comment = ["Fill / Package / Fill Material"]
-class Baffle(Fixture):
- pass
-class Basin(Fixture):
- pass
-class PlatePackage(Fixture):
- pass
-PlatePackage.comment = ["For plate heat exchanger"]
-class HalfPipeCoilJacket(Fixture):
- pass
-class FinnedCoil(Fixture):
- pass
-class Impeller(Fixture):
- pass
-class Stirrer(Fixture):
- pass
-
-# === OPERATION RELATED EQUIPMENT
-class Subunit(FunctionalPlantItem):
- pass
-class SealingSystem(Subunit):
- pass
-SealingSystem.comment = [
- "[Seals] is a generic term for 'mech. seals', 'gasket', 'shaft seal', 'rotary seal', 'o-ring seal', "
- "'liquid seal'", "gasket: between flat flanges"]
-class LubricationSystem(Subunit):
- pass
-class NoLubricationSystem(Subunit):
- pass
-class CoolingSystem(Subunit):
- pass
-class HeatingSystem(Subunit):
- pass
-class Burner(Subunit):
- pass
-class Bypass(Subunit):
- pass
-class ElectricalEnergySupply(Subunit):
- pass
-class CompressedAirSupply(Subunit):
- pass
-class SteamSupply(Subunit):
- pass
-class CondensateSeparator(Subunit):
- pass
-class InertgasSupply(Subunit):
- pass
-class PhysicalDevice(Instrumentation):
- pass
-class FlowControlValve(PhysicalDevice):
- pass
-class PressureControlValve(PhysicalDevice):
- pass
-class NonReturnValve(PhysicalDevice):
- pass
-class ApiAdaptorValve(PhysicalDevice):
- pass
-comment = ["https://www.opwglobal.com/products/us/transportation-products/"
- "tank-truck-products/mechanical-tank-truck-products/"
- "bottom-loading-adapters-gravity-couplers-dust-caps/api-adaptors"]
-class ShutOffValve(PhysicalDevice):
- pass
-class BottomDrainValve(PhysicalDevice):
- pass
-class ThreeWayValve(PhysicalDevice):
- pass
-class ThrottlingValve(PhysicalDevice):
- pass
-class InletValve(PhysicalDevice):
- pass
-class OutletValve(PhysicalDevice):
- pass
-class Orifice(PhysicalDevice):
- pass
+with upper_onto:
+    # === HIGHER-LEVEL STRUCTURE
+    class PlantItem(Thing):
+     pass
+    class FunctionalPlantItem(PlantItem):
+     pass
+    class StructuralPlantItem(PlantItem):
+     pass
+    AllDisjoint([FunctionalPlantItem, StructuralPlantItem])
+    
+    # === Ports
+    class Port(Thing):
+     pass
+    class ConnectionType(Thing):
+     pass
+    class Inlet(ConnectionType):
+     pass
+    class Outlet(ConnectionType):
+     pass
+    class hasConnectionType(Port >> ConnectionType, FunctionalProperty):
+     pass
+    class hasName(Port >> str, FunctionalProperty):
+     pass
+    class portEquippedWithInstrumentation(Port >> PlantItem, FunctionalProperty):
+      pass
+    
+    # === Control instance
+    class ControlInstance(Thing):
+     pass
+    class Operator(ControlInstance):
+     pass
+    class ProgrammableLogicController(ControlInstance):
+     pass
+    class OperatorAndProcessControlSystem(ControlInstance):
+     pass
+    class NotControlled(ControlInstance):
+     pass
+    
+    AllDisjoint([Operator, ProgrammableLogicController, NotControlled]) #TODO
+    
+    # === FailSafePosition
+    class FailSafePosition(Thing):
+     pass
+    class FailOpen(FailSafePosition):
+     pass
+    class FailClosed(FailSafePosition):
+     pass
+    
+    # === OperatingConditions
+    class OperationMode(Thing):
+     pass
+    class NormalOperation(OperationMode):
+     pass
+    class StartUpOperation(OperationMode):
+     pass
+    class ShutDownOperation(OperationMode):
+     pass
+    class Maintenance(OperationMode):
+     pass
 
 
-class EquipmentEntity(Thing):
- pass
-EquipmentEntity.comment = ["Process unit is composed of plant items (fixture, instrumentation, support system)",
- "has a nominal function and an operating state"]
-class SourceEntity(EquipmentEntity):
- pass
-class SinkEntity(EquipmentEntity):
- pass
-class ConnectionPipeEntity(EquipmentEntity):
- pass
-class TankTruckEntity(EquipmentEntity):
- pass
-class StorageTankEntity(EquipmentEntity):
- pass
-class SettlingTankEntity(EquipmentEntity):
- pass
-class StabilizerColumnEntity(EquipmentEntity):
- pass
-class DistillationColumnEntity(EquipmentEntity):
- pass
-class SteamDrivenReboilerEntity(EquipmentEntity):
- pass
-class PumpEntity(EquipmentEntity):
- pass
-class CompressorEntity(EquipmentEntity):
- pass
-class ValveEntity(EquipmentEntity):
- pass
-class ReactorEntity(EquipmentEntity):
- pass
-class WetScrubberEntity(EquipmentEntity):
- pass
-class InertgasBlanketingEntity(EquipmentEntity):
- pass
-# Pressure vessels
-class PressureVesselEntity(EquipmentEntity):
- pass
-class PressureReceiverEntity(PressureVesselEntity):
- pass
-class SteamReceiverEntity(PressureVesselEntity):
- pass
-class ShellTubeHeatExchangerEntity(EquipmentEntity):
- pass
-class ShellTubeEvaporatorEntity(EquipmentEntity):
- pass
-class PlateHeatExchangerEntity(EquipmentEntity):
- pass
-class CoolingTowerEntity(EquipmentEntity):
- pass
-class AirCooledCondenserEntity(EquipmentEntity):
- pass
-class FinTubeEvaporatorEntity(EquipmentEntity):
- pass
-
-# === Relations
-class hasFixture(EquipmentEntity >> Fixture):
- pass
-class isTransportable(EquipmentEntity >> bool, FunctionalProperty):
- pass
-class hasConnectionToAdjacentPlantItem(EquipmentEntity >> PlantItem):
- pass
-class hasInstrumentation(EquipmentEntity >> Instrumentation):
- pass
-class hasFailSafePosition(EquipmentEntity >> FailSafePosition):
- pass
-class hasMaterialTransferEquipment(EquipmentEntity >> MaterialTransferEquipment):
- pass
-class hasSubunit(EquipmentEntity >> Subunit):
- pass
-class hasApparatus(EquipmentEntity >> Apparatus):
- pass
-class hasPiping(EquipmentEntity >> Piping):
- pass
-class hasIdentifier(EquipmentEntity >> str):
- pass
-class hasIntendedFunction(EquipmentEntity >> process_onto.IntendedFunction):
- pass
-class hasMaximumOperatingPressureInBarGauge(EquipmentEntity >> float, FunctionalProperty):
- pass
-class hasMaximumOperatingTemperatureInKelvin(EquipmentEntity >> float, FunctionalProperty):
- pass
-class entityControlledBy(EquipmentEntity >> ControlInstance):
- pass
-class hasAnOperationMode(EquipmentEntity >> OperationMode):
- pass
-class formsControlLoopWith(Instrumentation >> Instrumentation):
- pass
-class hasPort(EquipmentEntity >> Port):
- pass
-class portEquippedWithInstrumentation(Port >> Instrumentation, FunctionalProperty):
- pass
-
-
-# === Intended function
-class IntendedFunction(Thing):
- pass
-class NoIntendedFunction(IntendedFunction):
- pass
-class Evaporating(IntendedFunction):
- pass
-class Condensing(IntendedFunction):
- pass
-class HeatTransferring(IntendedFunction):
- pass
-class Mixing(IntendedFunction):
- pass
-class Separating(IntendedFunction):
- pass
-class MaterialTransfer(IntendedFunction):
- pass
-class Stabilizing(IntendedFunction):
- pass
-class FlowControl(IntendedFunction):
- pass
-class PressureControl(IntendedFunction):
- pass
-class Reacting(IntendedFunction):
- pass
-class Purifying(IntendedFunction):
- pass
-class Inerting(IntendedFunction):
- pass
-class Transporting(IntendedFunction):
- pass
-class Loading(IntendedFunction):
- pass
-class Unloading(IntendedFunction):
- pass
-class Emptying(IntendedFunction):
- pass
-class Filling(IntendedFunction):
- pass
-class Storing(IntendedFunction):
- pass
-class ModeIndependent(IntendedFunction):
- pass
-class DeliverConstantVolumeFlow(IntendedFunction):
- pass
+with equipment_onto:
+    # === Piping
+    class Piping(StructuralPlantItem):
+     pass
+    class Pipe(Piping):
+     pass
+    class BlanketingGasline(Pipe):
+     pass
+    class TubeCoil(Pipe):
+     pass
+    class TubeBundle(Pipe):
+     pass
+    class VentPipe(Pipe):
+     pass
+    class TankTruckHose(Pipe):
+     pass
+    class Fitting(Piping):
+     pass
+    
+    # === Material transfer equipment
+    class MaterialTransferEquipment(FunctionalPlantItem):
+     pass
+    class Pump(MaterialTransferEquipment):
+     pass
+    class Fan(MaterialTransferEquipment):
+     pass
+    class CentrifugalPump(Pump):
+     pass
+    
+    class ReciprocatingPump(Pump):
+     pass
+    ReciprocatingPump.comment = ["is a positive displacement pump"]
+    class VacuumPump(Pump):
+     pass
+    class Compressor(MaterialTransferEquipment):
+     pass
+    class ScrewCompressor(Compressor):
+     pass
+    class PistonCompressor(Compressor):
+     pass
+    PistonCompressor.comment = ["piston compressor", "positive-displacement compressor"]
+    
+    # ==== APPARATUS
+    class Apparatus(StructuralPlantItem):
+     pass
+    class NoApparatus(Apparatus):
+     pass
+    class AtmosphericStorageTank(Apparatus):
+     pass
+    class PressureVessel(Apparatus):
+     pass
+    class OpenVessel(Apparatus):
+     pass
+    OpenVessel.comment = ["e.g. cooling tower"]
+    class Casing(Apparatus):
+     pass
+    class Body(Apparatus):
+     pass
+    Body.comment = ["e.g. valve body"]
+    class PumpCasing(Casing):
+     pass
+    class CompressorCasing(Casing):
+     pass
+    
+    # === INSTRUMENTATION
+    class Instrumentation(FunctionalPlantItem):
+     pass
+    # Trivial case
+    class NoInstrumentation(Instrumentation):
+     pass
+    class FrequencyConverter(Instrumentation):
+     pass
+    FrequencyConverter.comment = ["speed control pump/compressor"]
+    class Controller(Instrumentation):
+     pass
+    class SpeedController(Controller):
+     pass
+    class LevelIndicatorController(Controller):
+     pass
+    class QualityIndicatorController(Controller):
+     pass
+    class LevelIndicator(Instrumentation):
+     pass
+    class PressureIndicatorController(Controller):
+     pass
+    class FlowIndicatorController(Controller):
+     pass
+    class Transmitter(Instrumentation):
+     pass
+    class MonitoringSystem(Instrumentation):
+     pass
+    class Alarm(MonitoringSystem):
+     pass
+    class HighLevelAlarm(MonitoringSystem):
+     pass
+    class FlashingLight(MonitoringSystem):
+     pass
+    class Actuator(Instrumentation):
+     pass
+    class ElectricalActuator(Actuator):
+     pass
+    class ElectricMotor(ElectricalActuator):
+     pass
+    class Solenoid(ElectricalActuator):
+     pass
+    class HydraulicActuator(Actuator):
+     pass
+    class PneumaticActuator(Actuator):
+     pass
+    class ManualActuator(Actuator):
+     pass
+    
+    # === FIXTURE
+    class Fixture(StructuralPlantItem):
+     pass
+    class NoFixture(Fixture):
+     pass
+    class Jacket(Fixture):
+     pass
+    class Tray(Fixture):
+     pass
+    class ChimneyTray(Fixture):
+     pass
+    class LiquidDistributor(Fixture):
+     pass
+    LiquidDistributor.comment = ["Used in Cooling tower or wet scrubber", "can be spray system etc."]
+    class PackedBed(Fixture):
+     pass
+    PackedBed.comment = ["Fill / Package / Fill Material"]
+    class Baffle(Fixture):
+     pass
+    class Basin(Fixture):
+     pass
+    class PlatePackage(Fixture):
+     pass
+    PlatePackage.comment = ["For plate heat exchanger"]
+    class HalfPipeCoilJacket(Fixture):
+     pass
+    class FinnedCoil(Fixture):
+     pass
+    class Impeller(Fixture):
+     pass
+    class Stirrer(Fixture):
+     pass
+    
+    # === OPERATION RELATED EQUIPMENT
+    class Subunit(FunctionalPlantItem):
+     pass
+    class SealingSystem(Subunit):
+     pass
+    SealingSystem.comment = [
+     "[Seals] is a generic term for 'mech. seals', 'gasket', 'shaft seal', 'rotary seal', 'o-ring seal', "
+     "'liquid seal'", "gasket: between flat flanges"]
+    class LubricationSystem(Subunit):
+     pass
+    class NoLubricationSystem(Subunit):
+     pass
+    class CoolingSystem(Subunit):
+     pass
+    class HeatingSystem(Subunit):
+     pass
+    class Burner(Subunit):
+     pass
+    class Bypass(Subunit):
+     pass
+    class ElectricalEnergySupply(Subunit):
+     pass
+    class CompressedAirSupply(Subunit):
+     pass
+    class SteamSupply(Subunit):
+     pass
+    class CondensateSeparator(Subunit):
+     pass
+    class InertgasSupply(Subunit):
+     pass
+    class PhysicalDevice(Instrumentation):
+     pass
+    class FlowControlValve(PhysicalDevice):
+     pass
+    class PressureControlValve(PhysicalDevice):
+     pass
+    class NonReturnValve(PhysicalDevice):
+     pass
+    class ApiAdaptorValve(PhysicalDevice):
+     pass
+    comment = ["https://www.opwglobal.com/products/us/transportation-products/"
+     "tank-truck-products/mechanical-tank-truck-products/"
+     "bottom-loading-adapters-gravity-couplers-dust-caps/api-adaptors"]
+    class ShutOffValve(PhysicalDevice):
+     pass
+    class BottomDrainValve(PhysicalDevice):
+     pass
+    class ThreeWayValve(PhysicalDevice):
+     pass
+    class ThrottlingValve(PhysicalDevice):
+     pass
+    class InletValve(PhysicalDevice):
+     pass
+    class OutletValve(PhysicalDevice):
+     pass
+    class Orifice(PhysicalDevice):
+     pass
+    
+    
+    class EquipmentEntity(Thing):
+     pass
+    EquipmentEntity.comment = ["Process unit is composed of plant items (fixture, instrumentation, support system)",
+     "has a nominal function and an operating state"]
+    class SourceEntity(EquipmentEntity):
+     pass
+    class SinkEntity(EquipmentEntity):
+     pass
+    class ConnectionPipeEntity(EquipmentEntity):
+     pass
+    class TankTruckEntity(EquipmentEntity):
+     pass
+    class StorageTankEntity(EquipmentEntity):
+     pass
+    class SettlingTankEntity(EquipmentEntity):
+     pass
+    class StabilizerColumnEntity(EquipmentEntity):
+     pass
+    class DistillationColumnEntity(EquipmentEntity):
+     pass
+    class SteamDrivenReboilerEntity(EquipmentEntity):
+     pass
+    class PumpEntity(EquipmentEntity):
+     pass
+    class CompressorEntity(EquipmentEntity):
+     pass
+    class ValveEntity(EquipmentEntity):
+     pass
+    class ReactorEntity(EquipmentEntity):
+     pass
+    class WetScrubberEntity(EquipmentEntity):
+     pass
+    class InertgasBlanketingEntity(EquipmentEntity):
+     pass
+    # Pressure vessels
+    class PressureVesselEntity(EquipmentEntity):
+     pass
+    class PressureReceiverEntity(PressureVesselEntity):
+     pass
+    class SteamReceiverEntity(PressureVesselEntity):
+     pass
+    class ShellTubeHeatExchangerEntity(EquipmentEntity):
+     pass
+    class ShellTubeEvaporatorEntity(EquipmentEntity):
+     pass
+    class PlateHeatExchangerEntity(EquipmentEntity):
+     pass
+    class CoolingTowerEntity(EquipmentEntity):
+     pass
+    class AirCooledCondenserEntity(EquipmentEntity):
+     pass
+    class FinTubeEvaporatorEntity(EquipmentEntity):
+     pass
+    
+    # === Relations
+    class hasFixture(EquipmentEntity >> Fixture):
+     pass
+    class isTransportable(EquipmentEntity >> bool, FunctionalProperty):
+     pass
+    class hasConnectionToAdjacentPlantItem(EquipmentEntity >> PlantItem):
+     pass
+    class hasInstrumentation(EquipmentEntity >> Instrumentation):
+     pass
+    class hasFailSafePosition(EquipmentEntity >> FailSafePosition):
+     pass
+    class hasMaterialTransferEquipment(EquipmentEntity >> MaterialTransferEquipment):
+     pass
+    class hasSubunit(EquipmentEntity >> Subunit):
+     pass
+    class hasApparatus(EquipmentEntity >> Apparatus):
+     pass
+    class hasPiping(EquipmentEntity >> Piping):
+     pass
+    class hasIdentifier(EquipmentEntity >> str):
+     pass
+    class hasIntendedFunction(EquipmentEntity >> process_onto.IntendedFunction):
+     pass
+    class hasMaximumOperatingPressureInBarGauge(EquipmentEntity >> float, FunctionalProperty):
+     pass
+    class hasMaximumOperatingTemperatureInKelvin(EquipmentEntity >> float, FunctionalProperty):
+     pass
+    class entityControlledBy(EquipmentEntity >> ControlInstance):
+     pass
+    class hasAnOperationMode(EquipmentEntity >> OperationMode):
+     pass
+    class formsControlLoopWith(Instrumentation >> Instrumentation):
+     pass
+    class hasPort(EquipmentEntity >> Port):
+     pass
+    class portEquippedWithInstrumentation(Port >> Instrumentation, FunctionalProperty):
+     pass
+    
+    
+    # === Intended function
+    class IntendedFunction(Thing):
+     pass
+    class NoIntendedFunction(IntendedFunction):
+     pass
+    class Evaporating(IntendedFunction):
+     pass
+    class Condensing(IntendedFunction):
+     pass
+    class HeatTransferring(IntendedFunction):
+     pass
+    class Mixing(IntendedFunction):
+     pass
+    class Separating(IntendedFunction):
+     pass
+    class MaterialTransfer(IntendedFunction):
+     pass
+    class Stabilizing(IntendedFunction):
+     pass
+    class FlowControl(IntendedFunction):
+     pass
+    class PressureControl(IntendedFunction):
+     pass
+    class Reacting(IntendedFunction):
+     pass
+    class Purifying(IntendedFunction):
+     pass
+    class Inerting(IntendedFunction):
+     pass
+    class Transporting(IntendedFunction):
+     pass
+    class Loading(IntendedFunction):
+     pass
+    class Unloading(IntendedFunction):
+     pass
+    class Emptying(IntendedFunction):
+     pass
+    class Filling(IntendedFunction):
+     pass
+    class Storing(IntendedFunction):
+     pass
+    class ModeIndependent(IntendedFunction):
+     pass
+    class DeliverConstantVolumeFlow(IntendedFunction):
+     pass
 
 
 #%% Appendix J - Ontology for Chemicals
 
-class Substance(Thing):
- pass
-class Property(Thing):
- pass
-class StabilityReactivityInformation(Thing):
- pass
-class hasStabilityReactivityInformation(Substance >> StabilityReactivityInformation):
- pass
-class ReactsViolentlyWithOxidizer(StabilityReactivityInformation):
- pass
-class FormsExplosiveMixtureWithAir(StabilityReactivityInformation):
- pass
-class FormsExplosiveMixturesWithOxidizingAgents(StabilityReactivityInformation):
- pass
-class ReactsWithWater(StabilityReactivityInformation):
- pass
-class ReactsWithChlorates(StabilityReactivityInformation):
- pass
-class PolymerizesExothermicallyWithoutInhibitor(StabilityReactivityInformation):
- pass
-class PolymerizesExothermicallyWhenExposedToLight(StabilityReactivityInformation):
- pass
-class PolymerizesExothermicallyWhenExposedToHeat(StabilityReactivityInformation):
- pass
-class FormationOfHazardousDecompositionProducts(StabilityReactivityInformation):
- pass
-class ThermalDecompositionGeneratesCorrosiveVapors(FormationOfHazardousDecompositionProducts):
- pass
-class IncompatibleToStrongAcids(StabilityReactivityInformation):
- pass
-class IncompatibleToStrongBases(StabilityReactivityInformation):
- pass
-class IncompatibleToStrongOxidizers(StabilityReactivityInformation):
- pass
-class SpecificSubstanceTask(Thing):
- pass
-class hasSpecificTask(Substance >> SpecificSubstanceTask):
- pass
-class ScrubbingAgent(SpecificSubstanceTask):
- pass
-class Stabilizer(SpecificSubstanceTask):
- pass
-Stabilizer.comment = ["chemical that is used to prevent degradation"]
-class ReactionInhibitor(SpecificSubstanceTask):
- pass
-ReactionInhibitor.comment = ["Substance that decreases or prevents chemical reaction"]
-class Lubricant(SpecificSubstanceTask):
- pass
-class Refrigerant(SpecificSubstanceTask):
- pass
-class ProcessMedium(SpecificSubstanceTask):
- pass
-class CoolingMedium(SpecificSubstanceTask):
- pass
-class HeatingMedium(SpecificSubstanceTask):
- pass
-class InertGas(SpecificSubstanceTask):
- pass
-# Source 1: https://www.chemsafetypro.com/Topics/GHS/GHS_Classification_Criteria.html, Source 2: https://pubchem.ncbi.nlm.nih.gov/ghs/
-class HazardClass(Thing):
- pass
-class hasHazardClass(Substance >> HazardClass):
- pass
-class PhysicalHazard(HazardClass):
- pass
-class HealthHazard(HazardClass):
- pass
-class EnvironmentalHazard(HazardClass):
- pass
-class Explosives(PhysicalHazard):
- pass
-class FlammableGases(PhysicalHazard):
- pass
-class FlammableGasCategory1(FlammableGases):
- pass
-class FlammableGasCategory2(FlammableGases):
- pass
-class PyrophoricGasCategory1(FlammableGases):
- pass
-
-
-class ChemicallyUnstableGasCategoryA(FlammableGases):
- pass
-class ChemicallyUnstableGasCategoryB(FlammableGases):
- pass
-class Aerosols(PhysicalHazard):
- pass
-class AerosolCategory1(Aerosols):
- pass
-class AerosolCategory2(Aerosols):
- pass
-class OxidizingGases(PhysicalHazard):
- pass
-class GasesUnderPressure(PhysicalHazard):
- pass
-class CompressedGas(GasesUnderPressure):
- pass
-class LiquefiedGas(GasesUnderPressure):
- pass
-class RefrigeratedLiquefiedGas(GasesUnderPressure):
- pass
-class DissolvedGas(GasesUnderPressure):
- pass
-class FlammableLiquids(PhysicalHazard):
- pass
-class FlammableLiquidCategory1(FlammableLiquids):
- pass
-class FlammableLiquidCategory2(FlammableLiquids):
- pass
-class FlammableLiquidCategory3(FlammableLiquids):
- pass
-class FlammableLiquidCategory4(FlammableLiquids):
- pass
-class FlammableSolids(PhysicalHazard):
- pass
-class SelfReactiveSubstances(PhysicalHazard):
- pass
-class PyrophoricLiquids(PhysicalHazard):
- pass
-class PyrophoricSolids(PhysicalHazard):
- pass
-class SelfHeatingSubstances(PhysicalHazard):
- pass
-class EmitFlammableGasesWithWater(PhysicalHazard):
- pass
-class OxidizingLiquids(PhysicalHazard):
- pass
-class OxidizingSolids(PhysicalHazard):
- pass
-class OrganicPeroxides(PhysicalHazard):
- pass
-class CorrosiveToMetals(PhysicalHazard):
- pass
-class DesensitiziedExplosives(PhysicalHazard):
- pass
-class HazardousToAquaticEnvironment(EnvironmentalHazard):
- pass
-class HazardousToAquaticEnvironmentLongTermCategory1(HazardousToAquaticEnvironment):
- pass
-class HazardousToAquaticEnvironmentLongTermCategory2(HazardousToAquaticEnvironment):
- pass
-class HazardousToAquaticEnvironmentLongTermCategory3(HazardousToAquaticEnvironment):
- pass
-class HazardousToAquaticEnvironmentLongTermCategory4(HazardousToAquaticEnvironment):
- pass
-class HazardousToAquaticEnvironmentAcuteCategory1(HazardousToAquaticEnvironment):
- pass
-class HazardousToAquaticEnvironmentAcuteCategory2(HazardousToAquaticEnvironment):
- pass
-class HazardousToAquaticEnvironmentAcuteCategory3(HazardousToAquaticEnvironment):
- pass
-class HazardousToOzoneLayer(EnvironmentalHazard):
- pass
-class AcuteToxicity(HealthHazard):
- pass
-class AcuteToxicityCategory1(AcuteToxicity):
- pass
-class AcuteToxicityCategory2(AcuteToxicity):
- pass
-class AcuteToxicityCategory3(AcuteToxicity):
- pass
-
-class SpecificTargetOrganToxicitySingleExposure(HealthHazard):
- pass
-class SpecificTargetOrganToxicityRepeatedExposure(HealthHazard):
- pass
-class SpecificTargetOrganToxicitySingleExposureCategory1(HealthHazard):
- pass
-class SpecificTargetOrganToxicitySingleExposureCategory2(HealthHazard):
- pass
-class SpecificTargetOrganToxicitySingleExposureCategory3(HealthHazard):
- pass
-class SpecificTargetOrganToxicityRepeatedExposureCategory1(HealthHazard):
- pass
-class SpecificTargetOrganToxicityRepeatedExposureCategory2(HealthHazard):
- pass
-class SpecificTargetOrganToxicityRepeatedExposureCategory3(HealthHazard):
- pass
-class SkinCorrosionIrritation(HealthHazard):
- pass
-class SkinCorrosionIrritationCategory1(SkinCorrosionIrritation):
- pass
-class SkinCorrosionIrritationCategory2(SkinCorrosionIrritation):
- pass
-class SkinCorrosionIrritationCategory3(SkinCorrosionIrritation):
- pass
-class SeriousEyeDamageIrritation(HealthHazard):
- pass
-class SeriousEyeDamageIrritationCategory1(HealthHazard):
- pass
-class SeriousEyeDamageIrritationCategory2A(HealthHazard):
- pass
-class SeriousEyeDamageIrritationCategory2B(HealthHazard):
- pass
-class RespiratoryOrSkinSensitization(HealthHazard):
- pass
-class GermCellMutagenicity(HealthHazard):
- pass
-class Carcinogenicity(HealthHazard):
- pass
-class ReproductiveToxicology(HealthHazard):
- pass
-class ReproductiveToxicityCategory1(HealthHazard):
- pass
-class ReproductiveToxicityCategory2(HealthHazard):
- pass
-class TargetOrganSystemicToxicitySingleExposure(HealthHazard):
- pass
-class TargetOrganSystemicToxicityRepeatedExposure(HealthHazard):
- pass
-class AspirationToxicity(HealthHazard):
- pass
-class AspirationHazardCategory1(AspirationToxicity):
- pass
-class AspirationHazardCategory2(AspirationToxicity):
- pass
-class Flashpoint(Property):
- pass
-Flashpoint.comment = ["Flammpunkt"]
-class hasFlashpointInKelvin(Substance >> float, FunctionalProperty):
- pass
-class hasFreezingPointInKelvin(Substance >> float, FunctionalProperty):
- pass
-hasFreezingPointInKelvin.comment = ["Schmelztemperatur gleich groß wie Erstarrungstemperatur"]
-class hasVaporPressureInPascal(Substance >> float, FunctionalProperty):
- pass
-class hasUpperExplosionLimitInPercent(Substance >> float, FunctionalProperty):
- pass
-class hasLowerExplosionLimitInPercent(Substance >> float, FunctionalProperty):
- pass
-class hasAutoIgnitionTemperatureInKelvin(Substance >> float, FunctionalProperty):
- pass
-class hasBoilingPointInKelvin(Substance >> float, FunctionalProperty):
- pass
-class StateOfAggregation(Substance):
- pass
-class Liquid(StateOfAggregation):
- pass
-class Gaseous(StateOfAggregation):
- pass
-class Multiphase(StateOfAggregation):
- pass
-class hasStateOfAggregation(Substance >> StateOfAggregation):
- pass 
-
-
+with substance_onto:
+    class Substance(Thing):
+     pass
+    class Property(Thing):
+     pass
+    class StabilityReactivityInformation(Thing):
+     pass
+    class hasStabilityReactivityInformation(Substance >> StabilityReactivityInformation):
+     pass
+    class ReactsViolentlyWithOxidizer(StabilityReactivityInformation):
+     pass
+    class FormsExplosiveMixtureWithAir(StabilityReactivityInformation):
+     pass
+    class FormsExplosiveMixturesWithOxidizingAgents(StabilityReactivityInformation):
+     pass
+    class ReactsWithWater(StabilityReactivityInformation):
+     pass
+    class ReactsWithChlorates(StabilityReactivityInformation):
+     pass
+    class PolymerizesExothermicallyWithoutInhibitor(StabilityReactivityInformation):
+     pass
+    class PolymerizesExothermicallyWhenExposedToLight(StabilityReactivityInformation):
+     pass
+    class PolymerizesExothermicallyWhenExposedToHeat(StabilityReactivityInformation):
+     pass
+    class FormationOfHazardousDecompositionProducts(StabilityReactivityInformation):
+     pass
+    class ThermalDecompositionGeneratesCorrosiveVapors(FormationOfHazardousDecompositionProducts):
+     pass
+    class IncompatibleToStrongAcids(StabilityReactivityInformation):
+     pass
+    class IncompatibleToStrongBases(StabilityReactivityInformation):
+     pass
+    class IncompatibleToStrongOxidizers(StabilityReactivityInformation):
+     pass
+    class SpecificSubstanceTask(Thing):
+     pass
+    class hasSpecificTask(Substance >> SpecificSubstanceTask):
+     pass
+    class ScrubbingAgent(SpecificSubstanceTask):
+     pass
+    class Stabilizer(SpecificSubstanceTask):
+     pass
+    Stabilizer.comment = ["chemical that is used to prevent degradation"]
+    class ReactionInhibitor(SpecificSubstanceTask):
+     pass
+    ReactionInhibitor.comment = ["Substance that decreases or prevents chemical reaction"]
+    class Lubricant(SpecificSubstanceTask):
+     pass
+    class Refrigerant(SpecificSubstanceTask):
+     pass
+    class ProcessMedium(SpecificSubstanceTask):
+     pass
+    class CoolingMedium(SpecificSubstanceTask):
+     pass
+    class HeatingMedium(SpecificSubstanceTask):
+     pass
+    class InertGas(SpecificSubstanceTask):
+     pass
+    # Source 1: https://www.chemsafetypro.com/Topics/GHS/GHS_Classification_Criteria.html, Source 2: https://pubchem.ncbi.nlm.nih.gov/ghs/
+    class HazardClass(Thing):
+     pass
+    class hasHazardClass(Substance >> HazardClass):
+     pass
+    class PhysicalHazard(HazardClass):
+     pass
+    class HealthHazard(HazardClass):
+     pass
+    class EnvironmentalHazard(HazardClass):
+     pass
+    class Explosives(PhysicalHazard):
+     pass
+    class FlammableGases(PhysicalHazard):
+     pass
+    class FlammableGasCategory1(FlammableGases):
+     pass
+    class FlammableGasCategory2(FlammableGases):
+     pass
+    class PyrophoricGasCategory1(FlammableGases):
+     pass
+    
+    
+    class ChemicallyUnstableGasCategoryA(FlammableGases):
+     pass
+    class ChemicallyUnstableGasCategoryB(FlammableGases):
+     pass
+    class Aerosols(PhysicalHazard):
+     pass
+    class AerosolCategory1(Aerosols):
+     pass
+    class AerosolCategory2(Aerosols):
+     pass
+    class OxidizingGases(PhysicalHazard):
+     pass
+    class GasesUnderPressure(PhysicalHazard):
+     pass
+    class CompressedGas(GasesUnderPressure):
+     pass
+    class LiquefiedGas(GasesUnderPressure):
+     pass
+    class RefrigeratedLiquefiedGas(GasesUnderPressure):
+     pass
+    class DissolvedGas(GasesUnderPressure):
+     pass
+    class FlammableLiquids(PhysicalHazard):
+     pass
+    class FlammableLiquidCategory1(FlammableLiquids):
+     pass
+    class FlammableLiquidCategory2(FlammableLiquids):
+     pass
+    class FlammableLiquidCategory3(FlammableLiquids):
+     pass
+    class FlammableLiquidCategory4(FlammableLiquids):
+     pass
+    class FlammableSolids(PhysicalHazard):
+     pass
+    class SelfReactiveSubstances(PhysicalHazard):
+     pass
+    class PyrophoricLiquids(PhysicalHazard):
+     pass
+    class PyrophoricSolids(PhysicalHazard):
+     pass
+    class SelfHeatingSubstances(PhysicalHazard):
+     pass
+    class EmitFlammableGasesWithWater(PhysicalHazard):
+     pass
+    class OxidizingLiquids(PhysicalHazard):
+     pass
+    class OxidizingSolids(PhysicalHazard):
+     pass
+    class OrganicPeroxides(PhysicalHazard):
+     pass
+    class CorrosiveToMetals(PhysicalHazard):
+     pass
+    class DesensitiziedExplosives(PhysicalHazard):
+     pass
+    class HazardousToAquaticEnvironment(EnvironmentalHazard):
+     pass
+    class HazardousToAquaticEnvironmentLongTermCategory1(HazardousToAquaticEnvironment):
+     pass
+    class HazardousToAquaticEnvironmentLongTermCategory2(HazardousToAquaticEnvironment):
+     pass
+    class HazardousToAquaticEnvironmentLongTermCategory3(HazardousToAquaticEnvironment):
+     pass
+    class HazardousToAquaticEnvironmentLongTermCategory4(HazardousToAquaticEnvironment):
+     pass
+    class HazardousToAquaticEnvironmentAcuteCategory1(HazardousToAquaticEnvironment):
+     pass
+    class HazardousToAquaticEnvironmentAcuteCategory2(HazardousToAquaticEnvironment):
+     pass
+    class HazardousToAquaticEnvironmentAcuteCategory3(HazardousToAquaticEnvironment):
+     pass
+    class HazardousToOzoneLayer(EnvironmentalHazard):
+     pass
+    class AcuteToxicity(HealthHazard):
+     pass
+    class AcuteToxicityCategory1(AcuteToxicity):
+     pass
+    class AcuteToxicityCategory2(AcuteToxicity):
+     pass
+    class AcuteToxicityCategory3(AcuteToxicity):
+     pass
+    
+    class SpecificTargetOrganToxicitySingleExposure(HealthHazard):
+     pass
+    class SpecificTargetOrganToxicityRepeatedExposure(HealthHazard):
+     pass
+    class SpecificTargetOrganToxicitySingleExposureCategory1(HealthHazard):
+     pass
+    class SpecificTargetOrganToxicitySingleExposureCategory2(HealthHazard):
+     pass
+    class SpecificTargetOrganToxicitySingleExposureCategory3(HealthHazard):
+     pass
+    class SpecificTargetOrganToxicityRepeatedExposureCategory1(HealthHazard):
+     pass
+    class SpecificTargetOrganToxicityRepeatedExposureCategory2(HealthHazard):
+     pass
+    class SpecificTargetOrganToxicityRepeatedExposureCategory3(HealthHazard):
+     pass
+    class SkinCorrosionIrritation(HealthHazard):
+     pass
+    class SkinCorrosionIrritationCategory1(SkinCorrosionIrritation):
+     pass
+    class SkinCorrosionIrritationCategory2(SkinCorrosionIrritation):
+     pass
+    class SkinCorrosionIrritationCategory3(SkinCorrosionIrritation):
+     pass
+    class SeriousEyeDamageIrritation(HealthHazard):
+     pass
+    class SeriousEyeDamageIrritationCategory1(HealthHazard):
+     pass
+    class SeriousEyeDamageIrritationCategory2A(HealthHazard):
+     pass
+    class SeriousEyeDamageIrritationCategory2B(HealthHazard):
+     pass
+    class RespiratoryOrSkinSensitization(HealthHazard):
+     pass
+    class GermCellMutagenicity(HealthHazard):
+     pass
+    class Carcinogenicity(HealthHazard):
+     pass
+    class ReproductiveToxicology(HealthHazard):
+     pass
+    class ReproductiveToxicityCategory1(HealthHazard):
+     pass
+    class ReproductiveToxicityCategory2(HealthHazard):
+     pass
+    class TargetOrganSystemicToxicitySingleExposure(HealthHazard):
+     pass
+    class TargetOrganSystemicToxicityRepeatedExposure(HealthHazard):
+     pass
+    class AspirationToxicity(HealthHazard):
+     pass
+    class AspirationHazardCategory1(AspirationToxicity):
+     pass
+    class AspirationHazardCategory2(AspirationToxicity):
+     pass
+    class Flashpoint(Property):
+     pass
+    Flashpoint.comment = ["Flammpunkt"]
+    class hasFlashpointInKelvin(Substance >> float, FunctionalProperty):
+     pass
+    class hasFreezingPointInKelvin(Substance >> float, FunctionalProperty):
+     pass
+    hasFreezingPointInKelvin.comment = ["Schmelztemperatur gleich groß wie Erstarrungstemperatur"]
+    class hasVaporPressureInPascal(Substance >> float, FunctionalProperty):
+     pass
+    class hasUpperExplosionLimitInPercent(Substance >> float, FunctionalProperty):
+     pass
+    class hasLowerExplosionLimitInPercent(Substance >> float, FunctionalProperty):
+     pass
+    class hasAutoIgnitionTemperatureInKelvin(Substance >> float, FunctionalProperty):
+     pass
+    class hasBoilingPointInKelvin(Substance >> float, FunctionalProperty):
+     pass
+    class StateOfAggregation(Substance):
+     pass
+    class Liquid(StateOfAggregation):
+     pass
+    class Gaseous(StateOfAggregation):
+     pass
+    class Multiphase(StateOfAggregation):
+     pass
+    class hasStateOfAggregation(Substance >> StateOfAggregation):
+     pass 
+    
+    
 
 
 
 #%% Appendix L - Ontology for Causes
 
-class ReducedFlowArea(Cause):
- equivalent_to = [Cause &
- (causeInvolvesEquipmentEntity.some(equipment_onto.ConnectionPipeEntity) &
- isCauseOfDeviation.some(deviation_onto.LowFlow))]
-class HosePipeBlocked(Cause):
- equivalent_to = [Cause &
- (isCauseOfDeviation.some(deviation_onto.NoFlow) &
- causeInvolvesEquipmentEntity.some(equipment_onto.TankTruckEntity &
- equipment_onto.hasPiping.some(equipment_onto.TankTruckHose)))]
-class PhysicalImpact(Cause):
- equivalent_to = [Cause &
- (isCauseOfDeviation.some(deviation_onto.ElsewhereFlow) &
- causeInvolvesSiteInformation.some(
- site_information.involvesPlantAmbientInformation.some(site_information.VehicleTraffic |
- site_information.CranePresent)) &
- causeInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.ModeIndependent)))]
-class MechanicalFailureOfSupport(Cause):
- equivalent_to = [Cause &
- (isCauseOfDeviation.some(deviation_onto.ElsewhereFlow) &
- causeRequiresBoundaryCondition.some(boundary_onto.FoundationCanBeAffected) &
- causeInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.ModeIndependent)))]
-class Pollution(Cause):
- equivalent_to = [Cause &
- (isCauseOfDeviation.some(deviation_onto.OtherThanComposition) &
- causeRequiresBoundaryCondition.some(boundary_onto.IntroductionOfImpurities) &
- causeInvolvesEquipmentEntity.some(
- equipment_onto.hasApparatus.some(equipment_onto.AtmosphericStorageTank |
- equipment_onto.PressureVessel)))]
-class NoFeed(Cause):
- equivalent_to = [Cause &
- (isCauseOfDeviation.some(deviation_onto.NoFlow) &
- causeInvolvesSubstance.some(substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium)) &
- causeInvolvesEquipmentEntity.some(equipment_onto.StabilizerColumnEntity |
- equipment_onto.ReactorEntity))]
-class WrongMountingOfNonReturnValve(Cause):
- equivalent_to = [Cause &
- (isCauseOfDeviation.some(deviation_onto.NoFlow) &
- causeInvolvesEquipmentEntity.some(equipment_onto.hasInstrumentation.some(equipment_onto.NonReturnValve))
- )]
-# Unit tests conducted @200414 [TestFreezeUp] in unit_tests\overarching_phenomena.py
-class FreezeUp(Cause):
- equivalent_to = [Cause &
- (causeInvolvesSubstance.some(
- substance_onto.hasStateOfAggregation.some(substance_onto.Liquid) &
- (substance_onto.hasFreezingPointInKelvin >= upper_onto.lowest_ambient_temperature)
- )
- &
- causeInvolvesEquipmentEntity.some(equipment_onto.ConnectionPipeEntity) &
- isCauseOfDeviation.some(deviation_onto.LowTemperature))]
-FreezeUp.comment = ["[FreezeUp] is seen as a cause for no flow.",
- "It can also be modeled as an [Effect] (T_low & pipe -> [FreezeUp])",
-"The modelling is consequence-oriented, thus (T_low & pipe -> [PipeFracture])"]
-class ValveClosedPressureBuildUpInPiping(Cause):
- equivalent_to = [Cause &
- (causeInvolvesEquipmentEntity.some(
- equipment_onto.hasInstrumentation.some(equipment_onto.ShutOffValve) &
- equipment_onto.hasIntendedFunction.some(process_onto.ModeIndependent)) &
- isCauseOfDeviation.some(deviation_onto.HighPressure))
- |
- (causeInvolvesEquipmentEntity.some(
- equipment_onto.hasInstrumentation.some(equipment_onto.FlowControlValve) &
- equipment_onto.hasIntendedFunction.some(process_onto.FlowControl)) &
- isCauseOfDeviation.some(deviation_onto.HighPressure))
- |
- (causeInvolvesEquipmentEntity.some(
- equipment_onto.hasInstrumentation.some(equipment_onto.PressureControlValve) &
- equipment_onto.hasIntendedFunction.some(process_onto.PressureControl)) &
- isCauseOfDeviation.some(deviation_onto.HighPressure))]
-class DrainValveInadvertentlyOpened(Cause):
- equivalent_to = [Cause &
- ((causeInvolvesEquipmentEntity.some(
- equipment_onto.hasInstrumentation.some(equipment_onto.BottomDrainValve) &
- equipment_onto.hasIntendedFunction.some(process_onto.ModeIndependent)) &
- causeInvolvesSubstance.some(substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
- substance_onto.Multiphase)) &
- isCauseOfDeviation.some(deviation_onto.ElsewhereFlow))
- |
- (causeInvolvesEquipmentEntity.some(
- equipment_onto.hasInstrumentation.some(equipment_onto.BottomDrainValve) &
- equipment_onto.hasIntendedFunction.some(process_onto.DeliverConstantVolumeFlow |
- equipment_onto.NormalOperation)) &
- causeInvolvesSubstance.some(substance_onto.hasStateOfAggregation.some(substance_onto.Liquid)) &
- isCauseOfDeviation.some(deviation_onto.ElsewhereFlow)))]
-class LiquidTransferWithoutCompensation(Cause):
- equivalent_to = [Cause &
- (causeInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.Emptying)) &
- causeInvolvesSubstance.some(substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
- substance_onto.Multiphase)) &
- isCauseOfDeviation.some(deviation_onto.LowPressure))
- ]
-class InsufficientThermalInbreathing(Cause):
- equivalent_to = [Cause &
- causeInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.Storing)) &
- isCauseOfDeviation.some(deviation_onto.LowPressure)
- ]
+with causes_onto:
+    class ReducedFlowArea(Cause):
+     equivalent_to = [Cause &
+     (causeInvolvesEquipmentEntity.some(equipment_onto.ConnectionPipeEntity) &
+     isCauseOfDeviation.some(deviation_onto.LowFlow))]
+    class HosePipeBlocked(Cause):
+     equivalent_to = [Cause &
+     (isCauseOfDeviation.some(deviation_onto.NoFlow) &
+     causeInvolvesEquipmentEntity.some(equipment_onto.TankTruckEntity &
+     equipment_onto.hasPiping.some(equipment_onto.TankTruckHose)))]
+    class PhysicalImpact(Cause):
+     equivalent_to = [Cause &
+     (isCauseOfDeviation.some(deviation_onto.ElsewhereFlow) &
+     causeInvolvesSiteInformation.some(
+     site_information.involvesPlantAmbientInformation.some(site_information.VehicleTraffic |
+     site_information.CranePresent)) &
+     causeInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.ModeIndependent)))]
+    class MechanicalFailureOfSupport(Cause):
+     equivalent_to = [Cause &
+     (isCauseOfDeviation.some(deviation_onto.ElsewhereFlow) &
+     causeRequiresBoundaryCondition.some(boundary_onto.FoundationCanBeAffected) &
+     causeInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.ModeIndependent)))]
+    class Pollution(Cause):
+     equivalent_to = [Cause &
+     (isCauseOfDeviation.some(deviation_onto.OtherThanComposition) &
+     causeRequiresBoundaryCondition.some(boundary_onto.IntroductionOfImpurities) &
+     causeInvolvesEquipmentEntity.some(
+     equipment_onto.hasApparatus.some(equipment_onto.AtmosphericStorageTank |
+     equipment_onto.PressureVessel)))]
+    class NoFeed(Cause):
+     equivalent_to = [Cause &
+     (isCauseOfDeviation.some(deviation_onto.NoFlow) &
+     causeInvolvesSubstance.some(substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium)) &
+     causeInvolvesEquipmentEntity.some(equipment_onto.StabilizerColumnEntity |
+     equipment_onto.ReactorEntity))]
+    class WrongMountingOfNonReturnValve(Cause):
+     equivalent_to = [Cause &
+     (isCauseOfDeviation.some(deviation_onto.NoFlow) &
+     causeInvolvesEquipmentEntity.some(equipment_onto.hasInstrumentation.some(equipment_onto.NonReturnValve))
+     )]
+    # Unit tests conducted @200414 [TestFreezeUp] in unit_tests\overarching_phenomena.py
+    class FreezeUp(Cause):
+     equivalent_to = [Cause &
+     (causeInvolvesSubstance.some(
+     substance_onto.hasStateOfAggregation.some(substance_onto.Liquid) &
+     (substance_onto.hasFreezingPointInKelvin >= upper_onto.lowest_ambient_temperature)
+     )
+     &
+     causeInvolvesEquipmentEntity.some(equipment_onto.ConnectionPipeEntity) &
+     isCauseOfDeviation.some(deviation_onto.LowTemperature))]
+    FreezeUp.comment = ["[FreezeUp] is seen as a cause for no flow.",
+     "It can also be modeled as an [Effect] (T_low & pipe -> [FreezeUp])",
+    "The modelling is consequence-oriented, thus (T_low & pipe -> [PipeFracture])"]
+    class ValveClosedPressureBuildUpInPiping(Cause):
+     equivalent_to = [Cause &
+     (causeInvolvesEquipmentEntity.some(
+     equipment_onto.hasInstrumentation.some(equipment_onto.ShutOffValve) &
+     equipment_onto.hasIntendedFunction.some(process_onto.ModeIndependent)) &
+     isCauseOfDeviation.some(deviation_onto.HighPressure))
+     |
+     (causeInvolvesEquipmentEntity.some(
+     equipment_onto.hasInstrumentation.some(equipment_onto.FlowControlValve) &
+     equipment_onto.hasIntendedFunction.some(process_onto.FlowControl)) &
+     isCauseOfDeviation.some(deviation_onto.HighPressure))
+     |
+     (causeInvolvesEquipmentEntity.some(
+     equipment_onto.hasInstrumentation.some(equipment_onto.PressureControlValve) &
+     equipment_onto.hasIntendedFunction.some(process_onto.PressureControl)) &
+     isCauseOfDeviation.some(deviation_onto.HighPressure))]
+    class DrainValveInadvertentlyOpened(Cause):
+     equivalent_to = [Cause &
+     ((causeInvolvesEquipmentEntity.some(
+     equipment_onto.hasInstrumentation.some(equipment_onto.BottomDrainValve) &
+     equipment_onto.hasIntendedFunction.some(process_onto.ModeIndependent)) &
+     causeInvolvesSubstance.some(substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
+     substance_onto.Multiphase)) &
+     isCauseOfDeviation.some(deviation_onto.ElsewhereFlow))
+     |
+     (causeInvolvesEquipmentEntity.some(
+     equipment_onto.hasInstrumentation.some(equipment_onto.BottomDrainValve) &
+     equipment_onto.hasIntendedFunction.some(process_onto.DeliverConstantVolumeFlow |
+     equipment_onto.NormalOperation)) &
+     causeInvolvesSubstance.some(substance_onto.hasStateOfAggregation.some(substance_onto.Liquid)) &
+     isCauseOfDeviation.some(deviation_onto.ElsewhereFlow)))]
+    class LiquidTransferWithoutCompensation(Cause):
+     equivalent_to = [Cause &
+     (causeInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.Emptying)) &
+     causeInvolvesSubstance.some(substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
+     substance_onto.Multiphase)) &
+     isCauseOfDeviation.some(deviation_onto.LowPressure))
+     ]
+    class InsufficientThermalInbreathing(Cause):
+     equivalent_to = [Cause &
+     causeInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.Storing)) &
+     isCauseOfDeviation.some(deviation_onto.LowPressure)
+     ]
+    
+    
+    
+    class InsufficientThermalOutbreathing(Cause):
+     equivalent_to = [Cause &
+     causeInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.Storing)) &
+     isCauseOfDeviation.some(deviation_onto.HighPressure)]
+    class NoInertgasSupply(Cause):
+     equivalent_to = [Cause &
+     (isCauseOfDeviation.some(deviation_onto.NoFlow) &
+     causeInvolvesEquipmentEntity.some(equipment_onto.InertgasBlanketingEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.Inerting)) &
+     causeInvolvesSubstance.some(substance_onto.hasSpecificTask.some(substance_onto.InertGas)))]
+    class IncreasedInletPressure(Cause):
+     equivalent_to = [Cause &
+     ((isCauseOfDeviation.some(deviation_onto.HighFlow) &
+     causeInvolvesEquipmentEntity.some(equipment_onto.InertgasBlanketingEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.Inerting)) &
+     causeInvolvesSubstance.some(substance_onto.hasSpecificTask.some(substance_onto.InertGas))))]
+    class IncorrectPressureAdjustment(Cause):
+     equivalent_to = [Cause &
+     (isCauseOfDeviation.some(deviation_onto.LowPressure) &
+     causeInvolvesEquipmentEntity.some(
+     equipment_onto.hasIntendedFunction.some(process_onto.ModeIndependent) &
+     equipment_onto.hasPiping.some(equipment_onto.BlanketingGasline) &
+     equipment_onto.hasInstrumentation.some(equipment_onto.PressureIndicatorController)))]
+    class BlockedOutflowLine(Cause):
+     equivalent_to = [Cause &
+     (
+     (causeInvolvesEquipmentEntity.some(equipment_onto.WetScrubberEntity |
+     equipment_onto.AirCooledCondenserEntity |
+     equipment_onto.ShellTubeEvaporatorEntity |
+     equipment_onto.FinTubeEvaporatorEntity) &
+     isCauseOfDeviation.some(deviation_onto.NoFlow |
+     deviation_onto.HighPressure))
+     |
+     (causeInvolvesEquipmentEntity.some(equipment_onto.CompressorEntity) &
+     isCauseOfDeviation.some(deviation_onto.NoFlow |
+     deviation_onto.HighPressure) &
+     causeInvolvesSubstance.some(
+     substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium |
+     substance_onto.Refrigerant)))
+     |
+     (causeInvolvesEquipmentEntity.some(equipment_onto.StabilizerColumnEntity) &
+     isCauseOfDeviation.some(deviation_onto.HighLevel) &
+     causeInvolvesSubstance.some(
+     substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium))))]
+    class TooLittleStabilizer(Cause):
+     equivalent_to = [Cause &
+     (isCauseOfDeviation.some(deviation_onto.OtherThanComposition) &
+     causeInvolvesEquipmentEntity.some((equipment_onto.ConnectionPipeEntity |
+     equipment_onto.StorageTankEntity |
+     equipment_onto.SettlingTankEntity |
+     equipment_onto.PressureVesselEntity |
+     equipment_onto.WetScrubberEntity |
+     equipment_onto.PressureReceiverEntity |
+     equipment_onto.ShellTubeHeatExchangerEntity |
+     equipment_onto.ShellTubeEvaporatorEntity |
+     equipment_onto.FinTubeEvaporatorEntity)) &
+     causeRequiresBoundaryCondition.some(boundary_onto.SubstanceContainsStabilizer) &
+     causeInvolvesSubstance.some(
+     substance_onto.hasStabilityReactivityInformation.some(substance_onto.PolymerizesExothermicallyWithoutInhibitor)))]
+    class TooLittleInhibitor(Cause):
+     equivalent_to = [Cause &
+     (isCauseOfDeviation.some(deviation_onto.OtherThanComposition) &
+     causeInvolvesEquipmentEntity.some((equipment_onto.ConnectionPipeEntity |
+     equipment_onto.StorageTankEntity |
+     equipment_onto.SettlingTankEntity |
+     equipment_onto.PressureVesselEntity |
+     equipment_onto.WetScrubberEntity |
+     equipment_onto.PressureReceiverEntity |
+     equipment_onto.ShellTubeHeatExchangerEntity |
+     equipment_onto.ShellTubeEvaporatorEntity |
+     equipment_onto.FinTubeEvaporatorEntity)) &
+     causeInvolvesSubstance.some(
+     substance_onto.hasStabilityReactivityInformation.some(substance_onto.PolymerizesExothermicallyWithoutInhibitor)))]
+    class ExcessiveFluidWithdrawal(Cause):
+     equivalent_to = [Cause &
+     causeInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity) &
+     isCauseOfDeviation.some(deviation_onto.LowPressure)]
+    ExcessiveFluidWithdrawal.comment = ["The issue of depressurization and collapse of vessel is addressed",
+     "https://www.aiche.org/resources/publications/cep/2019/december/protect-tanks-overpressure-and-vacuum",
+    "API 2000"]
+    class WaterHammer(Cause):
+     equivalent_to = [Cause &
+     causeInvolvesSubstance.some(
+     substance_onto.hasStateOfAggregation.some(substance_onto.Liquid) &
+     substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium)) &
+     isCauseOfDeviation.some(deviation_onto.HighPressure) &
+     causeInvolvesEquipmentEntity.some(equipment_onto.ConnectionPipeEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.Filling |
+     process_onto.ModeIndependent))]
+    WaterHammer.comment = ["Synonyms: hydraulic shock, fluid hammer"]
+    class ThermalExpansion(Cause):
+     equivalent_to = [Cause &
+     ((causeInvolvesSubstance.some(substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
+     substance_onto.Multiphase |
+     substance_onto.Gaseous) &
+    substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium)) &
+     causeInvolvesEquipmentEntity.some(equipment_onto.ConnectionPipeEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.ModeIndependent)) &
+     causeRequiresBoundaryCondition.some(boundary_onto.ExternalFirePossible |
+     boundary_onto.LocatedOutside) &
+     isCauseOfDeviation.some(deviation_onto.HighPressure))
+     |
+     (causeInvolvesSubstance.some(substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
+     substance_onto.Multiphase |
+     substance_onto.Gaseous) &
+    substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium)) &
+     causeInvolvesEquipmentEntity.some(equipment_onto.hasApparatus.some(equipment_onto.PressureVessel) &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.ModeIndependent)
+     ) &
+     causeRequiresBoundaryCondition.some(boundary_onto.ExternalFirePossible |
+     boundary_onto.LocatedOutside) &
+     isCauseOfDeviation.some(deviation_onto.HighPressure)))]
+    
+    
+    
+    class HighAmbientTemperature(Cause):
+     equivalent_to = [Cause &
+     (causeInvolvesEquipmentEntity.some(equipment_onto.AirCooledCondenserEntity) &
+     isCauseOfDeviation.some(deviation_onto.HighTemperature |
+     deviation_onto.HighPressure) &
+     causeRequiresBoundaryCondition.some(boundary_onto.LocatedOutside))]
+    class WrongRotatingSpeed(Cause):
+     equivalent_to = [Cause &
+     (
+     (isCauseOfDeviation.some(deviation_onto.HighFlow |
+     deviation_onto.LowFlow) &
+     causeInvolvesSubstance.some(
+     substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium |
+     substance_onto.Refrigerant)) &
+     causeInvolvesEquipmentEntity.some((equipment_onto.CompressorEntity |
+     equipment_onto.PumpEntity) &
+     equipment_onto.hasInstrumentation.some(equipment_onto.FrequencyConverter) &
+     equipment_onto.hasInstrumentation.some(equipment_onto.SpeedController) &
+     equipment_onto.hasInstrumentation.some(equipment_onto.ElectricMotor)))
+     |
+     (isCauseOfDeviation.some(
+     deviation_onto.HighPressure | deviation_onto.HighTemperature) &
+     causeInvolvesEquipmentEntity.some(equipment_onto.AirCooledCondenserEntity &
+     equipment_onto.hasInstrumentation.some(equipment_onto.ElectricMotor) &
+     equipment_onto.hasInstrumentation.some(equipment_onto.SpeedController) &
+     equipment_onto.hasInstrumentation.some(equipment_onto.FrequencyConverter))
+     ))]
+    class ConfusionOfSubstances(Cause):
+     equivalent_to = [Cause &
+     ((causeInvolvesEquipmentEntity.some(equipment_onto.SourceEntity &
+     equipment_onto.entityControlledBy.some(equipment_onto.Operator)) &
+     isCauseOfDeviation.some(deviation_onto.OtherThanComposition)))]
+    class WrongTankLinedUp(Cause):
+     equivalent_to = [Cause &
+     (causeInvolvesEquipmentEntity.some(equipment_onto.TankTruckEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.Unloading)) &
+     isCauseOfDeviation.some(deviation_onto.OtherThanComposition))]
+    class OtherSubstanceFromUpstream(Cause):
+     equivalent_to = [Cause &
+     ((causeRequiresBoundaryCondition.some(boundary_onto.UpstreamProcessInvolved) &
+     causeInvolvesSubstance.some(
+     substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium)) &
+     causeInvolvesEquipmentEntity.some(equipment_onto.SourceEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.ModeIndependent)) &
+     isCauseOfDeviation.some(deviation_onto.OtherThanComposition))
+     |
+     ((causeInvolvesSubstance.some(
+     substance_onto.hasSpecificTask.some(substance_onto.InertGas)) &
+     causeInvolvesEquipmentEntity.some(equipment_onto.InertgasBlanketingEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.Inerting)) &
+     isCauseOfDeviation.some(deviation_onto.OtherThanComposition))))]
+    class ReducedDwellTime(Cause):
+     equivalent_to = [Cause &
+     (isCauseOfDeviation.some(deviation_onto.OtherThanComposition) &
+     causeInvolvesEquipmentEntity.some(equipment_onto.SettlingTankEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.Separating)))]
+    class ContaminationInUnloadingLines(Cause):
+     equivalent_to = [Cause &
+     (causeInvolvesEquipmentEntity.some((equipment_onto.hasPiping.some(
+     equipment_onto.TankTruckHose)) &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.Unloading)) &
+     causeRequiresBoundaryCondition.some(boundary_onto.IntroductionOfImpurities |
+     boundary_onto.IntroductionOfWater) &
+     isCauseOfDeviation.some(deviation_onto.OtherThanComposition))]
+    class InadvertentContamination(Cause):
+     equivalent_to = [Cause &
+     ((causeRequiresBoundaryCondition.some(boundary_onto.IntroductionOfImpurities) &
+     causeInvolvesEquipmentEntity.some((equipment_onto.SourceEntity |
+     equipment_onto.SettlingTankEntity |
+     equipment_onto.PressureVesselEntity |
+     equipment_onto.WetScrubberEntity |
+     equipment_onto.PressureReceiverEntity) &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.ModeIndependent)) &
+     isCauseOfDeviation.some(deviation_onto.OtherThanComposition))
+     |
+     (causeRequiresBoundaryCondition.some(boundary_onto.IntroductionOfImpurities) &
+     causeInvolvesEquipmentEntity.some(equipment_onto.TankTruckEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.Unloading)) &
+     isCauseOfDeviation.some(deviation_onto.OtherThanComposition)))]
+    class ContaminationByWaterAndTemperatureFallsBelowFreezingPoint(Cause):
+     equivalent_to = [Cause &
+     (causeRequiresBoundaryCondition.some(boundary_onto.IntroductionOfWater) &
+     causeInvolvesEquipmentEntity.some(equipment_onto.hasApparatus.some(
+     equipment_onto.AtmosphericStorageTank |
+     equipment_onto.PressureVessel) &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.Storing | process_onto.ModeIndependent)) &
+     causeInvolvesSecondDeviation.some(deviation_onto.OtherThanComposition) &
+     isCauseOfDeviation.some(deviation_onto.LowTemperature))]
+    class ContaminationByWater(Cause):
+     equivalent_to = [Cause &
+     ((causeRequiresBoundaryCondition.some(boundary_onto.IntroductionOfWater) &
+     causeInvolvesEquipmentEntity.some((equipment_onto.SettlingTankEntity |
+     equipment_onto.PressureVesselEntity |
+     equipment_onto.WetScrubberEntity |
+     equipment_onto.PressureReceiverEntity |
+     equipment_onto.ShellTubeHeatExchangerEntity |
+     equipment_onto.ShellTubeEvaporatorEntity |
+     equipment_onto.FinTubeEvaporatorEntity) &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.ModeIndependent |
+     process_onto.Filling)
+     ) &
+     isCauseOfDeviation.some(deviation_onto.OtherThanComposition))
+     |
+     (causeRequiresBoundaryCondition.some(boundary_onto.IntroductionOfWater) &
+     causeInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.Storing |
+     process_onto.Filling)) &
+     isCauseOfDeviation.some(deviation_onto.OtherThanComposition)))]
+     
+     
+    class MaterialDegradation(Cause):
+     equivalent_to = [Cause &
+     (isCauseOfDeviation.some(deviation_onto.HighVibration) &
+     causeInvolvesEquipmentEntity.some(equipment_onto.hasApparatus.some(
+     equipment_onto.PressureVessel |
+     equipment_onto.AtmosphericStorageTank |
+     equipment_onto.Piping)))]
+    class ExternalLeakage(Cause):
+     equivalent_to = [Cause &
+     ((causeInvolvesEquipmentEntity.some(equipment_onto.CompressorEntity) &
+     causeInvolvesSubstance.some(
+     substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
+     substance_onto.Gaseous)) & # liquid: because lubricant
+     isCauseOfDeviation.some(deviation_onto.ElsewhereFlow))
+     |
+     (isCauseOfDeviation.some(deviation_onto.HighCorrosion) &
+     causeInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.ModeIndependent)))
+     |
+     (causeInvolvesEquipmentEntity.some((equipment_onto.PressureReceiverEntity |
+     equipment_onto.FinTubeEvaporatorEntity |
+     equipment_onto.ShellTubeEvaporatorEntity |
+     equipment_onto.AirCooledCondenserEntity |
+     equipment_onto.WetScrubberEntity) &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.ModeIndependent)) &
+     causeInvolvesSubstance.some(
+     substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
+     substance_onto.Multiphase)) &
+     isCauseOfDeviation.some(deviation_onto.ElsewhereFlow))
+     |
+     (causeInvolvesEquipmentEntity.some(equipment_onto.TankTruckEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.Unloading)) &
+     causeInvolvesSubstance.some(
+     substance_onto.hasStateOfAggregation.some(substance_onto.Liquid)) &
+     isCauseOfDeviation.some(deviation_onto.ElsewhereFlow))
+     |
+     (causeInvolvesEquipmentEntity.some(equipment_onto.ConnectionPipeEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.ModeIndependent)) &
+     causeInvolvesSubstance.some(
+     substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
+     substance_onto.Gaseous |
+     substance_onto.Multiphase)) &
+     isCauseOfDeviation.some(deviation_onto.ElsewhereFlow))
+     |
+     (causeInvolvesEquipmentEntity.some(
+     equipment_onto.hasInstrumentation.some(equipment_onto.BottomDrainValve |
+     equipment_onto.ThreeWayValve |
+     equipment_onto.ShutOffValve) &
+     equipment_onto.hasIntendedFunction.some(process_onto.ModeIndependent)) &
+     causeInvolvesSubstance.some(
+     substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
+     substance_onto.Gaseous |
+     substance_onto.Multiphase)) &
+     isCauseOfDeviation.some(deviation_onto.ElsewhereFlow))
+     |
+     (causeInvolvesEquipmentEntity.some(equipment_onto.hasApparatus.some(equipment_onto.PressureVessel) &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.ModeIndependent)) &
+     causeInvolvesSubstance.some(
+     substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
+     substance_onto.Gaseous |
+     substance_onto.Multiphase) &
+     substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium)) &
+     isCauseOfDeviation.some(deviation_onto.ElsewhereFlow)))]
+    class InternalLeakage(Cause):
+     equivalent_to = [Cause &
+     ((isCauseOfDeviation.some(deviation_onto.ElsewhereFlow |
+     deviation_onto.OtherThanComposition) &
+     causeInvolvesEquipmentEntity.some(equipment_onto.hasFixture.some(equipment_onto.HalfPipeCoilJacket |
+     equipment_onto.Jacket |
+     equipment_onto.PlatePackage) |
+     equipment_onto.hasPiping.some(equipment_onto.TubeCoil |
+     equipment_onto.TubeBundle)))
+     |
+     (isCauseOfDeviation.some(deviation_onto.ElsewhereFlow) &
+     causeInvolvesSubstance.some(substance_onto.hasSpecificTask.some(substance_onto.HeatingMedium)) &
+     causeInvolvesEquipmentEntity.some(equipment_onto.StabilizerColumnEntity |
+     equipment_onto.SteamDrivenReboilerEntity)))]
+    class ClosedOutletValve(Cause):
+     equivalent_to = [Cause &
+     (
+     (causeInvolvesEquipmentEntity.some(equipment_onto.hasInstrumentation.some(equipment_onto.OutletValve) &
+     equipment_onto.hasApparatus.some(equipment_onto.PressureVessel) &
+     causeInvolvesSubstance.some(
+     substance_onto.hasStateOfAggregation.some(substance_onto.Gaseous)) &
+     isCauseOfDeviation.some(deviation_onto.HighPressure))
+     |
+     (causeInvolvesEquipmentEntity.some(equipment_onto.hasInstrumentation.some(equipment_onto.OutletValve) &
+     equipment_onto.hasApparatus.some(equipment_onto.Compressor)) &
+     causeInvolvesSubstance.some(
+     substance_onto.hasStateOfAggregation.some(substance_onto.Gaseous)) &
+     isCauseOfDeviation.some(deviation_onto.NoFlow | deviation_onto.HighPressure))))]
+    ClosedOutletValve.comment = ["Pump specific details are covered in pump ontology"]
+    class ClosedInletValve(Cause):
+     equivalent_to = [Cause &
+     ((causeInvolvesEquipmentEntity.some(equipment_onto.hasInstrumentation.some(equipment_onto.InletValve) &
+     equipment_onto.hasApparatus.some(equipment_onto.PressureVessel |
+     equipment_onto.AtmosphericStorageTank)) &
+     causeInvolvesSubstance.some(substance_onto.hasStateOfAggregation.some(substance_onto.Liquid)) &
+     isCauseOfDeviation.some(deviation_onto.LowLevel | deviation_onto.NoFlow))
+     |
+     (causeInvolvesEquipmentEntity.some(equipment_onto.hasInstrumentation.some(equipment_onto.InletValve) &
+     equipment_onto.hasApparatus.some(equipment_onto.PressureVessel)) &
+     causeInvolvesSubstance.some(
+     substance_onto.hasStateOfAggregation.some(substance_onto.Gaseous)) &
+     isCauseOfDeviation.some(deviation_onto.LowPressure))
+     |
+     (causeInvolvesEquipmentEntity.some(equipment_onto.CompressorEntity &
+     equipment_onto.hasInstrumentation.some(equipment_onto.InletValve)) &
+     causeInvolvesSubstance.some(
+     substance_onto.hasStateOfAggregation.some(substance_onto.Gaseous)) &
+     isCauseOfDeviation.some(deviation_onto.NoFlow |
+     deviation_onto.LowPressure))
+     |
+     (causeInvolvesEquipmentEntity.some(equipment_onto.PumpEntity &
+     equipment_onto.hasInstrumentation.some(equipment_onto.InletValve) &
+     equipment_onto.hasIntendedFunction.some(process_onto.DeliverConstantVolumeFlow)) &
+     isCauseOfDeviation.some(deviation_onto.NoFlow)))]
+    ClosedInletValve.comment = ["Pump specific details are covered in pump ontology"] 
+    
+    
+    
+    class LossOfCooling(Cause):
+     equivalent_to = [Cause &
+     (causeInvolvesEquipmentEntity.some(equipment_onto.hasSubunit.some(equipment_onto.CoolingSystem)) &
+     isCauseOfDeviation.some(deviation_onto.HighTemperature))]
+    class DeliveryOfHighVolatilityComponents(causes_onto.Cause):
+     equivalent_to = [causes_onto.Cause &
+     (causes_onto.isCauseOfDeviation.some(deviation_onto.OtherThanComposition) &
+     causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.StabilizerColumnEntity) &
+     causes_onto.causeInvolvesSubstance.some(substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium)))]
+    class BlockedReboilerLines(causes_onto.Cause):
+     equivalent_to = [causes_onto.Cause &
+     (causes_onto.isCauseOfDeviation.some(deviation_onto.NoFlow) &
+     causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.SteamDrivenReboilerEntity) &
+     causes_onto.causeInvolvesSubstance.some(
+     substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium)))]
+    class MalfunctionLubricationSystem(causes_onto.Cause):
+     equivalent_to = [causes_onto.Cause &
+     (causes_onto.causeInvolvesSubstance.some(
+     substance_onto.hasSpecificTask.some(substance_onto.Lubricant)) &
+     causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.CompressorEntity &
+     equipment_onto.hasSubunit.some(equipment_onto.LubricationSystem)) &
+     causes_onto.isCauseOfDeviation.some(deviation_onto.HighTemperature))]
+    MalfunctionLubricationSystem.comment = ["Issues described in 'How to limit fire and explosion hazards with oil-flooded rotary screw compressors' by Steven J. Luzik"]
+    class InsufficientVentilation(causes_onto.Cause):
+     equivalent_to = [causes_onto.Cause &
+     (causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.CompressorEntity) &
+     causes_onto.causeInvolvesSubstance.some(
+     substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium |
+     substance_onto.Refrigerant)) &
+     causes_onto.isCauseOfDeviation.some(deviation_onto.HighTemperature))]
+    class NoSteamFlow(causes_onto.Cause):
+     equivalent_to = [causes_onto.Cause &
+     (causes_onto.isCauseOfDeviation.some(deviation_onto.NoFlow) &
+     causes_onto.causeInvolvesSubstance.some(
+     substance_onto.hasSpecificTask.some(substance_onto.HeatingMedium)) &
+     causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.SteamDrivenReboilerEntity))]
+    class LessSteamFlow(causes_onto.Cause):
+     equivalent_to = [causes_onto.Cause &
+     (causes_onto.isCauseOfDeviation.some(deviation_onto.LowFlow) &
+     causes_onto.causeInvolvesSubstance.some(
+     substance_onto.hasSpecificTask.some(substance_onto.HeatingMedium)) &
+     causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.SteamDrivenReboilerEntity))]
+    class MoreSteamFlow(causes_onto.Cause):
+     equivalent_to = [causes_onto.Cause &
+     (causes_onto.isCauseOfDeviation.some(deviation_onto.HighFlow) &
+     causes_onto.causeInvolvesSubstance.some(substance_onto.hasSpecificTask.some(substance_onto.HeatingMedium)) &
+     causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.SteamDrivenReboilerEntity))]
+    class NonCondensables(causes_onto.Cause):
+     equivalent_to = [causes_onto.Cause &
+     (causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.AirCooledCondenserEntity) &
+     causes_onto.causeRequiresBoundaryCondition.some(boundary_onto.IntroductionOfAir) &
+     causes_onto.isCauseOfDeviation.some(deviation_onto.OtherThanComposition))]
+    NonCondensables.comment = ["Eigentlich wird hier noch high pressure benötigt"]
+    class Fouling(causes_onto.Cause):
+     equivalent_to = [causes_onto.Cause &
+     ((causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.AirCooledCondenserEntity) &
+     causes_onto.causeRequiresBoundaryCondition.some(boundary_onto.IntroductionOfImpurities) &
+     causes_onto.isCauseOfDeviation.some(deviation_onto.HighTemperature))
+     |
+     (causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.ShellTubeHeatExchangerEntity |
+     equipment_onto.ShellTubeEvaporatorEntity) &
+     causes_onto.causeInvolvesSubstance.some(
+     substance_onto.hasSpecificTask.some(substance_onto.Refrigerant)) &
+     causes_onto.isCauseOfDeviation.some(deviation_onto.HighTemperature |
+     deviation_onto.OtherThanComposition)))]
+    class IncorrectSetPointControlValve(causes_onto.Cause):
+     equivalent_to = [causes_onto.Cause &
+     ((causes_onto.causeInvolvesEquipmentEntity.some(
+     equipment_onto.hasInstrumentation.some(equipment_onto.FlowControlValve) &
+     equipment_onto.hasIntendedFunction.some(process_onto.FlowControl)) &
+     causes_onto.isCauseOfDeviation.some(deviation_onto.HighFlow |
+     deviation_onto.NoFlow |
+     deviation_onto.LowFlow))
+     |
+     (causes_onto.causeInvolvesEquipmentEntity.some(
+     equipment_onto.hasInstrumentation.some(equipment_onto.PressureControlValve) &
+     equipment_onto.hasIntendedFunction.some(process_onto.PressureControl)) &
+     causes_onto.isCauseOfDeviation.some(deviation_onto.HighPressure |
+     deviation_onto.LowPressure)))]
+    class BypassOpened(causes_onto.Cause):
+     equivalent_to = [causes_onto.Cause &
+     (causes_onto.causeInvolvesEquipmentEntity.some(
+     equipment_onto.hasSubunit.some(equipment_onto.Bypass) &
+     equipment_onto.hasIntendedFunction.some(process_onto.ModeIndependent)
+     ) &
+     causes_onto.isCauseOfDeviation.some(deviation_onto.HighFlow))
+     ]
+    class ValveIntactUnintentionallyClosed(causes_onto.Cause):
+     equivalent_to = [causes_onto.Cause &
+     ((causes_onto.causeInvolvesEquipmentEntity.some((equipment_onto.ValveEntity |
+     equipment_onto.InertgasBlanketingEntity) &
+     equipment_onto.hasInstrumentation.some(
+     equipment_onto.FlowControlValve |
+     equipment_onto.PressureControlValve |
+     equipment_onto.ShutOffValve |
+     equipment_onto.ThreeWayValve) &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.ModeIndependent)) &
+     causes_onto.isCauseOfDeviation.some(deviation_onto.NoFlow))
+     |
+     (causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.PumpEntity &
+     (equipment_onto.hasInstrumentation.some(equipment_onto.OutletValve) |
+     equipment_onto.hasInstrumentation.some(equipment_onto.InletValve)) &
+     causes_onto.isCauseOfDeviation.some(
+     deviation_onto.NoFlow |
+     deviation_onto.HighTemperature))
+     ))]
+    
+    
+    class ValveStuckOpen(causes_onto.Cause):
+     equivalent_to = [causes_onto.Cause &
+     ((causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.ValveEntity &
+     equipment_onto.hasInstrumentation.some(
+     equipment_onto.FlowControlValve |
+     equipment_onto.PressureControlValve) &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.FlowControl |
+     process_onto.PressureControl)) &
+     causes_onto.isCauseOfDeviation.some(deviation_onto.HighFlow))
+     |
+     (causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.StabilizerColumnEntity) &
+     causes_onto.isCauseOfDeviation.some(deviation_onto.LowLevel)))]
+    class ValvePartiallyOpened(causes_onto.Cause):
+     equivalent_to = [causes_onto.Cause &
+     (causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.ValveEntity &
+     equipment_onto.hasInstrumentation.some(
+     equipment_onto.ShutOffValve)) &
+     causes_onto.isCauseOfDeviation.some(deviation_onto.LowFlow))]
+    class PluggedRestrictionOrifice(causes_onto.Cause):
+     equivalent_to = [causes_onto.Cause &
+     (causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.Orifice) &
+     causes_onto.isCauseOfDeviation.some(deviation_onto.NoFlow))]
+    class ValveWronglyClosed(causes_onto.Cause):
+     equivalent_to = [causes_onto.Cause &
+     (causes_onto.causeInvolvesEquipmentEntity.some(
+     equipment_onto.hasInstrumentation.some(equipment_onto.FlowControlValve) &
+     equipment_onto.hasIntendedFunction.some(process_onto.FlowControl)) &
+     causes_onto.isCauseOfDeviation.some(deviation_onto.NoFlow))]
+    class ValveWronglyOpened(causes_onto.Cause):
+     equivalent_to = [causes_onto.Cause &
+     (causes_onto.causeInvolvesEquipmentEntity.some(
+     equipment_onto.hasInstrumentation.some(equipment_onto.FlowControlValve) &
+     equipment_onto.hasIntendedFunction.some(process_onto.FlowControl |
+     process_onto.ModeIndependent)) &
+     causes_onto.isCauseOfDeviation.some(deviation_onto.HighFlow))]
+    class PumpingAgainstPolymerizedLine(causes_onto.Cause):
+     equivalent_to = [causes_onto.Cause &
+     (causes_onto.isCauseOfDeviation.some(deviation_onto.NoFlow) &
+     causes_onto.causeInvolvesSubstance.some(
+     substance_onto.hasStabilityReactivityInformation.some(
+     substance_onto.PolymerizesExothermicallyWhenExposedToLight |
+     substance_onto.PolymerizesExothermicallyWhenExposedToHeat |
+     substance_onto.PolymerizesExothermicallyWithoutInhibitor)) &
+     causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.PumpEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.DeliverConstantVolumeFlow)))]
+    class ImpellerFault(causes_onto.Cause):
+     equivalent_to = [causes_onto.Cause &
+     (causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.PumpEntity &
+     equipment_onto.hasMaterialTransferEquipment.some(
+     equipment_onto.CentrifugalPump) &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.DeliverConstantVolumeFlow)) &
+     causes_onto.isCauseOfDeviation.some(deviation_onto.LowFlow))]
+    class WrongImpeller(causes_onto.Cause):
+     equivalent_to = [causes_onto.Cause &
+     (causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.PumpEntity &
+     equipment_onto.hasMaterialTransferEquipment.some(
+     equipment_onto.CentrifugalPump) &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.DeliverConstantVolumeFlow)) &
+     causes_onto.isCauseOfDeviation.some(deviation_onto.HighFlow))]
+    class MissingImpeller(causes_onto.Cause):
+     equivalent_to = [causes_onto.Cause &
+     (causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.PumpEntity &
+     equipment_onto.hasMaterialTransferEquipment.some(
+     equipment_onto.CentrifugalPump) &
+     equipment_onto.hasFixture.some(
+     equipment_onto.Impeller) &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.DeliverConstantVolumeFlow)) &
+     causes_onto.isCauseOfDeviation.some(deviation_onto.NoFlow))]
+    class PumpOperationFailure(causes_onto.Cause):
+     equivalent_to = [causes_onto.Cause &
+     ((causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.PumpEntity &
+     equipment_onto.hasMaterialTransferEquipment.some(
+     equipment_onto.CentrifugalPump) &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.DeliverConstantVolumeFlow)) &
+     causes_onto.isCauseOfDeviation.some(deviation_onto.ReverseFlow)))]
+    class PumpIncorrectlySet(causes_onto.Cause):
+     equivalent_to = [causes_onto.Cause &
+     causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.PumpEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.DeliverConstantVolumeFlow)) &
+     causes_onto.isCauseOfDeviation.some(deviation_onto.HighFlow)]
+    class OperationBelowMinimumFlowRate(causes_onto.Cause):
+     equivalent_to = [causes_onto.Cause &
+     (causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.PumpEntity &
+     equipment_onto.hasMaterialTransferEquipment.some(
+     equipment_onto.CentrifugalPump) &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.DeliverConstantVolumeFlow)
+     ) &
+     causes_onto.isCauseOfDeviation.some(deviation_onto.LowFlow))]
+    class EntrainedAir(causes_onto.Cause):
+     equivalent_to = [causes_onto.Cause &
+     (causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.PumpEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.DeliverConstantVolumeFlow)) &
+     causes_onto.causeRequiresBoundaryCondition.some(boundary_onto.IntroductionOfAir) &
+     causes_onto.isCauseOfDeviation.some(deviation_onto.OtherThanComposition))] 
 
 
-
-class InsufficientThermalOutbreathing(Cause):
- equivalent_to = [Cause &
- causeInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.Storing)) &
- isCauseOfDeviation.some(deviation_onto.HighPressure)]
-class NoInertgasSupply(Cause):
- equivalent_to = [Cause &
- (isCauseOfDeviation.some(deviation_onto.NoFlow) &
- causeInvolvesEquipmentEntity.some(equipment_onto.InertgasBlanketingEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.Inerting)) &
- causeInvolvesSubstance.some(substance_onto.hasSpecificTask.some(substance_onto.InertGas)))]
-class IncreasedInletPressure(Cause):
- equivalent_to = [Cause &
- ((isCauseOfDeviation.some(deviation_onto.HighFlow) &
- causeInvolvesEquipmentEntity.some(equipment_onto.InertgasBlanketingEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.Inerting)) &
- causeInvolvesSubstance.some(substance_onto.hasSpecificTask.some(substance_onto.InertGas))))]
-class IncorrectPressureAdjustment(Cause):
- equivalent_to = [Cause &
- (isCauseOfDeviation.some(deviation_onto.LowPressure) &
- causeInvolvesEquipmentEntity.some(
- equipment_onto.hasIntendedFunction.some(process_onto.ModeIndependent) &
- equipment_onto.hasPiping.some(equipment_onto.BlanketingGasline) &
- equipment_onto.hasInstrumentation.some(equipment_onto.PressureIndicatorController)))]
-class BlockedOutflowLine(Cause):
- equivalent_to = [Cause &
- (
- (causeInvolvesEquipmentEntity.some(equipment_onto.WetScrubberEntity |
- equipment_onto.AirCooledCondenserEntity |
- equipment_onto.ShellTubeEvaporatorEntity |
- equipment_onto.FinTubeEvaporatorEntity) &
- isCauseOfDeviation.some(deviation_onto.NoFlow |
- deviation_onto.HighPressure))
- |
- (causeInvolvesEquipmentEntity.some(equipment_onto.CompressorEntity) &
- isCauseOfDeviation.some(deviation_onto.NoFlow |
- deviation_onto.HighPressure) &
- causeInvolvesSubstance.some(
- substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium |
- substance_onto.Refrigerant)))
- |
- (causeInvolvesEquipmentEntity.some(equipment_onto.StabilizerColumnEntity) &
- isCauseOfDeviation.some(deviation_onto.HighLevel) &
- causeInvolvesSubstance.some(
- substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium))))]
-class TooLittleStabilizer(Cause):
- equivalent_to = [Cause &
- (isCauseOfDeviation.some(deviation_onto.OtherThanComposition) &
- causeInvolvesEquipmentEntity.some((equipment_onto.ConnectionPipeEntity |
- equipment_onto.StorageTankEntity |
- equipment_onto.SettlingTankEntity |
- equipment_onto.PressureVesselEntity |
- equipment_onto.WetScrubberEntity |
- equipment_onto.PressureReceiverEntity |
- equipment_onto.ShellTubeHeatExchangerEntity |
- equipment_onto.ShellTubeEvaporatorEntity |
- equipment_onto.FinTubeEvaporatorEntity)) &
- causeRequiresBoundaryCondition.some(boundary_onto.SubstanceContainsStabilizer) &
- causeInvolvesSubstance.some(
- substance_onto.hasStabilityReactivityInformation.some(substance_onto.PolymerizesExothermicallyWithoutInhibitor)))]
-class TooLittleInhibitor(Cause):
- equivalent_to = [Cause &
- (isCauseOfDeviation.some(deviation_onto.OtherThanComposition) &
- causeInvolvesEquipmentEntity.some((equipment_onto.ConnectionPipeEntity |
- equipment_onto.StorageTankEntity |
- equipment_onto.SettlingTankEntity |
- equipment_onto.PressureVesselEntity |
- equipment_onto.WetScrubberEntity |
- equipment_onto.PressureReceiverEntity |
- equipment_onto.ShellTubeHeatExchangerEntity |
- equipment_onto.ShellTubeEvaporatorEntity |
- equipment_onto.FinTubeEvaporatorEntity)) &
- causeInvolvesSubstance.some(
- substance_onto.hasStabilityReactivityInformation.some(substance_onto.PolymerizesExothermicallyWithoutInhibitor)))]
-class ExcessiveFluidWithdrawal(Cause):
- equivalent_to = [Cause &
- causeInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity) &
- isCauseOfDeviation.some(deviation_onto.LowPressure)]
-ExcessiveFluidWithdrawal.comment = ["The issue of depressurization and collapse of vessel is addressed",
- "https://www.aiche.org/resources/publications/cep/2019/december/protect-tanks-overpressure-and-vacuum",
-"API 2000"]
-class WaterHammer(Cause):
- equivalent_to = [Cause &
- causeInvolvesSubstance.some(
- substance_onto.hasStateOfAggregation.some(substance_onto.Liquid) &
- substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium)) &
- isCauseOfDeviation.some(deviation_onto.HighPressure) &
- causeInvolvesEquipmentEntity.some(equipment_onto.ConnectionPipeEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.Filling |
- process_onto.ModeIndependent))]
-WaterHammer.comment = ["Synonyms: hydraulic shock, fluid hammer"]
-class ThermalExpansion(Cause):
- equivalent_to = [Cause &
- ((causeInvolvesSubstance.some(substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
- substance_onto.Multiphase |
- substance_onto.Gaseous) &
-substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium)) &
- causeInvolvesEquipmentEntity.some(equipment_onto.ConnectionPipeEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.ModeIndependent)) &
- causeRequiresBoundaryCondition.some(boundary_onto.ExternalFirePossible |
- boundary_onto.LocatedOutside) &
- isCauseOfDeviation.some(deviation_onto.HighPressure))
- |
- (causeInvolvesSubstance.some(substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
- substance_onto.Multiphase |
- substance_onto.Gaseous) &
-substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium)) &
- causeInvolvesEquipmentEntity.some(equipment_onto.hasApparatus.some(equipment_onto.PressureVessel) &
- equipment_onto.hasIntendedFunction.some(
- process_onto.ModeIndependent)
- ) &
- causeRequiresBoundaryCondition.some(boundary_onto.ExternalFirePossible |
- boundary_onto.LocatedOutside) &
- isCauseOfDeviation.some(deviation_onto.HighPressure)))]
-
-
-
-class HighAmbientTemperature(Cause):
- equivalent_to = [Cause &
- (causeInvolvesEquipmentEntity.some(equipment_onto.AirCooledCondenserEntity) &
- isCauseOfDeviation.some(deviation_onto.HighTemperature |
- deviation_onto.HighPressure) &
- causeRequiresBoundaryCondition.some(boundary_onto.LocatedOutside))]
-class WrongRotatingSpeed(Cause):
- equivalent_to = [Cause &
- (
- (isCauseOfDeviation.some(deviation_onto.HighFlow |
- deviation_onto.LowFlow) &
- causeInvolvesSubstance.some(
- substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium |
- substance_onto.Refrigerant)) &
- causeInvolvesEquipmentEntity.some((equipment_onto.CompressorEntity |
- equipment_onto.PumpEntity) &
- equipment_onto.hasInstrumentation.some(equipment_onto.FrequencyConverter) &
- equipment_onto.hasInstrumentation.some(equipment_onto.SpeedController) &
- equipment_onto.hasInstrumentation.some(equipment_onto.ElectricMotor)))
- |
- (isCauseOfDeviation.some(
- deviation_onto.HighPressure | deviation_onto.HighTemperature) &
- causeInvolvesEquipmentEntity.some(equipment_onto.AirCooledCondenserEntity &
- equipment_onto.hasInstrumentation.some(equipment_onto.ElectricMotor) &
- equipment_onto.hasInstrumentation.some(equipment_onto.SpeedController) &
- equipment_onto.hasInstrumentation.some(equipment_onto.FrequencyConverter))
- ))]
-class ConfusionOfSubstances(Cause):
- equivalent_to = [Cause &
- ((causeInvolvesEquipmentEntity.some(equipment_onto.SourceEntity &
- equipment_onto.entityControlledBy.some(equipment_onto.Operator)) &
- isCauseOfDeviation.some(deviation_onto.OtherThanComposition)))]
-class WrongTankLinedUp(Cause):
- equivalent_to = [Cause &
- (causeInvolvesEquipmentEntity.some(equipment_onto.TankTruckEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.Unloading)) &
- isCauseOfDeviation.some(deviation_onto.OtherThanComposition))]
-class OtherSubstanceFromUpstream(Cause):
- equivalent_to = [Cause &
- ((causeRequiresBoundaryCondition.some(boundary_onto.UpstreamProcessInvolved) &
- causeInvolvesSubstance.some(
- substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium)) &
- causeInvolvesEquipmentEntity.some(equipment_onto.SourceEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.ModeIndependent)) &
- isCauseOfDeviation.some(deviation_onto.OtherThanComposition))
- |
- ((causeInvolvesSubstance.some(
- substance_onto.hasSpecificTask.some(substance_onto.InertGas)) &
- causeInvolvesEquipmentEntity.some(equipment_onto.InertgasBlanketingEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.Inerting)) &
- isCauseOfDeviation.some(deviation_onto.OtherThanComposition))))]
-class ReducedDwellTime(Cause):
- equivalent_to = [Cause &
- (isCauseOfDeviation.some(deviation_onto.OtherThanComposition) &
- causeInvolvesEquipmentEntity.some(equipment_onto.SettlingTankEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.Separating)))]
-class ContaminationInUnloadingLines(Cause):
- equivalent_to = [Cause &
- (causeInvolvesEquipmentEntity.some((equipment_onto.hasPiping.some(
- equipment_onto.TankTruckHose)) &
- equipment_onto.hasIntendedFunction.some(
- process_onto.Unloading)) &
- causeRequiresBoundaryCondition.some(boundary_onto.IntroductionOfImpurities |
- boundary_onto.IntroductionOfWater) &
- isCauseOfDeviation.some(deviation_onto.OtherThanComposition))]
-class InadvertentContamination(Cause):
- equivalent_to = [Cause &
- ((causeRequiresBoundaryCondition.some(boundary_onto.IntroductionOfImpurities) &
- causeInvolvesEquipmentEntity.some((equipment_onto.SourceEntity |
- equipment_onto.SettlingTankEntity |
- equipment_onto.PressureVesselEntity |
- equipment_onto.WetScrubberEntity |
- equipment_onto.PressureReceiverEntity) &
- equipment_onto.hasIntendedFunction.some(
- process_onto.ModeIndependent)) &
- isCauseOfDeviation.some(deviation_onto.OtherThanComposition))
- |
- (causeRequiresBoundaryCondition.some(boundary_onto.IntroductionOfImpurities) &
- causeInvolvesEquipmentEntity.some(equipment_onto.TankTruckEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.Unloading)) &
- isCauseOfDeviation.some(deviation_onto.OtherThanComposition)))]
-class ContaminationByWaterAndTemperatureFallsBelowFreezingPoint(Cause):
- equivalent_to = [Cause &
- (causeRequiresBoundaryCondition.some(boundary_onto.IntroductionOfWater) &
- causeInvolvesEquipmentEntity.some(equipment_onto.hasApparatus.some(
- equipment_onto.AtmosphericStorageTank |
- equipment_onto.PressureVessel) &
- equipment_onto.hasIntendedFunction.some(
- process_onto.Storing | process_onto.ModeIndependent)) &
- causeInvolvesSecondDeviation.some(deviation_onto.OtherThanComposition) &
- isCauseOfDeviation.some(deviation_onto.LowTemperature))]
-class ContaminationByWater(Cause):
- equivalent_to = [Cause &
- ((causeRequiresBoundaryCondition.some(boundary_onto.IntroductionOfWater) &
- causeInvolvesEquipmentEntity.some((equipment_onto.SettlingTankEntity |
- equipment_onto.PressureVesselEntity |
- equipment_onto.WetScrubberEntity |
- equipment_onto.PressureReceiverEntity |
- equipment_onto.ShellTubeHeatExchangerEntity |
- equipment_onto.ShellTubeEvaporatorEntity |
- equipment_onto.FinTubeEvaporatorEntity) &
- equipment_onto.hasIntendedFunction.some(
- process_onto.ModeIndependent |
- process_onto.Filling)
- ) &
- isCauseOfDeviation.some(deviation_onto.OtherThanComposition))
- |
- (causeRequiresBoundaryCondition.some(boundary_onto.IntroductionOfWater) &
- causeInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.Storing |
- process_onto.Filling)) &
- isCauseOfDeviation.some(deviation_onto.OtherThanComposition)))]
- 
- 
-class MaterialDegradation(Cause):
- equivalent_to = [Cause &
- (isCauseOfDeviation.some(deviation_onto.HighVibration) &
- causeInvolvesEquipmentEntity.some(equipment_onto.hasApparatus.some(
- equipment_onto.PressureVessel |
- equipment_onto.AtmosphericStorageTank |
- equipment_onto.Piping)))]
-class ExternalLeakage(Cause):
- equivalent_to = [Cause &
- ((causeInvolvesEquipmentEntity.some(equipment_onto.CompressorEntity) &
- causeInvolvesSubstance.some(
- substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
- substance_onto.Gaseous)) & # liquid: because lubricant
- isCauseOfDeviation.some(deviation_onto.ElsewhereFlow))
- |
- (isCauseOfDeviation.some(deviation_onto.HighCorrosion) &
- causeInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.ModeIndependent)))
- |
- (causeInvolvesEquipmentEntity.some((equipment_onto.PressureReceiverEntity |
- equipment_onto.FinTubeEvaporatorEntity |
- equipment_onto.ShellTubeEvaporatorEntity |
- equipment_onto.AirCooledCondenserEntity |
- equipment_onto.WetScrubberEntity) &
- equipment_onto.hasIntendedFunction.some(
- process_onto.ModeIndependent)) &
- causeInvolvesSubstance.some(
- substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
- substance_onto.Multiphase)) &
- isCauseOfDeviation.some(deviation_onto.ElsewhereFlow))
- |
- (causeInvolvesEquipmentEntity.some(equipment_onto.TankTruckEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.Unloading)) &
- causeInvolvesSubstance.some(
- substance_onto.hasStateOfAggregation.some(substance_onto.Liquid)) &
- isCauseOfDeviation.some(deviation_onto.ElsewhereFlow))
- |
- (causeInvolvesEquipmentEntity.some(equipment_onto.ConnectionPipeEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.ModeIndependent)) &
- causeInvolvesSubstance.some(
- substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
- substance_onto.Gaseous |
- substance_onto.Multiphase)) &
- isCauseOfDeviation.some(deviation_onto.ElsewhereFlow))
- |
- (causeInvolvesEquipmentEntity.some(
- equipment_onto.hasInstrumentation.some(equipment_onto.BottomDrainValve |
- equipment_onto.ThreeWayValve |
- equipment_onto.ShutOffValve) &
- equipment_onto.hasIntendedFunction.some(process_onto.ModeIndependent)) &
- causeInvolvesSubstance.some(
- substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
- substance_onto.Gaseous |
- substance_onto.Multiphase)) &
- isCauseOfDeviation.some(deviation_onto.ElsewhereFlow))
- |
- (causeInvolvesEquipmentEntity.some(equipment_onto.hasApparatus.some(equipment_onto.PressureVessel) &
- equipment_onto.hasIntendedFunction.some(
- process_onto.ModeIndependent)) &
- causeInvolvesSubstance.some(
- substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
- substance_onto.Gaseous |
- substance_onto.Multiphase) &
- substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium)) &
- isCauseOfDeviation.some(deviation_onto.ElsewhereFlow)))]
-class InternalLeakage(Cause):
- equivalent_to = [Cause &
- ((isCauseOfDeviation.some(deviation_onto.ElsewhereFlow |
- deviation_onto.OtherThanComposition) &
- causeInvolvesEquipmentEntity.some(equipment_onto.hasFixture.some(equipment_onto.HalfPipeCoilJacket |
- equipment_onto.Jacket |
- equipment_onto.PlatePackage) |
- equipment_onto.hasPiping.some(equipment_onto.TubeCoil |
- equipment_onto.TubeBundle)))
- |
- (isCauseOfDeviation.some(deviation_onto.ElsewhereFlow) &
- causeInvolvesSubstance.some(substance_onto.hasSpecificTask.some(substance_onto.HeatingMedium)) &
- causeInvolvesEquipmentEntity.some(equipment_onto.StabilizerColumnEntity |
- equipment_onto.SteamDrivenReboilerEntity)))]
-class ClosedOutletValve(Cause):
- equivalent_to = [Cause &
- (
- (causeInvolvesEquipmentEntity.some(equipment_onto.hasInstrumentation.some(equipment_onto.OutletValve) &
- equipment_onto.hasApparatus.some(equipment_onto.PressureVessel) &
- causeInvolvesSubstance.some(
- substance_onto.hasStateOfAggregation.some(substance_onto.Gaseous)) &
- isCauseOfDeviation.some(deviation_onto.HighPressure))
- |
- (causeInvolvesEquipmentEntity.some(equipment_onto.hasInstrumentation.some(equipment_onto.OutletValve) &
- equipment_onto.hasApparatus.some(equipment_onto.Compressor)) &
- causeInvolvesSubstance.some(
- substance_onto.hasStateOfAggregation.some(substance_onto.Gaseous)) &
- isCauseOfDeviation.some(deviation_onto.NoFlow | deviation_onto.HighPressure))))]
-ClosedOutletValve.comment = ["Pump specific details are covered in pump ontology"]
-class ClosedInletValve(Cause):
- equivalent_to = [Cause &
- ((causeInvolvesEquipmentEntity.some(equipment_onto.hasInstrumentation.some(equipment_onto.InletValve) &
- equipment_onto.hasApparatus.some(equipment_onto.PressureVessel |
- equipment_onto.AtmosphericStorageTank)) &
- causeInvolvesSubstance.some(substance_onto.hasStateOfAggregation.some(substance_onto.Liquid)) &
- isCauseOfDeviation.some(deviation_onto.LowLevel | deviation_onto.NoFlow))
- |
- (causeInvolvesEquipmentEntity.some(equipment_onto.hasInstrumentation.some(equipment_onto.InletValve) &
- equipment_onto.hasApparatus.some(equipment_onto.PressureVessel)) &
- causeInvolvesSubstance.some(
- substance_onto.hasStateOfAggregation.some(substance_onto.Gaseous)) &
- isCauseOfDeviation.some(deviation_onto.LowPressure))
- |
- (causeInvolvesEquipmentEntity.some(equipment_onto.CompressorEntity &
- equipment_onto.hasInstrumentation.some(equipment_onto.InletValve)) &
- causeInvolvesSubstance.some(
- substance_onto.hasStateOfAggregation.some(substance_onto.Gaseous)) &
- isCauseOfDeviation.some(deviation_onto.NoFlow |
- deviation_onto.LowPressure))
- |
- (causeInvolvesEquipmentEntity.some(equipment_onto.PumpEntity &
- equipment_onto.hasInstrumentation.some(equipment_onto.InletValve) &
- equipment_onto.hasIntendedFunction.some(process_onto.DeliverConstantVolumeFlow)) &
- isCauseOfDeviation.some(deviation_onto.NoFlow)))]
-ClosedInletValve.comment = ["Pump specific details are covered in pump ontology"] 
-
-
-
-class LossOfCooling(Cause):
- equivalent_to = [Cause &
- (causeInvolvesEquipmentEntity.some(equipment_onto.hasSubunit.some(equipment_onto.CoolingSystem)) &
- isCauseOfDeviation.some(deviation_onto.HighTemperature))]
-class DeliveryOfHighVolatilityComponents(causes_onto.Cause):
- equivalent_to = [causes_onto.Cause &
- (causes_onto.isCauseOfDeviation.some(deviation_onto.OtherThanComposition) &
- causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.StabilizerColumnEntity) &
- causes_onto.causeInvolvesSubstance.some(substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium)))]
-class BlockedReboilerLines(causes_onto.Cause):
- equivalent_to = [causes_onto.Cause &
- (causes_onto.isCauseOfDeviation.some(deviation_onto.NoFlow) &
- causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.SteamDrivenReboilerEntity) &
- causes_onto.causeInvolvesSubstance.some(
- substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium)))]
-class MalfunctionLubricationSystem(causes_onto.Cause):
- equivalent_to = [causes_onto.Cause &
- (causes_onto.causeInvolvesSubstance.some(
- substance_onto.hasSpecificTask.some(substance_onto.Lubricant)) &
- causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.CompressorEntity &
- equipment_onto.hasSubunit.some(equipment_onto.LubricationSystem)) &
- causes_onto.isCauseOfDeviation.some(deviation_onto.HighTemperature))]
-MalfunctionLubricationSystem.comment = ["Issues described in 'How to limit fire and explosion hazards with oil-flooded rotary screw compressors' by Steven J. Luzik"]
-class InsufficientVentilation(causes_onto.Cause):
- equivalent_to = [causes_onto.Cause &
- (causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.CompressorEntity) &
- causes_onto.causeInvolvesSubstance.some(
- substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium |
- substance_onto.Refrigerant)) &
- causes_onto.isCauseOfDeviation.some(deviation_onto.HighTemperature))]
-class NoSteamFlow(causes_onto.Cause):
- equivalent_to = [causes_onto.Cause &
- (causes_onto.isCauseOfDeviation.some(deviation_onto.NoFlow) &
- causes_onto.causeInvolvesSubstance.some(
- substance_onto.hasSpecificTask.some(substance_onto.HeatingMedium)) &
- causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.SteamDrivenReboilerEntity))]
-class LessSteamFlow(causes_onto.Cause):
- equivalent_to = [causes_onto.Cause &
- (causes_onto.isCauseOfDeviation.some(deviation_onto.LowFlow) &
- causes_onto.causeInvolvesSubstance.some(
- substance_onto.hasSpecificTask.some(substance_onto.HeatingMedium)) &
- causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.SteamDrivenReboilerEntity))]
-class MoreSteamFlow(causes_onto.Cause):
- equivalent_to = [causes_onto.Cause &
- (causes_onto.isCauseOfDeviation.some(deviation_onto.HighFlow) &
- causes_onto.causeInvolvesSubstance.some(substance_onto.hasSpecificTask.some(substance_onto.HeatingMedium)) &
- causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.SteamDrivenReboilerEntity))]
-class NonCondensables(causes_onto.Cause):
- equivalent_to = [causes_onto.Cause &
- (causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.AirCooledCondenserEntity) &
- causes_onto.causeRequiresBoundaryCondition.some(boundary_onto.IntroductionOfAir) &
- causes_onto.isCauseOfDeviation.some(deviation_onto.OtherThanComposition))]
-NonCondensables.comment = ["Eigentlich wird hier noch high pressure benötigt"]
-class Fouling(causes_onto.Cause):
- equivalent_to = [causes_onto.Cause &
- ((causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.AirCooledCondenserEntity) &
- causes_onto.causeRequiresBoundaryCondition.some(boundary_onto.IntroductionOfImpurities) &
- causes_onto.isCauseOfDeviation.some(deviation_onto.HighTemperature))
- |
- (causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.ShellTubeHeatExchangerEntity |
- equipment_onto.ShellTubeEvaporatorEntity) &
- causes_onto.causeInvolvesSubstance.some(
- substance_onto.hasSpecificTask.some(substance_onto.Refrigerant)) &
- causes_onto.isCauseOfDeviation.some(deviation_onto.HighTemperature |
- deviation_onto.OtherThanComposition)))]
-class IncorrectSetPointControlValve(causes_onto.Cause):
- equivalent_to = [causes_onto.Cause &
- ((causes_onto.causeInvolvesEquipmentEntity.some(
- equipment_onto.hasInstrumentation.some(equipment_onto.FlowControlValve) &
- equipment_onto.hasIntendedFunction.some(process_onto.FlowControl)) &
- causes_onto.isCauseOfDeviation.some(deviation_onto.HighFlow |
- deviation_onto.NoFlow |
- deviation_onto.LowFlow))
- |
- (causes_onto.causeInvolvesEquipmentEntity.some(
- equipment_onto.hasInstrumentation.some(equipment_onto.PressureControlValve) &
- equipment_onto.hasIntendedFunction.some(process_onto.PressureControl)) &
- causes_onto.isCauseOfDeviation.some(deviation_onto.HighPressure |
- deviation_onto.LowPressure)))]
-class BypassOpened(causes_onto.Cause):
- equivalent_to = [causes_onto.Cause &
- (causes_onto.causeInvolvesEquipmentEntity.some(
- equipment_onto.hasSubunit.some(equipment_onto.Bypass) &
- equipment_onto.hasIntendedFunction.some(process_onto.ModeIndependent)
- ) &
- causes_onto.isCauseOfDeviation.some(deviation_onto.HighFlow))
- ]
-class ValveIntactUnintentionallyClosed(causes_onto.Cause):
- equivalent_to = [causes_onto.Cause &
- ((causes_onto.causeInvolvesEquipmentEntity.some((equipment_onto.ValveEntity |
- equipment_onto.InertgasBlanketingEntity) &
- equipment_onto.hasInstrumentation.some(
- equipment_onto.FlowControlValve |
- equipment_onto.PressureControlValve |
- equipment_onto.ShutOffValve |
- equipment_onto.ThreeWayValve) &
- equipment_onto.hasIntendedFunction.some(
- process_onto.ModeIndependent)) &
- causes_onto.isCauseOfDeviation.some(deviation_onto.NoFlow))
- |
- (causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.PumpEntity &
- (equipment_onto.hasInstrumentation.some(equipment_onto.OutletValve) |
- equipment_onto.hasInstrumentation.some(equipment_onto.InletValve)) &
- causes_onto.isCauseOfDeviation.some(
- deviation_onto.NoFlow |
- deviation_onto.HighTemperature))
- ))]
-
-
-class ValveStuckOpen(causes_onto.Cause):
- equivalent_to = [causes_onto.Cause &
- ((causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.ValveEntity &
- equipment_onto.hasInstrumentation.some(
- equipment_onto.FlowControlValve |
- equipment_onto.PressureControlValve) &
- equipment_onto.hasIntendedFunction.some(
- process_onto.FlowControl |
- process_onto.PressureControl)) &
- causes_onto.isCauseOfDeviation.some(deviation_onto.HighFlow))
- |
- (causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.StabilizerColumnEntity) &
- causes_onto.isCauseOfDeviation.some(deviation_onto.LowLevel)))]
-class ValvePartiallyOpened(causes_onto.Cause):
- equivalent_to = [causes_onto.Cause &
- (causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.ValveEntity &
- equipment_onto.hasInstrumentation.some(
- equipment_onto.ShutOffValve)) &
- causes_onto.isCauseOfDeviation.some(deviation_onto.LowFlow))]
-class PluggedRestrictionOrifice(causes_onto.Cause):
- equivalent_to = [causes_onto.Cause &
- (causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.Orifice) &
- causes_onto.isCauseOfDeviation.some(deviation_onto.NoFlow))]
-class ValveWronglyClosed(causes_onto.Cause):
- equivalent_to = [causes_onto.Cause &
- (causes_onto.causeInvolvesEquipmentEntity.some(
- equipment_onto.hasInstrumentation.some(equipment_onto.FlowControlValve) &
- equipment_onto.hasIntendedFunction.some(process_onto.FlowControl)) &
- causes_onto.isCauseOfDeviation.some(deviation_onto.NoFlow))]
-class ValveWronglyOpened(causes_onto.Cause):
- equivalent_to = [causes_onto.Cause &
- (causes_onto.causeInvolvesEquipmentEntity.some(
- equipment_onto.hasInstrumentation.some(equipment_onto.FlowControlValve) &
- equipment_onto.hasIntendedFunction.some(process_onto.FlowControl |
- process_onto.ModeIndependent)) &
- causes_onto.isCauseOfDeviation.some(deviation_onto.HighFlow))]
-class PumpingAgainstPolymerizedLine(causes_onto.Cause):
- equivalent_to = [causes_onto.Cause &
- (causes_onto.isCauseOfDeviation.some(deviation_onto.NoFlow) &
- causes_onto.causeInvolvesSubstance.some(
- substance_onto.hasStabilityReactivityInformation.some(
- substance_onto.PolymerizesExothermicallyWhenExposedToLight |
- substance_onto.PolymerizesExothermicallyWhenExposedToHeat |
- substance_onto.PolymerizesExothermicallyWithoutInhibitor)) &
- causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.PumpEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.DeliverConstantVolumeFlow)))]
-class ImpellerFault(causes_onto.Cause):
- equivalent_to = [causes_onto.Cause &
- (causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.PumpEntity &
- equipment_onto.hasMaterialTransferEquipment.some(
- equipment_onto.CentrifugalPump) &
- equipment_onto.hasIntendedFunction.some(
- process_onto.DeliverConstantVolumeFlow)) &
- causes_onto.isCauseOfDeviation.some(deviation_onto.LowFlow))]
-class WrongImpeller(causes_onto.Cause):
- equivalent_to = [causes_onto.Cause &
- (causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.PumpEntity &
- equipment_onto.hasMaterialTransferEquipment.some(
- equipment_onto.CentrifugalPump) &
- equipment_onto.hasIntendedFunction.some(
- process_onto.DeliverConstantVolumeFlow)) &
- causes_onto.isCauseOfDeviation.some(deviation_onto.HighFlow))]
-class MissingImpeller(causes_onto.Cause):
- equivalent_to = [causes_onto.Cause &
- (causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.PumpEntity &
- equipment_onto.hasMaterialTransferEquipment.some(
- equipment_onto.CentrifugalPump) &
- equipment_onto.hasFixture.some(
- equipment_onto.Impeller) &
- equipment_onto.hasIntendedFunction.some(
- process_onto.DeliverConstantVolumeFlow)) &
- causes_onto.isCauseOfDeviation.some(deviation_onto.NoFlow))]
-class PumpOperationFailure(causes_onto.Cause):
- equivalent_to = [causes_onto.Cause &
- ((causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.PumpEntity &
- equipment_onto.hasMaterialTransferEquipment.some(
- equipment_onto.CentrifugalPump) &
- equipment_onto.hasIntendedFunction.some(
- process_onto.DeliverConstantVolumeFlow)) &
- causes_onto.isCauseOfDeviation.some(deviation_onto.ReverseFlow)))]
-class PumpIncorrectlySet(causes_onto.Cause):
- equivalent_to = [causes_onto.Cause &
- causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.PumpEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.DeliverConstantVolumeFlow)) &
- causes_onto.isCauseOfDeviation.some(deviation_onto.HighFlow)]
-class OperationBelowMinimumFlowRate(causes_onto.Cause):
- equivalent_to = [causes_onto.Cause &
- (causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.PumpEntity &
- equipment_onto.hasMaterialTransferEquipment.some(
- equipment_onto.CentrifugalPump) &
- equipment_onto.hasIntendedFunction.some(
- process_onto.DeliverConstantVolumeFlow)
- ) &
- causes_onto.isCauseOfDeviation.some(deviation_onto.LowFlow))]
-class EntrainedAir(causes_onto.Cause):
- equivalent_to = [causes_onto.Cause &
- (causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.PumpEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.DeliverConstantVolumeFlow)) &
- causes_onto.causeRequiresBoundaryCondition.some(boundary_onto.IntroductionOfAir) &
- causes_onto.isCauseOfDeviation.some(deviation_onto.OtherThanComposition))] 
-
-
-class DeadHeadingOfPump(causes_onto.Cause):
- equivalent_to = [causes_onto.Cause &
- ((causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.PumpEntity &
- equipment_onto.hasInstrumentation.some(
- equipment_onto.OutletValve) &
- equipment_onto.hasIntendedFunction.some(
- process_onto.DeliverConstantVolumeFlow |
- equipment_onto.NormalOperation)) &
- causes_onto.isCauseOfDeviation.some(deviation_onto.NoFlow)))]
-DeadHeadingOfPump.comment = ["Occurs when the pump's discharge is closed (blockage or closed valve)"]
-class InsufficientNPSH(causes_onto.Cause):
- equivalent_to = [causes_onto.Cause &
- (causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.PumpEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.DeliverConstantVolumeFlow)) &
- causes_onto.isCauseOfDeviation.some(deviation_onto.LowPressure))]
-class PumpSealFailure(causes_onto.Cause):
- equivalent_to = [causes_onto.Cause &
- ((causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.PumpEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.DeliverConstantVolumeFlow)) &
- causes_onto.isCauseOfDeviation.some(deviation_onto.ElsewhereFlow)))]
-class ChargingFailure(causes_onto.Cause):
- equivalent_to = [causes_onto.Cause &
- (causes_onto.isCauseOfDeviation.some(deviation_onto.OtherThanComposition |
- deviation_onto.OtherSequence) &
- causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.ReactorEntity))]
-class DosingFailure(causes_onto.Cause):
- equivalent_to = [causes_onto.Cause &
- (causes_onto.isCauseOfDeviation.some(deviation_onto.OtherThanComposition |
- deviation_onto.OtherSequence) &
- causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.ReactorEntity))]
-class AbnormalHeatInput(causes_onto.Cause):
- equivalent_to = [causes_onto.Cause &
- ((causes_onto.causeInvolvesEquipmentEntity.some((equipment_onto.PressureVesselEntity |
- equipment_onto.PlateHeatExchangerEntity |
- equipment_onto.AirCooledCondenserEntity |
- equipment_onto.ShellTubeHeatExchangerEntity |
- equipment_onto.ConnectionPipeEntity) &
- equipment_onto.hasIntendedFunction.some(
- process_onto.ModeIndependent |
- process_onto.Storing)) &
- causes_onto.isCauseOfDeviation.some(deviation_onto.HighTemperature))
- |
- (causes_onto.causeInvolvesEquipmentEntity.some(
- equipment_onto.hasApparatus.some(equipment_onto.PressureVessel) &
- equipment_onto.hasIntendedFunction.some(process_onto.ModeIndependent)) &
- causes_onto.isCauseOfDeviation.some(deviation_onto.HighTemperature))
- |
- (causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.Filling |
- process_onto.Storing)) &
- causes_onto.isCauseOfDeviation.some(deviation_onto.HighTemperature))
- |
- (causes_onto.causeInvolvesEquipmentEntity.some(
- equipment_onto.hasSubunit.some(equipment_onto.HeatingSystem)) &
- causes_onto.isCauseOfDeviation.some(deviation_onto.HighTemperature)))]
-class LeakingDrainValve(causes_onto.Cause):
- equivalent_to = [causes_onto.Cause &
- (causes_onto.causeInvolvesEquipmentEntity.some(
- equipment_onto.hasInstrumentation.some(equipment_onto.BottomDrainValve) &
- equipment_onto.hasIntendedFunction.some(process_onto.ModeIndependent)) &
- causes_onto.causeInvolvesSubstance.some(
- substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
- substance_onto.Multiphase)) &
- causes_onto.isCauseOfDeviation.some(deviation_onto.ElsewhereFlow))]
-class AbruptReliefOfContent(causes_onto.Cause):
- equivalent_to = [causes_onto.Cause &
- (causes_onto.causeInvolvesSubstance.some(
- substance_onto.hasStateOfAggregation.some(substance_onto.Gaseous)) &
- (causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.ConnectionPipeEntity |
- equipment_onto.hasApparatus.some(
- equipment_onto.PressureVessel))) &
- causes_onto.isCauseOfDeviation.some(deviation_onto.LowTemperature))]
-AbruptReliefOfContent.comment = ["Abrupt relief can lead to ignition of flammable mixture"]
-class CoolingFailure(causes_onto.Cause):
- equivalent_to = [causes_onto.Cause &
- (causes_onto.causeInvolvesEquipmentEntity.some(
- equipment_onto.hasSubunit.some(equipment_onto.CoolingSystem)) &
- causes_onto.isCauseOfDeviation.some(deviation_onto.HighTemperature))]
-class BlockedInflowLine(causes_onto.Cause):
- equivalent_to = [causes_onto.Cause &
- ((causes_onto.causeInvolvesSubstance.some(
- substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
- substance_onto.Multiphase)) &
- causes_onto.isCauseOfDeviation.some(deviation_onto.LowLevel) &
- causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.Filling)))
- |
- (causes_onto.causeInvolvesSubstance.some(
- substance_onto.hasStateOfAggregation.some(substance_onto.Gaseous)) &
- causes_onto.isCauseOfDeviation.some(deviation_onto.LowPressure) &
- causes_onto.causeInvolvesEquipmentEntity.some(
- equipment_onto.hasApparatus.some(equipment_onto.PressureVessel) &
- equipment_onto.hasIntendedFunction.some(process_onto.ModeIndependent)
- ))
- |
- (causes_onto.causeInvolvesSubstance.some(
- substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
- substance_onto.Multiphase)) &
- causes_onto.isCauseOfDeviation.some(deviation_onto.LowLevel) &
- causes_onto.causeInvolvesEquipmentEntity.some(
- equipment_onto.hasApparatus.some(equipment_onto.PressureVessel) &
- equipment_onto.hasIntendedFunction.some(process_onto.ModeIndependent)))
- |
- (causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.WetScrubberEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.ModeIndependent)) &
- causes_onto.isCauseOfDeviation.some(deviation_onto.NoFlow | deviation_onto.LowFlow |
- deviation_onto.LowLevel | deviation_onto.LowPressure))
- |
- (causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.StabilizerColumnEntity &
- equipment_onto.hasIntendedFunction.some(process_onto.ModeIndependent)) &
- causes_onto.causeInvolvesSubstance.some(substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium)) &
- causes_onto.isCauseOfDeviation.some(deviation_onto.NoFlow)))]
-
-class ExcessiveInflow(causes_onto.Cause):
- equivalent_to = [causes_onto.Cause &
- ((causes_onto.causeInvolvesSubstance.some(
- substance_onto.hasStateOfAggregation.some(substance_onto.Gaseous |
- substance_onto.Multiphase |
- substance_onto.Liquid)) &
- causes_onto.isCauseOfDeviation.some(deviation_onto.HighFlow) &
- causes_onto.causeInvolvesEquipmentEntity.some(
- equipment_onto.hasApparatus.some(equipment_onto.PressureVessel) &
- equipment_onto.hasIntendedFunction.some(process_onto.ModeIndependent)
- ))
- |
- (causes_onto.causeInvolvesSubstance.some(
- substance_onto.hasStateOfAggregation.some(
- substance_onto.Liquid | substance_onto.Multiphase)) &
- causes_onto.isCauseOfDeviation.some(deviation_onto.HighLevel) &
- causes_onto.causeInvolvesEquipmentEntity.some(
- equipment_onto.hasApparatus.some(equipment_onto.AtmosphericStorageTank |
- equipment_onto.PressureVessel) &
- equipment_onto.hasIntendedFunction.some(process_onto.Filling))
- )
- |
- (causes_onto.causeInvolvesSubstance.some(
- substance_onto.hasStateOfAggregation.some(substance_onto.Gaseous)) &
- causes_onto.isCauseOfDeviation.some(deviation_onto.HighFlow) &
- causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.InertgasBlanketingEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.Inerting)
- )
- )
- )
- ]
-class LossOfInflow(causes_onto.Cause):
- equivalent_to = [causes_onto.Cause &
- ((causes_onto.causeInvolvesSubstance.some(
- substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
- substance_onto.Multiphase)) &
- causes_onto.isCauseOfDeviation.some(deviation_onto.LowLevel) &
- causes_onto.causeInvolvesEquipmentEntity.some(
- equipment_onto.hasApparatus.some(equipment_onto.AtmosphericStorageTank) &
- equipment_onto.hasIntendedFunction.some(process_onto.Filling)
- ))
- |
- (causes_onto.causeInvolvesSubstance.some(
- substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
- substance_onto.Multiphase)) &
- causes_onto.isCauseOfDeviation.some(deviation_onto.LowLevel) &
- causes_onto.causeInvolvesEquipmentEntity.some(
- equipment_onto.hasApparatus.some(equipment_onto.PressureVessel) &
- equipment_onto.hasIntendedFunction.some(process_onto.ModeIndependent)
- ))
- )
- ]
-class IncorrectIndicationOfFillingLevel(causes_onto.Cause):
- equivalent_to = [causes_onto.Cause &
- ((causes_onto.causeInvolvesSubstance.some(
- substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
- substance_onto.Multiphase)) &
- causes_onto.isCauseOfDeviation.some(deviation_onto.HighLevel) &
- causes_onto.causeInvolvesEquipmentEntity.some(
- equipment_onto.hasApparatus.some(equipment_onto.AtmosphericStorageTank) &
- equipment_onto.hasIntendedFunction.some(process_onto.Filling)))
- |
- (causes_onto.causeInvolvesSubstance.some(
- substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
- substance_onto.Multiphase)) &
- causes_onto.isCauseOfDeviation.some(deviation_onto.HighLevel) &
- causes_onto.causeInvolvesEquipmentEntity.some(
- equipment_onto.hasApparatus.some(equipment_onto.PressureVessel) &
- equipment_onto.hasIntendedFunction.some(process_onto.ModeIndependent)))
- )
- ]
-class IncorrectFilling(causes_onto.Cause):
- equivalent_to = [causes_onto.Cause &
- (causes_onto.causeInvolvesEquipmentEntity.some(
- equipment_onto.hasApparatus.some(equipment_onto.PressureVessel |
- equipment_onto.AtmosphericStorageTank) &
- equipment_onto.entityControlledBy.some(equipment_onto.Operator) &
- equipment_onto.hasIntendedFunction.some(process_onto.Filling)) &
- causes_onto.isCauseOfDeviation.some(deviation_onto.LowLevel |
- deviation_onto.HighLevel |
- deviation_onto.LowFlow |
- deviation_onto.HighFlow))]
+with deviation_onto:
+    class DeadHeadingOfPump(causes_onto.Cause):
+     equivalent_to = [causes_onto.Cause &
+     ((causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.PumpEntity &
+     equipment_onto.hasInstrumentation.some(
+     equipment_onto.OutletValve) &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.DeliverConstantVolumeFlow |
+     equipment_onto.NormalOperation)) &
+     causes_onto.isCauseOfDeviation.some(deviation_onto.NoFlow)))]
+    DeadHeadingOfPump.comment = ["Occurs when the pump's discharge is closed (blockage or closed valve)"]
+    class InsufficientNPSH(causes_onto.Cause):
+     equivalent_to = [causes_onto.Cause &
+     (causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.PumpEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.DeliverConstantVolumeFlow)) &
+     causes_onto.isCauseOfDeviation.some(deviation_onto.LowPressure))]
+    class PumpSealFailure(causes_onto.Cause):
+     equivalent_to = [causes_onto.Cause &
+     ((causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.PumpEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.DeliverConstantVolumeFlow)) &
+     causes_onto.isCauseOfDeviation.some(deviation_onto.ElsewhereFlow)))]
+    class ChargingFailure(causes_onto.Cause):
+     equivalent_to = [causes_onto.Cause &
+     (causes_onto.isCauseOfDeviation.some(deviation_onto.OtherThanComposition |
+     deviation_onto.OtherSequence) &
+     causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.ReactorEntity))]
+    class DosingFailure(causes_onto.Cause):
+     equivalent_to = [causes_onto.Cause &
+     (causes_onto.isCauseOfDeviation.some(deviation_onto.OtherThanComposition |
+     deviation_onto.OtherSequence) &
+     causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.ReactorEntity))]
+    class AbnormalHeatInput(causes_onto.Cause):
+     equivalent_to = [causes_onto.Cause &
+     ((causes_onto.causeInvolvesEquipmentEntity.some((equipment_onto.PressureVesselEntity |
+     equipment_onto.PlateHeatExchangerEntity |
+     equipment_onto.AirCooledCondenserEntity |
+     equipment_onto.ShellTubeHeatExchangerEntity |
+     equipment_onto.ConnectionPipeEntity) &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.ModeIndependent |
+     process_onto.Storing)) &
+     causes_onto.isCauseOfDeviation.some(deviation_onto.HighTemperature))
+     |
+     (causes_onto.causeInvolvesEquipmentEntity.some(
+     equipment_onto.hasApparatus.some(equipment_onto.PressureVessel) &
+     equipment_onto.hasIntendedFunction.some(process_onto.ModeIndependent)) &
+     causes_onto.isCauseOfDeviation.some(deviation_onto.HighTemperature))
+     |
+     (causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.Filling |
+     process_onto.Storing)) &
+     causes_onto.isCauseOfDeviation.some(deviation_onto.HighTemperature))
+     |
+     (causes_onto.causeInvolvesEquipmentEntity.some(
+     equipment_onto.hasSubunit.some(equipment_onto.HeatingSystem)) &
+     causes_onto.isCauseOfDeviation.some(deviation_onto.HighTemperature)))]
+    class LeakingDrainValve(causes_onto.Cause):
+     equivalent_to = [causes_onto.Cause &
+     (causes_onto.causeInvolvesEquipmentEntity.some(
+     equipment_onto.hasInstrumentation.some(equipment_onto.BottomDrainValve) &
+     equipment_onto.hasIntendedFunction.some(process_onto.ModeIndependent)) &
+     causes_onto.causeInvolvesSubstance.some(
+     substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
+     substance_onto.Multiphase)) &
+     causes_onto.isCauseOfDeviation.some(deviation_onto.ElsewhereFlow))]
+    class AbruptReliefOfContent(causes_onto.Cause):
+     equivalent_to = [causes_onto.Cause &
+     (causes_onto.causeInvolvesSubstance.some(
+     substance_onto.hasStateOfAggregation.some(substance_onto.Gaseous)) &
+     (causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.ConnectionPipeEntity |
+     equipment_onto.hasApparatus.some(
+     equipment_onto.PressureVessel))) &
+     causes_onto.isCauseOfDeviation.some(deviation_onto.LowTemperature))]
+    AbruptReliefOfContent.comment = ["Abrupt relief can lead to ignition of flammable mixture"]
+    class CoolingFailure(causes_onto.Cause):
+     equivalent_to = [causes_onto.Cause &
+     (causes_onto.causeInvolvesEquipmentEntity.some(
+     equipment_onto.hasSubunit.some(equipment_onto.CoolingSystem)) &
+     causes_onto.isCauseOfDeviation.some(deviation_onto.HighTemperature))]
+    class BlockedInflowLine(causes_onto.Cause):
+     equivalent_to = [causes_onto.Cause &
+     ((causes_onto.causeInvolvesSubstance.some(
+     substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
+     substance_onto.Multiphase)) &
+     causes_onto.isCauseOfDeviation.some(deviation_onto.LowLevel) &
+     causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.Filling)))
+     |
+     (causes_onto.causeInvolvesSubstance.some(
+     substance_onto.hasStateOfAggregation.some(substance_onto.Gaseous)) &
+     causes_onto.isCauseOfDeviation.some(deviation_onto.LowPressure) &
+     causes_onto.causeInvolvesEquipmentEntity.some(
+     equipment_onto.hasApparatus.some(equipment_onto.PressureVessel) &
+     equipment_onto.hasIntendedFunction.some(process_onto.ModeIndependent)
+     ))
+     |
+     (causes_onto.causeInvolvesSubstance.some(
+     substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
+     substance_onto.Multiphase)) &
+     causes_onto.isCauseOfDeviation.some(deviation_onto.LowLevel) &
+     causes_onto.causeInvolvesEquipmentEntity.some(
+     equipment_onto.hasApparatus.some(equipment_onto.PressureVessel) &
+     equipment_onto.hasIntendedFunction.some(process_onto.ModeIndependent)))
+     |
+     (causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.WetScrubberEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.ModeIndependent)) &
+     causes_onto.isCauseOfDeviation.some(deviation_onto.NoFlow | deviation_onto.LowFlow |
+     deviation_onto.LowLevel | deviation_onto.LowPressure))
+     |
+     (causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.StabilizerColumnEntity &
+     equipment_onto.hasIntendedFunction.some(process_onto.ModeIndependent)) &
+     causes_onto.causeInvolvesSubstance.some(substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium)) &
+     causes_onto.isCauseOfDeviation.some(deviation_onto.NoFlow)))]
+    
+    class ExcessiveInflow(causes_onto.Cause):
+     equivalent_to = [causes_onto.Cause &
+     ((causes_onto.causeInvolvesSubstance.some(
+     substance_onto.hasStateOfAggregation.some(substance_onto.Gaseous |
+     substance_onto.Multiphase |
+     substance_onto.Liquid)) &
+     causes_onto.isCauseOfDeviation.some(deviation_onto.HighFlow) &
+     causes_onto.causeInvolvesEquipmentEntity.some(
+     equipment_onto.hasApparatus.some(equipment_onto.PressureVessel) &
+     equipment_onto.hasIntendedFunction.some(process_onto.ModeIndependent)
+     ))
+     |
+     (causes_onto.causeInvolvesSubstance.some(
+     substance_onto.hasStateOfAggregation.some(
+     substance_onto.Liquid | substance_onto.Multiphase)) &
+     causes_onto.isCauseOfDeviation.some(deviation_onto.HighLevel) &
+     causes_onto.causeInvolvesEquipmentEntity.some(
+     equipment_onto.hasApparatus.some(equipment_onto.AtmosphericStorageTank |
+     equipment_onto.PressureVessel) &
+     equipment_onto.hasIntendedFunction.some(process_onto.Filling))
+     )
+     |
+     (causes_onto.causeInvolvesSubstance.some(
+     substance_onto.hasStateOfAggregation.some(substance_onto.Gaseous)) &
+     causes_onto.isCauseOfDeviation.some(deviation_onto.HighFlow) &
+     causes_onto.causeInvolvesEquipmentEntity.some(equipment_onto.InertgasBlanketingEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.Inerting)
+     )
+     )
+     )
+     ]
+    class LossOfInflow(causes_onto.Cause):
+     equivalent_to = [causes_onto.Cause &
+     ((causes_onto.causeInvolvesSubstance.some(
+     substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
+     substance_onto.Multiphase)) &
+     causes_onto.isCauseOfDeviation.some(deviation_onto.LowLevel) &
+     causes_onto.causeInvolvesEquipmentEntity.some(
+     equipment_onto.hasApparatus.some(equipment_onto.AtmosphericStorageTank) &
+     equipment_onto.hasIntendedFunction.some(process_onto.Filling)
+     ))
+     |
+     (causes_onto.causeInvolvesSubstance.some(
+     substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
+     substance_onto.Multiphase)) &
+     causes_onto.isCauseOfDeviation.some(deviation_onto.LowLevel) &
+     causes_onto.causeInvolvesEquipmentEntity.some(
+     equipment_onto.hasApparatus.some(equipment_onto.PressureVessel) &
+     equipment_onto.hasIntendedFunction.some(process_onto.ModeIndependent)
+     ))
+     )
+     ]
+    class IncorrectIndicationOfFillingLevel(causes_onto.Cause):
+     equivalent_to = [causes_onto.Cause &
+     ((causes_onto.causeInvolvesSubstance.some(
+     substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
+     substance_onto.Multiphase)) &
+     causes_onto.isCauseOfDeviation.some(deviation_onto.HighLevel) &
+     causes_onto.causeInvolvesEquipmentEntity.some(
+     equipment_onto.hasApparatus.some(equipment_onto.AtmosphericStorageTank) &
+     equipment_onto.hasIntendedFunction.some(process_onto.Filling)))
+     |
+     (causes_onto.causeInvolvesSubstance.some(
+     substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
+     substance_onto.Multiphase)) &
+     causes_onto.isCauseOfDeviation.some(deviation_onto.HighLevel) &
+     causes_onto.causeInvolvesEquipmentEntity.some(
+     equipment_onto.hasApparatus.some(equipment_onto.PressureVessel) &
+     equipment_onto.hasIntendedFunction.some(process_onto.ModeIndependent)))
+     )
+     ]
+    class IncorrectFilling(causes_onto.Cause):
+     equivalent_to = [causes_onto.Cause &
+     (causes_onto.causeInvolvesEquipmentEntity.some(
+     equipment_onto.hasApparatus.some(equipment_onto.PressureVessel |
+     equipment_onto.AtmosphericStorageTank) &
+     equipment_onto.entityControlledBy.some(equipment_onto.Operator) &
+     equipment_onto.hasIntendedFunction.some(process_onto.Filling)) &
+     causes_onto.isCauseOfDeviation.some(deviation_onto.LowLevel |
+     deviation_onto.HighLevel |
+     deviation_onto.LowFlow |
+     deviation_onto.HighFlow))]
 
 
 #%% Causes Missing from Local Ontology
@@ -4802,374 +4818,374 @@ class FailureOfControlSystem(Cause):                    pass
 
 #%% Appendix K - Ontology for Underlying Causes
 
-
-class UtilityFailure(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- isUnderlyingcauseOfCause.some(NoInertgasSupply | NoSteamFlow)
- ]
-class MalfunctionUpstreamProcess(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- isUnderlyingcauseOfCause.some(DeliveryOfHighVolatilityComponents)
- ]
-class IntroductionOfRainwater(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- (isUnderlyingcauseOfCause.some(ContaminationInUnloadingLines) &
- underlyingcauseRequiresBoundaryCondition.some(boundary_onto.LocatedOutside))
- ]
-class MalfunctionFlowController(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- (isUnderlyingcauseOfCause.some(ExcessiveInflow |
- LossOfInflow) &
- underlyingcauseInvolvesEquipmentEntity.some(
- equipment_onto.hasInstrumentation.some(equipment_onto.FlowControlValve) |
- equipment_onto.hasInstrumentation.some(
- equipment_onto.LevelIndicatorController |
- equipment_onto.FlowIndicatorController)))]
-class MalfunctionPressureController(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- (isUnderlyingcauseOfCause.some(IncreasedInletPressure |
- IncorrectPressureAdjustment) &
- underlyingcauseInvolvesEquipmentEntity.some(
- equipment_onto.hasInstrumentation.some(equipment_onto.PressureControlValve)))]
-class AmbientTemperatureChange(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- isUnderlyingcauseOfCause.some(InsufficientThermalInbreathing)]
-class VehicleCollision(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- isUnderlyingcauseOfCause.some(PhysicalImpact)]
-class IncorrectCrossConnection(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- isUnderlyingcauseOfCause.some(AbnormalVaporIntake)]
-class ImproperProcessHeatInput(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- (isUnderlyingcauseOfCause.some(ThermalExpansion) &
- underlyingcauseInvolvesEquipmentEntity.some(
- equipment_onto.hasSubunit.some(equipment_onto.HeatingSystem)))]
-class FastGasRelaxation(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- isUnderlyingcauseOfCause.some(AbruptReliefOfContent)]
-class ExternalFire(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- ((isUnderlyingcauseOfCause.some(AbnormalHeatInput) &
- underlyingcauseRequiresBoundaryCondition.some(boundary_onto.ExternalFirePossible))
- |
- (underlyingcauseInvolvesEquipmentEntity.some(
- equipment_onto.hasApparatus.some(equipment_onto.PressureVessel)) &
- isUnderlyingcauseOfCause.some(ThermalExpansion) &
- underlyingcauseRequiresBoundaryCondition.some(boundary_onto.ExternalFirePossible)
- )
- |
- (isUnderlyingcauseOfCause.some(AbnormalHeatInput) &
- underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.Storing)) &
- underlyingcauseRequiresBoundaryCondition.some(boundary_onto.ExternalFirePossible)))
- ]
-class SolarRadiation(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
-                  ((isUnderlyingcauseOfCause.some(AbnormalHeatInput) &
-                    underlyingcauseInvolvesSubstance.some(
-                        (substance_onto.hasFlashpointInKelvin <= 348.15) &
-                        substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium)) &
-                    underlyingcauseRequiresBoundaryCondition.some(boundary_onto.LocatedOutside))
-                   |
-                   (isUnderlyingcauseOfCause.some(InsufficientThermalOutbreathing) &
-                    underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity) &
-                    underlyingcauseRequiresBoundaryCondition.some(boundary_onto.LocatedOutside))
-                   )
-                  ]
- 
-SolarRadiation.comment = ["Assumption behind surface temperature of tank/vessel can rise to 75 °C, flash point is compared to it"]
-
-class RapidlyClosingValve(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
-                  (isUnderlyingcauseOfCause.some(WaterHammer) &
-                   underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.ConnectionPipeEntity))
-                  ]
- 
-class BlockedPipingAndHeatInput(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
-                  (isUnderlyingcauseOfCause.some(ThermalExpansion) &
-                   underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.ConnectionPipeEntity) &
-                   underlyingcauseRequiresBoundaryCondition.some(boundary_onto.ExternalFirePossible |
-                                                                 boundary_onto.LocatedOutside)
-                   )
-                  ]
-BlockedPipingAndHeatInput.comment = ["Requires external heat, therefore the boundary conditions"]
-
-class AbnormallyHotIntake(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- ((isUnderlyingcauseOfCause.some(AbnormalHeatInput |
- ThermalExpansion) &
- underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.SteamReceiverEntity |
- equipment_onto.PressureReceiverEntity |
- equipment_onto.ReactorEntity))
- |
- (isUnderlyingcauseOfCause.some(AbnormalHeatInput) &
- underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.Filling)))
- )] 
- 
- 
-class DepositionOfImpurities(UnderlyingCause):
-  equivalent_to = [UnderlyingCause &
-  isUnderlyingcauseOfCause.some(BlockedInflowLine |
-  ReducedFlowArea)]
-class LevelIndicatorControllerFailure(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- (isUnderlyingcauseOfCause.some(ValveWronglyClosed |
- ValveWronglyOpened |
- IncorrectSetPointControlValve) &
- underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.hasInstrumentation.some(equipment_onto.LevelIndicatorController) |
- equipment_onto.hasConnectionToAdjacentPlantItem.some(equipment_onto.LevelIndicatorController)))]
-class ControlValveFailsOpen(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- (isUnderlyingcauseOfCause.some(ValveWronglyOpened) &
- underlyingcauseInvolvesEquipmentEntity.some(
- equipment_onto.hasInstrumentation.some(equipment_onto.FlowControlValve |
- equipment_onto.PressureControlValve)))
- ]
-class ControlValveFailsClosed(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- (isUnderlyingcauseOfCause.some(ValveWronglyClosed) &
- underlyingcauseInvolvesEquipmentEntity.some(
- equipment_onto.hasInstrumentation.some(equipment_onto.FlowControlValve |
- equipment_onto.PressureControlValve)))
- ]
-class PressureIndicatorControllerFailure(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- (isUnderlyingcauseOfCause.some(ValveWronglyClosed |
- ValveWronglyOpened |
- IncorrectPressureAdjustment |
- IncorrectSetPointControlValve) &
- underlyingcauseInvolvesEquipmentEntity.some(
- equipment_onto.hasInstrumentation.some(equipment_onto.PressureIndicatorController) |
- equipment_onto.hasConnectionToAdjacentPlantItem.some(equipment_onto.PressureIndicatorController)))
- ]
-class FlowIndicatorControllerFailure(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- (isUnderlyingcauseOfCause.some(ValveWronglyClosed |
- ValveWronglyOpened |
- IncorrectSetPointControlValve) &
- underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.SteamDrivenReboilerEntity &
- (equipment_onto.hasInstrumentation.some(
- equipment_onto.PressureIndicatorController) |
-equipment_onto.hasConnectionToAdjacentPlantItem.some(
- equipment_onto.PressureIndicatorController)))
- )]
-class AbnormalHeatRemoval(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- isUnderlyingcauseOfCause.some(FreezeUp)]
-class LowAmbientTemperature(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- (underlyingcauseRequiresBoundaryCondition.some(boundary_onto.LocatedOutside) &
- isUnderlyingcauseOfCause.some(FreezeUp))]
- 
-class DefectiveSeal(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- (underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.hasSubunit.some(equipment_onto.SealingSystem)) &
- isUnderlyingcauseOfCause.some(ExternalLeakage))]
-DefectiveSeal.comment = ["Called 'seal failure' in Lees' Loss Prevention ... pp. 12/40"]
-
-class DepositionOfImpurities(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- isUnderlyingcauseOfCause.some(BlockedOutflowLine)]
- 
-class MechanicalDamage(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- isUnderlyingcauseOfCause.some(EquipmentFailure |
- HeatInputByRecirculationPump)]
- 
-class WearDown(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- (isUnderlyingcauseOfCause.some(PumpSealFailure) &
- underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.PumpEntity))
- |
- (isUnderlyingcauseOfCause.some(InternalLeakage) &
- underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.SteamDrivenReboilerEntity))
- ]
- 
-class LossOfLeakTightness(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- isUnderlyingcauseOfCause.some(ExternalLeakage | LeakingDrainValve)
- ]
- 
-class SuddenStartingPump(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- (underlyingcauseInvolvesEquipmentEntity.some(
- equipment_onto.hasMaterialTransferEquipment.some(equipment_onto.ReciprocatingPump)) &
- isUnderlyingcauseOfCause.some(WaterHammer))]
- 
-class SuddenlyStoppingPump(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- (underlyingcauseInvolvesEquipmentEntity.some(
- equipment_onto.hasMaterialTransferEquipment.some(equipment_onto.ReciprocatingPump)) &
- isUnderlyingcauseOfCause.some(WaterHammer))]
-
-class PowerFailure(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- ((underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.hasSubunit.some(equipment_onto.ElectricalEnergySupply)) &
- isUnderlyingcauseOfCause.some(EquipmentFailure))
- |
- (isUnderlyingcauseOfCause.some(WaterHammer) &
- underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.ValveEntity &
- equipment_onto.hasSubunit.some(equipment_onto.ElectricalEnergySupply))
- )
- |
- (isUnderlyingcauseOfCause.some(WaterHammer) &
- underlyingcauseInvolvesEquipmentEntity.some(
- (equipment_onto.hasMaterialTransferEquipment.some(equipment_onto.ReciprocatingPump)) &
- equipment_onto.hasSubunit.some(equipment_onto.ElectricalEnergySupply))
- ))]
- 
-class MalfunctionSpeedControl(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- (underlyingcauseInvolvesEquipmentEntity.some(
- equipment_onto.hasInstrumentation.some(equipment_onto.SpeedController)) &
- isUnderlyingcauseOfCause.some(WrongRotatingSpeed |
- EquipmentFailure))]
- 
- 
-class BreakdownOfActuator(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- (underlyingcauseInvolvesEquipmentEntity.some(
- equipment_onto.hasInstrumentation.some(equipment_onto.ElectricalActuator |
- equipment_onto.ManualActuator |
- equipment_onto.HydraulicActuator |
- equipment_onto.PneumaticActuator)) &
- (isUnderlyingcauseOfCause.some(EquipmentFailure)))]
- 
-class FailureControlLoop(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- ((underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.hasInstrumentation.some(equipment_onto.Controller) &
- equipment_onto.entityControlledBy.some(equipment_onto.ProgrammableLogicController)) &
- isUnderlyingcauseOfCause.some(EquipmentFailure |
- DeadHeadingOfPump))
- |
- (underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.hasInstrumentation.some(equipment_onto.Controller) &
- equipment_onto.entityControlledBy.some(equipment_onto.ProgrammableLogicController)) &
- isUnderlyingcauseOfCause.some(CoolingFailure))
- |
- isUnderlyingcauseOfCause.some(IncorrectIndicationOfFillingLevel)
- |
- isUnderlyingcauseOfCause.some(NoSteamFlow))]
- 
-class ValveFailure(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- (isUnderlyingcauseOfCause.some(ClosedInletValve) |
- isUnderlyingcauseOfCause.some(ClosedOutletValve) |
- isUnderlyingcauseOfCause.some(OpenedInletValve) |
- isUnderlyingcauseOfCause.some(OpenedOutletValve))]
- 
-class MaintenanceError(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- isUnderlyingcauseOfCause.some(WrongMountingOfNonReturnValve | LeakingDrainValve | MissingImpeller)]
-
-class OperationalError(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- ((underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.entityControlledBy.some(equipment_onto.Operator)) &
- isUnderlyingcauseOfCause.some(ConfusionOfSubstances | WrongTankLinedUp))
- |
- ((isUnderlyingcauseOfCause.some(ClosedInletValve) |
- isUnderlyingcauseOfCause.some(ClosedOutletValve) |
- isUnderlyingcauseOfCause.some(OpenedInletValve) |
- isUnderlyingcauseOfCause.some(OpenedOutletValve) |
- isUnderlyingcauseOfCause.some(PumpIncorrectlySet) |
- isUnderlyingcauseOfCause.some(ValveClosedPressureBuildUpInPiping) |
- isUnderlyingcauseOfCause.some(ExcessiveInflow) |
- isUnderlyingcauseOfCause.some(DeadHeadingOfPump) |
- isUnderlyingcauseOfCause.some(ConnectionsFaultyConnected) |
- isUnderlyingcauseOfCause.some(BypassOpened) |
- isUnderlyingcauseOfCause.some(ValveWronglyClosed) |
- isUnderlyingcauseOfCause.some(ValveWronglyOpened) |
- isUnderlyingcauseOfCause.some(IncorrectFilling) |
- isUnderlyingcauseOfCause.some(ValveIntactUnintentionallyClosed) |
- isUnderlyingcauseOfCause.some(DrainValveInadvertentlyOpened) |
- isUnderlyingcauseOfCause.some(IncorrectSetPointControlValve)
- )))]
-class ContaminationInTankTruck(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- (underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.TankTruckEntity) &
- isUnderlyingcauseOfCause.some(InadvertentContamination))]
-class CondensationAirHumidity(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- isUnderlyingcauseOfCause.some(ContaminationByWater) &
- underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
- equipment_onto.hasIntendedFunction.some(process_onto.Storing))]
-class EntryDuringFilling(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- isUnderlyingcauseOfCause.some(ContaminationByWater) &
- underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
- equipment_onto.hasIntendedFunction.some(process_onto.Filling))]
-class LongStorageTimeOfStabilizer(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- isUnderlyingcauseOfCause.some(TooLittleStabilizer)]
-class PersistentMechanicalStresses(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- isUnderlyingcauseOfCause.some(MaterialDegradation)]
-class HoseIncorrectlyConnected(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- (isUnderlyingcauseOfCause.some(ExternalLeakage) &
- underlyingcauseInvolvesEquipmentEntity.some(
- equipment_onto.hasPiping.some(equipment_onto.TankTruckHose) &
- equipment_onto.entityControlledBy.some(equipment_onto.Operator)))]
-class BrokenHose(UnderlyingCause):
- equivalent_to = [UnderlyingCause &
- (isUnderlyingcauseOfCause.some(ExternalLeakage) &
- underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.hasPiping.some(equipment_onto.TankTruckHose)))]
-class MalfunctionOilTemperatureControl(causes_onto.UnderlyingCause):
- equivalent_to = [causes_onto.UnderlyingCause &
- causes_onto.isUnderlyingcauseOfCause.some(MalfunctionLubricationSystem)]
-class FailureOilCoolingFan(causes_onto.UnderlyingCause):
- equivalent_to = [causes_onto.UnderlyingCause &
- causes_onto.isUnderlyingcauseOfCause.some(MalfunctionLubricationSystem)]
-class CloggingOilCoolingLine(causes_onto.UnderlyingCause):
- equivalent_to = [causes_onto.UnderlyingCause &
- causes_onto.isUnderlyingcauseOfCause.some(MalfunctionLubricationSystem)]
-class CloggingOilFilter(causes_onto.UnderlyingCause):
- equivalent_to = [causes_onto.UnderlyingCause &
- causes_onto.isUnderlyingcauseOfCause.some(MalfunctionLubricationSystem)]
-class LowCompressorOilLevel(causes_onto.UnderlyingCause):
- equivalent_to = [causes_onto.UnderlyingCause &
- causes_onto.isUnderlyingcauseOfCause.some(MalfunctionLubricationSystem)]
-class EntryOfForeignGases(causes_onto.UnderlyingCause):
- equivalent_to = [causes_onto.UnderlyingCause &
- (causes_onto.isUnderlyingcauseOfCause.some(causes_onto.NonCondensables) &
- causes_onto.underlyingcauseRequiresBoundaryCondition.some(boundary_onto.IntroductionOfAir))]
-class Sediments(causes_onto.UnderlyingCause):
- equivalent_to = [causes_onto.UnderlyingCause &
- (causes_onto.isUnderlyingcauseOfCause.some(causes_onto.Fouling) &
- causes_onto.underlyingcauseRequiresBoundaryCondition.some(boundary_onto.IntroductionOfImpurities))]
- 
- 
-class GrowthOfOrganisms(causes_onto.UnderlyingCause):
- equivalent_to = [causes_onto.UnderlyingCause &
- (causes_onto.isUnderlyingcauseOfCause.some(causes_onto.Fouling)
- )]
-class MalfunctionControlAir(causes_onto.UnderlyingCause):
- equivalent_to = [causes_onto.UnderlyingCause &
- (causes_onto.isUnderlyingcauseOfCause.some(causes_onto.ValveWronglyClosed |
- causes_onto.ValveWronglyOpened |
- causes_onto.ValveClosedPressureBuildUpInPiping |
- FailureOfControlSystem) &
- causes_onto.underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.ValveEntity &
- equipment_onto.hasSubunit.some(equipment_onto.CompressedAirSupply) &
- equipment_onto.hasInstrumentation.some(equipment_onto.PneumaticActuator)))]
-class WrongElectricSignal(causes_onto.UnderlyingCause):
- equivalent_to = [causes_onto.UnderlyingCause &
- (causes_onto.isUnderlyingcauseOfCause.some(causes_onto.ValveWronglyClosed |
- causes_onto.ValveWronglyOpened |
- causes_onto.ValveClosedPressureBuildUpInPiping |
- FailureOfControlSystem) &
- causes_onto.underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.ValveEntity &
- equipment_onto.hasSubunit.some(equipment_onto.ElectricalEnergySupply) &
- equipment_onto.hasInstrumentation.some(equipment_onto.ElectricalActuator)
- ))] 
- 
- 
- 
- 
+with causes_onto:
+    class UtilityFailure(UnderlyingCause):
+     equivalent_to = [UnderlyingCause &
+     isUnderlyingcauseOfCause.some(NoInertgasSupply | NoSteamFlow)
+     ]
+    class MalfunctionUpstreamProcess(UnderlyingCause):
+     equivalent_to = [UnderlyingCause &
+     isUnderlyingcauseOfCause.some(DeliveryOfHighVolatilityComponents)
+     ]
+    class IntroductionOfRainwater(UnderlyingCause):
+     equivalent_to = [UnderlyingCause &
+     (isUnderlyingcauseOfCause.some(ContaminationInUnloadingLines) &
+     underlyingcauseRequiresBoundaryCondition.some(boundary_onto.LocatedOutside))
+     ]
+    class MalfunctionFlowController(UnderlyingCause):
+     equivalent_to = [UnderlyingCause &
+     (isUnderlyingcauseOfCause.some(ExcessiveInflow |
+     LossOfInflow) &
+     underlyingcauseInvolvesEquipmentEntity.some(
+     equipment_onto.hasInstrumentation.some(equipment_onto.FlowControlValve) |
+     equipment_onto.hasInstrumentation.some(
+     equipment_onto.LevelIndicatorController |
+     equipment_onto.FlowIndicatorController)))]
+    class MalfunctionPressureController(UnderlyingCause):
+     equivalent_to = [UnderlyingCause &
+     (isUnderlyingcauseOfCause.some(IncreasedInletPressure |
+     IncorrectPressureAdjustment) &
+     underlyingcauseInvolvesEquipmentEntity.some(
+     equipment_onto.hasInstrumentation.some(equipment_onto.PressureControlValve)))]
+    class AmbientTemperatureChange(UnderlyingCause):
+     equivalent_to = [UnderlyingCause &
+     isUnderlyingcauseOfCause.some(InsufficientThermalInbreathing)]
+    class VehicleCollision(UnderlyingCause):
+     equivalent_to = [UnderlyingCause &
+     isUnderlyingcauseOfCause.some(PhysicalImpact)]
+    class IncorrectCrossConnection(UnderlyingCause):
+     equivalent_to = [UnderlyingCause &
+     isUnderlyingcauseOfCause.some(AbnormalVaporIntake)]
+    class ImproperProcessHeatInput(UnderlyingCause):
+     equivalent_to = [UnderlyingCause &
+     (isUnderlyingcauseOfCause.some(ThermalExpansion) &
+     underlyingcauseInvolvesEquipmentEntity.some(
+     equipment_onto.hasSubunit.some(equipment_onto.HeatingSystem)))]
+    class FastGasRelaxation(UnderlyingCause):
+     equivalent_to = [UnderlyingCause &
+     isUnderlyingcauseOfCause.some(AbruptReliefOfContent)]
+    class ExternalFire(UnderlyingCause):
+     equivalent_to = [UnderlyingCause &
+     ((isUnderlyingcauseOfCause.some(AbnormalHeatInput) &
+     underlyingcauseRequiresBoundaryCondition.some(boundary_onto.ExternalFirePossible))
+     |
+     (underlyingcauseInvolvesEquipmentEntity.some(
+     equipment_onto.hasApparatus.some(equipment_onto.PressureVessel)) &
+     isUnderlyingcauseOfCause.some(ThermalExpansion) &
+     underlyingcauseRequiresBoundaryCondition.some(boundary_onto.ExternalFirePossible)
+     )
+     |
+     (isUnderlyingcauseOfCause.some(AbnormalHeatInput) &
+     underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.Storing)) &
+     underlyingcauseRequiresBoundaryCondition.some(boundary_onto.ExternalFirePossible)))
+     ]
+    class SolarRadiation(UnderlyingCause):
+     equivalent_to = [UnderlyingCause &
+                      ((isUnderlyingcauseOfCause.some(AbnormalHeatInput) &
+                        underlyingcauseInvolvesSubstance.some(
+                            (substance_onto.hasFlashpointInKelvin <= 348.15) &
+                            substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium)) &
+                        underlyingcauseRequiresBoundaryCondition.some(boundary_onto.LocatedOutside))
+                       |
+                       (isUnderlyingcauseOfCause.some(InsufficientThermalOutbreathing) &
+                        underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity) &
+                        underlyingcauseRequiresBoundaryCondition.some(boundary_onto.LocatedOutside))
+                       )
+                      ]
+     
+    SolarRadiation.comment = ["Assumption behind surface temperature of tank/vessel can rise to 75 °C, flash point is compared to it"]
+    
+    class RapidlyClosingValve(UnderlyingCause):
+     equivalent_to = [UnderlyingCause &
+                      (isUnderlyingcauseOfCause.some(WaterHammer) &
+                       underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.ConnectionPipeEntity))
+                      ]
+     
+    class BlockedPipingAndHeatInput(UnderlyingCause):
+     equivalent_to = [UnderlyingCause &
+                      (isUnderlyingcauseOfCause.some(ThermalExpansion) &
+                       underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.ConnectionPipeEntity) &
+                       underlyingcauseRequiresBoundaryCondition.some(boundary_onto.ExternalFirePossible |
+                                                                     boundary_onto.LocatedOutside)
+                       )
+                      ]
+    BlockedPipingAndHeatInput.comment = ["Requires external heat, therefore the boundary conditions"]
+    
+    class AbnormallyHotIntake(UnderlyingCause):
+     equivalent_to = [UnderlyingCause &
+     ((isUnderlyingcauseOfCause.some(AbnormalHeatInput |
+     ThermalExpansion) &
+     underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.SteamReceiverEntity |
+     equipment_onto.PressureReceiverEntity |
+     equipment_onto.ReactorEntity))
+     |
+     (isUnderlyingcauseOfCause.some(AbnormalHeatInput) &
+     underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.Filling)))
+     )] 
+     
+     
+    class DepositionOfImpurities(UnderlyingCause):
+      equivalent_to = [UnderlyingCause &
+      isUnderlyingcauseOfCause.some(BlockedInflowLine |
+      ReducedFlowArea)]
+    class LevelIndicatorControllerFailure(UnderlyingCause):
+     equivalent_to = [UnderlyingCause &
+     (isUnderlyingcauseOfCause.some(ValveWronglyClosed |
+     ValveWronglyOpened |
+     IncorrectSetPointControlValve) &
+     underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.hasInstrumentation.some(equipment_onto.LevelIndicatorController) |
+     equipment_onto.hasConnectionToAdjacentPlantItem.some(equipment_onto.LevelIndicatorController)))]
+    class ControlValveFailsOpen(UnderlyingCause):
+     equivalent_to = [UnderlyingCause &
+     (isUnderlyingcauseOfCause.some(ValveWronglyOpened) &
+     underlyingcauseInvolvesEquipmentEntity.some(
+     equipment_onto.hasInstrumentation.some(equipment_onto.FlowControlValve |
+     equipment_onto.PressureControlValve)))
+     ]
+    class ControlValveFailsClosed(UnderlyingCause):
+     equivalent_to = [UnderlyingCause &
+     (isUnderlyingcauseOfCause.some(ValveWronglyClosed) &
+     underlyingcauseInvolvesEquipmentEntity.some(
+     equipment_onto.hasInstrumentation.some(equipment_onto.FlowControlValve |
+     equipment_onto.PressureControlValve)))
+     ]
+    class PressureIndicatorControllerFailure(UnderlyingCause):
+     equivalent_to = [UnderlyingCause &
+     (isUnderlyingcauseOfCause.some(ValveWronglyClosed |
+     ValveWronglyOpened |
+     IncorrectPressureAdjustment |
+     IncorrectSetPointControlValve) &
+     underlyingcauseInvolvesEquipmentEntity.some(
+     equipment_onto.hasInstrumentation.some(equipment_onto.PressureIndicatorController) |
+     equipment_onto.hasConnectionToAdjacentPlantItem.some(equipment_onto.PressureIndicatorController)))
+     ]
+    class FlowIndicatorControllerFailure(UnderlyingCause):
+     equivalent_to = [UnderlyingCause &
+     (isUnderlyingcauseOfCause.some(ValveWronglyClosed |
+     ValveWronglyOpened |
+     IncorrectSetPointControlValve) &
+     underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.SteamDrivenReboilerEntity &
+     (equipment_onto.hasInstrumentation.some(
+     equipment_onto.PressureIndicatorController) |
+    equipment_onto.hasConnectionToAdjacentPlantItem.some(
+     equipment_onto.PressureIndicatorController)))
+     )]
+    class AbnormalHeatRemoval(UnderlyingCause):
+     equivalent_to = [UnderlyingCause &
+     isUnderlyingcauseOfCause.some(FreezeUp)]
+    class LowAmbientTemperature(UnderlyingCause):
+     equivalent_to = [UnderlyingCause &
+     (underlyingcauseRequiresBoundaryCondition.some(boundary_onto.LocatedOutside) &
+     isUnderlyingcauseOfCause.some(FreezeUp))]
+     
+    class DefectiveSeal(UnderlyingCause):
+     equivalent_to = [UnderlyingCause &
+     (underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.hasSubunit.some(equipment_onto.SealingSystem)) &
+     isUnderlyingcauseOfCause.some(ExternalLeakage))]
+    DefectiveSeal.comment = ["Called 'seal failure' in Lees' Loss Prevention ... pp. 12/40"]
+    
+    class DepositionOfImpurities(UnderlyingCause):
+     equivalent_to = [UnderlyingCause &
+     isUnderlyingcauseOfCause.some(BlockedOutflowLine)]
+     
+    class MechanicalDamage(UnderlyingCause):
+     equivalent_to = [UnderlyingCause &
+     isUnderlyingcauseOfCause.some(EquipmentFailure |
+     HeatInputByRecirculationPump)]
+     
+    class WearDown(UnderlyingCause):
+     equivalent_to = [UnderlyingCause &
+     (isUnderlyingcauseOfCause.some(PumpSealFailure) &
+     underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.PumpEntity))
+     |
+     (isUnderlyingcauseOfCause.some(InternalLeakage) &
+     underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.SteamDrivenReboilerEntity))
+     ]
+     
+    class LossOfLeakTightness(UnderlyingCause):
+     equivalent_to = [UnderlyingCause &
+     isUnderlyingcauseOfCause.some(ExternalLeakage | LeakingDrainValve)
+     ]
+     
+    class SuddenStartingPump(UnderlyingCause):
+     equivalent_to = [UnderlyingCause &
+     (underlyingcauseInvolvesEquipmentEntity.some(
+     equipment_onto.hasMaterialTransferEquipment.some(equipment_onto.ReciprocatingPump)) &
+     isUnderlyingcauseOfCause.some(WaterHammer))]
+     
+    class SuddenlyStoppingPump(UnderlyingCause):
+     equivalent_to = [UnderlyingCause &
+     (underlyingcauseInvolvesEquipmentEntity.some(
+     equipment_onto.hasMaterialTransferEquipment.some(equipment_onto.ReciprocatingPump)) &
+     isUnderlyingcauseOfCause.some(WaterHammer))]
+    
+    class PowerFailure(UnderlyingCause):
+     equivalent_to = [UnderlyingCause &
+     ((underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.hasSubunit.some(equipment_onto.ElectricalEnergySupply)) &
+     isUnderlyingcauseOfCause.some(EquipmentFailure))
+     |
+     (isUnderlyingcauseOfCause.some(WaterHammer) &
+     underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.ValveEntity &
+     equipment_onto.hasSubunit.some(equipment_onto.ElectricalEnergySupply))
+     )
+     |
+     (isUnderlyingcauseOfCause.some(WaterHammer) &
+     underlyingcauseInvolvesEquipmentEntity.some(
+     (equipment_onto.hasMaterialTransferEquipment.some(equipment_onto.ReciprocatingPump)) &
+     equipment_onto.hasSubunit.some(equipment_onto.ElectricalEnergySupply))
+     ))]
+     
+    class MalfunctionSpeedControl(UnderlyingCause):
+     equivalent_to = [UnderlyingCause &
+     (underlyingcauseInvolvesEquipmentEntity.some(
+     equipment_onto.hasInstrumentation.some(equipment_onto.SpeedController)) &
+     isUnderlyingcauseOfCause.some(WrongRotatingSpeed |
+     EquipmentFailure))]
+     
+     
+    class BreakdownOfActuator(UnderlyingCause):
+     equivalent_to = [UnderlyingCause &
+     (underlyingcauseInvolvesEquipmentEntity.some(
+     equipment_onto.hasInstrumentation.some(equipment_onto.ElectricalActuator |
+     equipment_onto.ManualActuator |
+     equipment_onto.HydraulicActuator |
+     equipment_onto.PneumaticActuator)) &
+     (isUnderlyingcauseOfCause.some(EquipmentFailure)))]
+     
+    class FailureControlLoop(UnderlyingCause):
+     equivalent_to = [UnderlyingCause &
+     ((underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.hasInstrumentation.some(equipment_onto.Controller) &
+     equipment_onto.entityControlledBy.some(equipment_onto.ProgrammableLogicController)) &
+     isUnderlyingcauseOfCause.some(EquipmentFailure |
+     DeadHeadingOfPump))
+     |
+     (underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.hasInstrumentation.some(equipment_onto.Controller) &
+     equipment_onto.entityControlledBy.some(equipment_onto.ProgrammableLogicController)) &
+     isUnderlyingcauseOfCause.some(CoolingFailure))
+     |
+     isUnderlyingcauseOfCause.some(IncorrectIndicationOfFillingLevel)
+     |
+     isUnderlyingcauseOfCause.some(NoSteamFlow))]
+     
+    class ValveFailure(UnderlyingCause):
+     equivalent_to = [UnderlyingCause &
+     (isUnderlyingcauseOfCause.some(ClosedInletValve) |
+     isUnderlyingcauseOfCause.some(ClosedOutletValve) |
+     isUnderlyingcauseOfCause.some(OpenedInletValve) |
+     isUnderlyingcauseOfCause.some(OpenedOutletValve))]
+     
+    class MaintenanceError(UnderlyingCause):
+     equivalent_to = [UnderlyingCause &
+     isUnderlyingcauseOfCause.some(WrongMountingOfNonReturnValve | LeakingDrainValve | MissingImpeller)]
+    
+    class OperationalError(UnderlyingCause):
+     equivalent_to = [UnderlyingCause &
+     ((underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.entityControlledBy.some(equipment_onto.Operator)) &
+     isUnderlyingcauseOfCause.some(ConfusionOfSubstances | WrongTankLinedUp))
+     |
+     ((isUnderlyingcauseOfCause.some(ClosedInletValve) |
+     isUnderlyingcauseOfCause.some(ClosedOutletValve) |
+     isUnderlyingcauseOfCause.some(OpenedInletValve) |
+     isUnderlyingcauseOfCause.some(OpenedOutletValve) |
+     isUnderlyingcauseOfCause.some(PumpIncorrectlySet) |
+     isUnderlyingcauseOfCause.some(ValveClosedPressureBuildUpInPiping) |
+     isUnderlyingcauseOfCause.some(ExcessiveInflow) |
+     isUnderlyingcauseOfCause.some(DeadHeadingOfPump) |
+     isUnderlyingcauseOfCause.some(ConnectionsFaultyConnected) |
+     isUnderlyingcauseOfCause.some(BypassOpened) |
+     isUnderlyingcauseOfCause.some(ValveWronglyClosed) |
+     isUnderlyingcauseOfCause.some(ValveWronglyOpened) |
+     isUnderlyingcauseOfCause.some(IncorrectFilling) |
+     isUnderlyingcauseOfCause.some(ValveIntactUnintentionallyClosed) |
+     isUnderlyingcauseOfCause.some(DrainValveInadvertentlyOpened) |
+     isUnderlyingcauseOfCause.some(IncorrectSetPointControlValve)
+     )))]
+    class ContaminationInTankTruck(UnderlyingCause):
+     equivalent_to = [UnderlyingCause &
+     (underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.TankTruckEntity) &
+     isUnderlyingcauseOfCause.some(InadvertentContamination))]
+    class CondensationAirHumidity(UnderlyingCause):
+     equivalent_to = [UnderlyingCause &
+     isUnderlyingcauseOfCause.some(ContaminationByWater) &
+     underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
+     equipment_onto.hasIntendedFunction.some(process_onto.Storing))]
+    class EntryDuringFilling(UnderlyingCause):
+     equivalent_to = [UnderlyingCause &
+     isUnderlyingcauseOfCause.some(ContaminationByWater) &
+     underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
+     equipment_onto.hasIntendedFunction.some(process_onto.Filling))]
+    class LongStorageTimeOfStabilizer(UnderlyingCause):
+     equivalent_to = [UnderlyingCause &
+     isUnderlyingcauseOfCause.some(TooLittleStabilizer)]
+    class PersistentMechanicalStresses(UnderlyingCause):
+     equivalent_to = [UnderlyingCause &
+     isUnderlyingcauseOfCause.some(MaterialDegradation)]
+    class HoseIncorrectlyConnected(UnderlyingCause):
+     equivalent_to = [UnderlyingCause &
+     (isUnderlyingcauseOfCause.some(ExternalLeakage) &
+     underlyingcauseInvolvesEquipmentEntity.some(
+     equipment_onto.hasPiping.some(equipment_onto.TankTruckHose) &
+     equipment_onto.entityControlledBy.some(equipment_onto.Operator)))]
+    class BrokenHose(UnderlyingCause):
+     equivalent_to = [UnderlyingCause &
+     (isUnderlyingcauseOfCause.some(ExternalLeakage) &
+     underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.hasPiping.some(equipment_onto.TankTruckHose)))]
+    class MalfunctionOilTemperatureControl(causes_onto.UnderlyingCause):
+     equivalent_to = [causes_onto.UnderlyingCause &
+     causes_onto.isUnderlyingcauseOfCause.some(MalfunctionLubricationSystem)]
+    class FailureOilCoolingFan(causes_onto.UnderlyingCause):
+     equivalent_to = [causes_onto.UnderlyingCause &
+     causes_onto.isUnderlyingcauseOfCause.some(MalfunctionLubricationSystem)]
+    class CloggingOilCoolingLine(causes_onto.UnderlyingCause):
+     equivalent_to = [causes_onto.UnderlyingCause &
+     causes_onto.isUnderlyingcauseOfCause.some(MalfunctionLubricationSystem)]
+    class CloggingOilFilter(causes_onto.UnderlyingCause):
+     equivalent_to = [causes_onto.UnderlyingCause &
+     causes_onto.isUnderlyingcauseOfCause.some(MalfunctionLubricationSystem)]
+    class LowCompressorOilLevel(causes_onto.UnderlyingCause):
+     equivalent_to = [causes_onto.UnderlyingCause &
+     causes_onto.isUnderlyingcauseOfCause.some(MalfunctionLubricationSystem)]
+    class EntryOfForeignGases(causes_onto.UnderlyingCause):
+     equivalent_to = [causes_onto.UnderlyingCause &
+     (causes_onto.isUnderlyingcauseOfCause.some(causes_onto.NonCondensables) &
+     causes_onto.underlyingcauseRequiresBoundaryCondition.some(boundary_onto.IntroductionOfAir))]
+    class Sediments(causes_onto.UnderlyingCause):
+     equivalent_to = [causes_onto.UnderlyingCause &
+     (causes_onto.isUnderlyingcauseOfCause.some(causes_onto.Fouling) &
+     causes_onto.underlyingcauseRequiresBoundaryCondition.some(boundary_onto.IntroductionOfImpurities))]
+     
+     
+    class GrowthOfOrganisms(causes_onto.UnderlyingCause):
+     equivalent_to = [causes_onto.UnderlyingCause &
+     (causes_onto.isUnderlyingcauseOfCause.some(causes_onto.Fouling)
+     )]
+    class MalfunctionControlAir(causes_onto.UnderlyingCause):
+     equivalent_to = [causes_onto.UnderlyingCause &
+     (causes_onto.isUnderlyingcauseOfCause.some(causes_onto.ValveWronglyClosed |
+     causes_onto.ValveWronglyOpened |
+     causes_onto.ValveClosedPressureBuildUpInPiping |
+     FailureOfControlSystem) &
+     causes_onto.underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.ValveEntity &
+     equipment_onto.hasSubunit.some(equipment_onto.CompressedAirSupply) &
+     equipment_onto.hasInstrumentation.some(equipment_onto.PneumaticActuator)))]
+    class WrongElectricSignal(causes_onto.UnderlyingCause):
+     equivalent_to = [causes_onto.UnderlyingCause &
+     (causes_onto.isUnderlyingcauseOfCause.some(causes_onto.ValveWronglyClosed |
+     causes_onto.ValveWronglyOpened |
+     causes_onto.ValveClosedPressureBuildUpInPiping |
+     FailureOfControlSystem) &
+     causes_onto.underlyingcauseInvolvesEquipmentEntity.some(equipment_onto.ValveEntity &
+     equipment_onto.hasSubunit.some(equipment_onto.ElectricalEnergySupply) &
+     equipment_onto.hasInstrumentation.some(equipment_onto.ElectricalActuator)
+     ))] 
+     
+     
+     
+     
 
 
 
@@ -5177,1795 +5193,1799 @@ class WrongElectricSignal(causes_onto.UnderlyingCause):
 
 #%% Appendix M - Ontology for Effects
 
-class BackContaminationOfSupply(Effect):
- equivalent_to = [Effect &
- ((effectInvolvesEquipmentEntity.some(equipment_onto.PumpEntity) &
- isEffectOfDeviation.some(deviation_onto.ReverseFlow)))]
-class InsufficientFilling(Effect):
- equivalent_to = [Effect & (
- (effectImpliedByCause.some(causes_onto.BlockedInflowLine | causes_onto.LossOfInflow) &
- isEffectOfDeviation.some(deviation_onto.NoFlow | deviation_onto.LowLevel) &
- effectInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
- equipment_onto.hasIntendedFunction.some(process_onto.Filling)))
- |
- (isEffectOfDeviation.some(deviation_onto.NoFlow) &
- effectOfPropagatedCause.value(True) &
- effectInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
- equipment_onto.hasIntendedFunction.some(process_onto.Filling))))]
+with effect_onto:
+    class BackContaminationOfSupply(Effect):
+     equivalent_to = [Effect &
+     ((effectInvolvesEquipmentEntity.some(equipment_onto.PumpEntity) &
+     isEffectOfDeviation.some(deviation_onto.ReverseFlow)))]
+    class InsufficientFilling(Effect):
+     equivalent_to = [Effect & (
+     (effectImpliedByCause.some(causes_onto.BlockedInflowLine | causes_onto.LossOfInflow) &
+     isEffectOfDeviation.some(deviation_onto.NoFlow | deviation_onto.LowLevel) &
+     effectInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
+     equipment_onto.hasIntendedFunction.some(process_onto.Filling)))
+     |
+     (isEffectOfDeviation.some(deviation_onto.NoFlow) &
+     effectOfPropagatedCause.value(True) &
+     effectInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
+     equipment_onto.hasIntendedFunction.some(process_onto.Filling))))]
+         
+    class UnintendedExothermicPolymerization(Effect):
+     equivalent_to = [Effect &
+     (
+     (effectInvolvesSubstance.some(
+     substance_onto.hasStabilityReactivityInformation.some(
+     substance_onto.PolymerizesExothermicallyWithoutInhibitor) &
+     effectImpliedByCause.some(causes_onto.TooLittleStabilizer |
+     causes_onto.TooLittleInhibitor |
+     causes_onto.InadvertentContamination) &
+     effectInvolvesEquipmentEntity.some((equipment_onto.ConnectionPipeEntity |
+     equipment_onto.PressureVesselEntity |
+     equipment_onto.WetScrubberEntity |
+     equipment_onto.StorageTankEntity |
+     equipment_onto.SettlingTankEntity) &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.ModeIndependent)
+     )))
+     |
+     (effectInvolvesSubstance.some(
+     substance_onto.hasStabilityReactivityInformation.some(
+     substance_onto.PolymerizesExothermicallyWhenExposedToHeat)) &
+     effectImpliedByCause.some(causes_onto.AbnormalHeatInput) &
+     effectImpliedByUnderlyingcause.some(causes_onto.ExternalFire) &
+     effectInvolvesEquipmentEntity.some((equipment_onto.ConnectionPipeEntity |
+     equipment_onto.PressureVesselEntity |
+     equipment_onto.StorageTankEntity |
+     equipment_onto.SettlingTankEntity) &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.ModeIndependent))
+     )
+     |
+     (effectInvolvesSubstance.some(
+     substance_onto.hasStabilityReactivityInformation.some(
+     substance_onto.PolymerizesExothermicallyWithoutInhibitor)) &
+     isEffectOfDeviation.some(deviation_onto.HighTemperature) &
+     effectInvolvesEquipmentEntity.some(
+     equipment_onto.hasIntendedFunction.some(process_onto.ModeIndependent)) &
+     effectImpliedByCause.some(causes_onto.TooLittleInhibitor)
+     )
+     )]
+    class PotentialViolentReactionWithOxidizers(Effect):
+     equivalent_to = [Effect &
+     (effectInvolvesEquipmentEntity.some(
+     equipment_onto.hasApparatus.some(equipment_onto.AtmosphericStorageTank) &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.Filling)) &
+     effectInvolvesSubstance.some(
+     substance_onto.hasStabilityReactivityInformation.some(
+     substance_onto.ReactsViolentlyWithOxidizer |
+     substance_onto.IncompatibleToStrongOxidizers)) &
+     isEffectOfDeviation.some(deviation_onto.OtherThanComposition) &
+     effectImpliedByCause.some(causes_onto.WrongTankLinedUp |
+     causes_onto.ConfusionOfSubstances))]
+    class AbnormalEvaporation(Effect):
+     equivalent_to = [Effect &
+     ((effectInvolvesSubstance.some(
+     substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
+     substance_onto.Multiphase) &
+     substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium)) &
+     effectInvolvesEquipmentEntity.some(
+     equipment_onto.hasApparatus.some(equipment_onto.PressureVessel) &
+     equipment_onto.hasIntendedFunction.some(process_onto.ModeIndependent)
+     ) &
+     effectImpliedByUnderlyingcause.some(causes_onto.ExternalFire) &
+     isEffectOfDeviation.some(deviation_onto.HighTemperature))
+     |
+     (effectInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.Filling |
+     process_onto.Storing)) &
+     effectInvolvesSubstance.some(
+     substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
+     substance_onto.Multiphase)) &
+     effectImpliedByCause.some(causes_onto.AbnormalHeatInput))
+     |
+     (effectInvolvesEquipmentEntity.some(equipment_onto.PressureVessel &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.Filling |
+     process_onto.Storing)) &
+     effectInvolvesSubstance.some(substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
+     substance_onto.Multiphase)) &
+     effectImpliedByCause.some(causes_onto.AbnormalHeatInput))
+     |
+     (isEffectOfDeviation.some(deviation_onto.HighTemperature) &
+     effectInvolvesSubstance.some(substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium)) &
+     effectInvolvesEquipmentEntity.some(equipment_onto.SteamDrivenReboilerEntity) &
+     effectImpliedByCause.some(causes_onto.MoreSteamFlow))
+     |
+     (effectImpliedByCause.some(causes_onto.DeliveryOfHighVolatilityComponents) &
+     effectInvolvesSubstance.some(
+     substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium)) &
+     effectInvolvesEquipmentEntity.some(equipment_onto.SteamDrivenReboilerEntity))
+     )]
+    
+    
+    class AccumulationOfImpurities(Effect):
+     equivalent_to = [Effect &
+     (effectInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.Filling)) &
+     effectImpliedByCause.some(causes_onto.ContaminationInUnloadingLines |
+     causes_onto.InadvertentContamination) &
+     effectInvolvesSubstance.some(
+     substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
+     substance_onto.Multiphase)) &
+     effectOfPropagatedCause.value(True) &
+     isEffectOfDeviation.some(deviation_onto.OtherThanComposition))]
+    class BacteriaGrowth(Effect):
+     equivalent_to = [Effect &
+     ((effectInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.Storing)) &
+     effectInvolvesSubstance.some(
+     substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
+     substance_onto.Multiphase)) &
+     effectImpliedByCause.some(causes_onto.ContaminationByWater) &
+     isEffectOfDeviation.some(deviation_onto.OtherThanComposition)
+     )
+     |
+     (effectInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.Storing)) &
+     effectImpliedByCause.some(causes_onto.ContaminationInUnloadingLines |
+     causes_onto.InadvertentContamination) &
+     effectInvolvesSubstance.some(
+     substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
+     substance_onto.Multiphase)) &
+     effectOfPropagatedCause.value(True) &
+     isEffectOfDeviation.some(deviation_onto.OtherThanComposition)))]
+    class GenerationOfElectrostaticCharge(Effect):
+     equivalent_to = [Effect &
+     (effectInvolvesEquipmentEntity.some((equipment_onto.TankTruckEntity |
+     equipment_onto.ConnectionPipeEntity) &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.Unloading |
+     process_onto.ModeIndependent)) &
+     effectInvolvesSubstance.some(
+     substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
+     substance_onto.Multiphase)) &
+     isEffectOfDeviation.some(deviation_onto.HighFlow))]
+    class Overfilling(Effect):
+     equivalent_to = [Effect &
+     ((effectInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.Filling)) &
+     effectInvolvesSubstance.some(
+     substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
+     substance_onto.Multiphase)) &
+     isEffectOfDeviation.some(deviation_onto.HighLevel))
+     |
+     (effectInvolvesEquipmentEntity.some(
+     equipment_onto.hasApparatus.some(equipment_onto.PressureVessel) &
+     equipment_onto.hasPiping.some(equipment_onto.VentPipe) &
+     equipment_onto.hasIntendedFunction.some(process_onto.Filling |
+     process_onto.ModeIndependent)) &
+     effectInvolvesSubstance.some(
+     substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
+     substance_onto.Multiphase)) &
+     isEffectOfDeviation.some(deviation_onto.HighLevel))
+     |
+     (isEffectOfDeviation.some(deviation_onto.HighFlow) &
+     effectInvolvesEquipmentEntity.some(
+     equipment_onto.hasApparatus.some(equipment_onto.PressureVessel |
+     equipment_onto.AtmosphericStorageTank |
+     equipment_onto.OpenVessel) &
+     equipment_onto.hasIntendedFunction.some(process_onto.Filling)) &
+     effectImpliedByCause.some(causes_onto.BypassOpened |
+     causes_onto.IncorrectSetPointControlValve |
+     causes_onto.WrongImpeller |
+     causes_onto.IncorrectFilling) &
+     effectInvolvesSubstance.some(
+     substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
+     substance_onto.Multiphase)))
+     |
+     (effectInvolvesEquipmentEntity.some(
+     equipment_onto.hasApparatus.some(equipment_onto.PressureVessel |
+     equipment_onto.AtmosphericStorageTank)) &
+     effectImpliedByCause.some(causes_onto.IncorrectIndicationOfFillingLevel) &
+     effectInvolvesSubstance.some(
+     substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
+     substance_onto.Multiphase))
+     ))]
+    
+    class PressureExceedingDesignPressure(Effect):
+     equivalent_to = [Effect &
+     ((isEffectOfDeviation.some(deviation_onto.HighPressure) &
+     effectInvolvesEquipmentEntity.some(equipment_onto.ConnectionPipeEntity |
+     equipment_onto.hasApparatus.some(equipment_onto.PressureVessel)))
+     |
+     (effectInvolvesEquipmentEntity.some((equipment_onto.AirCooledCondenserEntity |
+     equipment_onto.ShellTubeEvaporatorEntity |
+     equipment_onto.SteamDrivenReboilerEntity |
+     equipment_onto.FinTubeEvaporatorEntity |
+     equipment_onto.CompressorEntity) &
+     equipment_onto.hasIntendedFunction.some(process_onto.ModeIndependent)) &
+     effectImpliedByCause.some(causes_onto.BlockedOutflowLine))
+     |
+     (effectOfPropagatedCause.value(True) &
+     isEffectOfDeviation.some(deviation_onto.HighPressure) &
+     effectInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.Filling | process_onto.Storing | process_onto.ModeIndependent)))
+     |
+     (isEffectOfDeviation.some(deviation_onto.HighPressure) &
+     effectImpliedByCause.some(causes_onto.ThermalExpansion | causes_onto.InsufficientThermalOutbreathing) &
+     effectInvolvesEquipmentEntity.some(equipment_onto.ConnectionPipeEntity |
+     equipment_onto.hasApparatus.some(
+     equipment_onto.PressureVessel |
+     equipment_onto.AtmosphericStorageTank)))
+     |
+     (effectInvolvesEquipmentEntity.some(
+     equipment_onto.hasMaterialTransferEquipment.some(equipment_onto.ReciprocatingPump)) &
+     effectImpliedByCause.some(causes_onto.DeadHeadingOfPump |
+     causes_onto.PumpingAgainstPolymerizedLine))
+     |
+     (effectInvolvesEquipmentEntity.some(
+     equipment_onto.hasIntendedFunction.some(process_onto.FlowControl | process_onto.ModeIndependent)) &
+     effectImpliedByCause.some(causes_onto.ValveClosedPressureBuildUpInPiping))
+     |
+     PotentialViolentReactionWithOxidizers)] 
      
-class UnintendedExothermicPolymerization(Effect):
- equivalent_to = [Effect &
- (
- (effectInvolvesSubstance.some(
- substance_onto.hasStabilityReactivityInformation.some(
- substance_onto.PolymerizesExothermicallyWithoutInhibitor) &
- effectImpliedByCause.some(causes_onto.TooLittleStabilizer |
- causes_onto.TooLittleInhibitor |
- causes_onto.InadvertentContamination) &
- effectInvolvesEquipmentEntity.some((equipment_onto.ConnectionPipeEntity |
- equipment_onto.PressureVesselEntity |
- equipment_onto.WetScrubberEntity |
- equipment_onto.StorageTankEntity |
- equipment_onto.SettlingTankEntity) &
- equipment_onto.hasIntendedFunction.some(
- process_onto.ModeIndependent)
- )))
- |
- (effectInvolvesSubstance.some(
- substance_onto.hasStabilityReactivityInformation.some(
- substance_onto.PolymerizesExothermicallyWhenExposedToHeat)) &
- effectImpliedByCause.some(causes_onto.AbnormalHeatInput) &
- effectImpliedByUnderlyingcause.some(causes_onto.ExternalFire) &
- effectInvolvesEquipmentEntity.some((equipment_onto.ConnectionPipeEntity |
- equipment_onto.PressureVesselEntity |
- equipment_onto.StorageTankEntity |
- equipment_onto.SettlingTankEntity) &
- equipment_onto.hasIntendedFunction.some(
- process_onto.ModeIndependent))
- )
- |
- (effectInvolvesSubstance.some(
- substance_onto.hasStabilityReactivityInformation.some(
- substance_onto.PolymerizesExothermicallyWithoutInhibitor)) &
- isEffectOfDeviation.some(deviation_onto.HighTemperature) &
- effectInvolvesEquipmentEntity.some(
- equipment_onto.hasIntendedFunction.some(process_onto.ModeIndependent)) &
- effectImpliedByCause.some(causes_onto.TooLittleInhibitor)
- )
- )]
-class PotentialViolentReactionWithOxidizers(Effect):
- equivalent_to = [Effect &
- (effectInvolvesEquipmentEntity.some(
- equipment_onto.hasApparatus.some(equipment_onto.AtmosphericStorageTank) &
- equipment_onto.hasIntendedFunction.some(
- process_onto.Filling)) &
- effectInvolvesSubstance.some(
- substance_onto.hasStabilityReactivityInformation.some(
- substance_onto.ReactsViolentlyWithOxidizer |
- substance_onto.IncompatibleToStrongOxidizers)) &
- isEffectOfDeviation.some(deviation_onto.OtherThanComposition) &
- effectImpliedByCause.some(causes_onto.WrongTankLinedUp |
- causes_onto.ConfusionOfSubstances))]
-class AbnormalEvaporation(Effect):
- equivalent_to = [Effect &
- ((effectInvolvesSubstance.some(
- substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
- substance_onto.Multiphase) &
- substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium)) &
- effectInvolvesEquipmentEntity.some(
- equipment_onto.hasApparatus.some(equipment_onto.PressureVessel) &
- equipment_onto.hasIntendedFunction.some(process_onto.ModeIndependent)
- ) &
- effectImpliedByUnderlyingcause.some(causes_onto.ExternalFire) &
- isEffectOfDeviation.some(deviation_onto.HighTemperature))
- |
- (effectInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.Filling |
- process_onto.Storing)) &
- effectInvolvesSubstance.some(
- substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
- substance_onto.Multiphase)) &
- effectImpliedByCause.some(causes_onto.AbnormalHeatInput))
- |
- (effectInvolvesEquipmentEntity.some(equipment_onto.PressureVessel &
- equipment_onto.hasIntendedFunction.some(
- process_onto.Filling |
- process_onto.Storing)) &
- effectInvolvesSubstance.some(substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
- substance_onto.Multiphase)) &
- effectImpliedByCause.some(causes_onto.AbnormalHeatInput))
- |
- (isEffectOfDeviation.some(deviation_onto.HighTemperature) &
- effectInvolvesSubstance.some(substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium)) &
- effectInvolvesEquipmentEntity.some(equipment_onto.SteamDrivenReboilerEntity) &
- effectImpliedByCause.some(causes_onto.MoreSteamFlow))
- |
- (effectImpliedByCause.some(causes_onto.DeliveryOfHighVolatilityComponents) &
- effectInvolvesSubstance.some(
- substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium)) &
- effectInvolvesEquipmentEntity.some(equipment_onto.SteamDrivenReboilerEntity))
- )]
-
-
-class AccumulationOfImpurities(Effect):
- equivalent_to = [Effect &
- (effectInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.Filling)) &
- effectImpliedByCause.some(causes_onto.ContaminationInUnloadingLines |
- causes_onto.InadvertentContamination) &
- effectInvolvesSubstance.some(
- substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
- substance_onto.Multiphase)) &
- effectOfPropagatedCause.value(True) &
- isEffectOfDeviation.some(deviation_onto.OtherThanComposition))]
-class BacteriaGrowth(Effect):
- equivalent_to = [Effect &
- ((effectInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.Storing)) &
- effectInvolvesSubstance.some(
- substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
- substance_onto.Multiphase)) &
- effectImpliedByCause.some(causes_onto.ContaminationByWater) &
- isEffectOfDeviation.some(deviation_onto.OtherThanComposition)
- )
- |
- (effectInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.Storing)) &
- effectImpliedByCause.some(causes_onto.ContaminationInUnloadingLines |
- causes_onto.InadvertentContamination) &
- effectInvolvesSubstance.some(
- substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
- substance_onto.Multiphase)) &
- effectOfPropagatedCause.value(True) &
- isEffectOfDeviation.some(deviation_onto.OtherThanComposition)))]
-class GenerationOfElectrostaticCharge(Effect):
- equivalent_to = [Effect &
- (effectInvolvesEquipmentEntity.some((equipment_onto.TankTruckEntity |
- equipment_onto.ConnectionPipeEntity) &
- equipment_onto.hasIntendedFunction.some(
- process_onto.Unloading |
- process_onto.ModeIndependent)) &
- effectInvolvesSubstance.some(
- substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
- substance_onto.Multiphase)) &
- isEffectOfDeviation.some(deviation_onto.HighFlow))]
-class Overfilling(Effect):
- equivalent_to = [Effect &
- ((effectInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.Filling)) &
- effectInvolvesSubstance.some(
- substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
- substance_onto.Multiphase)) &
- isEffectOfDeviation.some(deviation_onto.HighLevel))
- |
- (effectInvolvesEquipmentEntity.some(
- equipment_onto.hasApparatus.some(equipment_onto.PressureVessel) &
- equipment_onto.hasPiping.some(equipment_onto.VentPipe) &
- equipment_onto.hasIntendedFunction.some(process_onto.Filling |
- process_onto.ModeIndependent)) &
- effectInvolvesSubstance.some(
- substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
- substance_onto.Multiphase)) &
- isEffectOfDeviation.some(deviation_onto.HighLevel))
- |
- (isEffectOfDeviation.some(deviation_onto.HighFlow) &
- effectInvolvesEquipmentEntity.some(
- equipment_onto.hasApparatus.some(equipment_onto.PressureVessel |
- equipment_onto.AtmosphericStorageTank |
- equipment_onto.OpenVessel) &
- equipment_onto.hasIntendedFunction.some(process_onto.Filling)) &
- effectImpliedByCause.some(causes_onto.BypassOpened |
- causes_onto.IncorrectSetPointControlValve |
- causes_onto.WrongImpeller |
- causes_onto.IncorrectFilling) &
- effectInvolvesSubstance.some(
- substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
- substance_onto.Multiphase)))
- |
- (effectInvolvesEquipmentEntity.some(
- equipment_onto.hasApparatus.some(equipment_onto.PressureVessel |
- equipment_onto.AtmosphericStorageTank)) &
- effectImpliedByCause.some(causes_onto.IncorrectIndicationOfFillingLevel) &
- effectInvolvesSubstance.some(
- substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
- substance_onto.Multiphase))
- ))]
-
-class PressureExceedingDesignPressure(Effect):
- equivalent_to = [Effect &
- ((isEffectOfDeviation.some(deviation_onto.HighPressure) &
- effectInvolvesEquipmentEntity.some(equipment_onto.ConnectionPipeEntity |
- equipment_onto.hasApparatus.some(equipment_onto.PressureVessel)))
- |
- (effectInvolvesEquipmentEntity.some((equipment_onto.AirCooledCondenserEntity |
- equipment_onto.ShellTubeEvaporatorEntity |
- equipment_onto.SteamDrivenReboilerEntity |
- equipment_onto.FinTubeEvaporatorEntity |
- equipment_onto.CompressorEntity) &
- equipment_onto.hasIntendedFunction.some(process_onto.ModeIndependent)) &
- effectImpliedByCause.some(causes_onto.BlockedOutflowLine))
- |
- (effectOfPropagatedCause.value(True) &
- isEffectOfDeviation.some(deviation_onto.HighPressure) &
- effectInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.Filling | process_onto.Storing | process_onto.ModeIndependent)))
- |
- (isEffectOfDeviation.some(deviation_onto.HighPressure) &
- effectImpliedByCause.some(causes_onto.ThermalExpansion | causes_onto.InsufficientThermalOutbreathing) &
- effectInvolvesEquipmentEntity.some(equipment_onto.ConnectionPipeEntity |
- equipment_onto.hasApparatus.some(
- equipment_onto.PressureVessel |
- equipment_onto.AtmosphericStorageTank)))
- |
- (effectInvolvesEquipmentEntity.some(
- equipment_onto.hasMaterialTransferEquipment.some(equipment_onto.ReciprocatingPump)) &
- effectImpliedByCause.some(causes_onto.DeadHeadingOfPump |
- causes_onto.PumpingAgainstPolymerizedLine))
- |
- (effectInvolvesEquipmentEntity.some(
- equipment_onto.hasIntendedFunction.some(process_onto.FlowControl | process_onto.ModeIndependent)) &
- effectImpliedByCause.some(causes_onto.ValveClosedPressureBuildUpInPiping))
- |
- PotentialViolentReactionWithOxidizers)] 
- 
- 
-class Fracture(Effect):
- equivalent_to = [Effect &
- (
- (effectImpliedByCause.some(causes_onto.PhysicalImpact) &
- isEffectOfDeviation.some(deviation_onto.ElsewhereFlow) &
- effectInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.ModeIndependent)))
- |
- PressureExceedingDesignPressure)]
-class FatigueFracture(Effect):
- equivalent_to = [Effect &
- ((isEffectOfDeviation.some(deviation_onto.HighVibration) &
- effectImpliedByCause.some(causes_onto.MaterialDegradation))
- |
- (isEffectOfDeviation.some(deviation_onto.HighVibration) &
- effectInvolvesEquipmentEntity.some(equipment_onto.PumpEntity))
- |
- (isEffectOfDeviation.some(deviation_onto.HighVibration) &
- effectInvolvesEquipmentEntity.some(equipment_onto.ConnectionPipeEntity)))]
-class BrittleFracture(Effect):
- equivalent_to = [Effect &
- isEffectOfDeviation.some(deviation_onto.LowTemperature) &
- effectImpliedByCause.some(causes_onto.MaterialDegradation)]
-BrittleFracture.comment = ["Source: Managing Cold Temperature and Brittle Fracture Hazards in Pressure "
- "Vessels by Daniel J. Benac, Nicholas Cherolis & David Wood",
- "Requires crack in high stress region",
-"sudden and unexpected failure",
-"https://www.psenterprise.com/sectors/oil-and-gas/brittle-fracture"]
-class DrainlineFracture(Effect):
- equivalent_to = [Effect &
- ((isEffectOfDeviation.some(deviation_onto.OtherThanComposition) &
- effectInvolvesSubstance.some(
- substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
- substance_onto.Multiphase)) &
- effectInvolvesEquipmentEntity.some(
- equipment_onto.hasInstrumentation.some(equipment_onto.BottomDrainValve) &
- equipment_onto.hasIntendedFunction.some(process_onto.ModeIndependent)) &
- effectRequiresBoundaryCondition.some(
- boundary_onto.AmbientTemperatureCanDropBelowFreezingPoint))
- |
- (isEffectOfDeviation.some(deviation_onto.LowTemperature) &
- effectInvolvesSecondDeviation.some(deviation_onto.OtherThanComposition) &
- effectInvolvesSubstance.some(
- substance_onto.hasStateOfAggregation.some(substance_onto.Multiphase |
- substance_onto.Liquid)) &
- effectInvolvesEquipmentEntity.some(
- equipment_onto.hasInstrumentation.some(equipment_onto.BottomDrainValve) &
- equipment_onto.hasIntendedFunction.some(process_onto.Storing | process_onto.ModeIndependent)))
- |
- (effectImpliedByCause.some(causes_onto.FreezeUp))
- |
- (isEffectOfDeviation.some(deviation_onto.LowTemperature) &
- effectInvolvesSubstance.some(
- substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
- substance_onto.Multiphase)) &
- effectInvolvesEquipmentEntity.some(
- equipment_onto.hasInstrumentation.some(equipment_onto.BottomDrainValve)) &
- effectRequiresBoundaryCondition.some(boundary_onto.IntroductionOfWater) &
- effectInvolvesSiteInformation.some(
- site_information.hasMinimumAmbientTemperatureInKelvin <= 273.15)))]
-DrainlineFracture.comment = ["second part of definition accomplishes for double jeopardy, T_low and X_other"]
-class InsufficientInertization(Effect):
- equivalent_to = [Effect &
- (effectInvolvesEquipmentEntity.some(equipment_onto.InertgasBlanketingEntity) &
- isEffectOfDeviation.some(deviation_onto.NoFlow |
- deviation_onto.OtherThanComposition) &
- effectInvolvesSubstance.some(
- substance_onto.hasSpecificTask.some(substance_onto.InertGas)))
- |
- (isEffectOfDeviation.some(deviation_onto.OtherThanComposition |
- deviation_onto.NoFlow) &
- effectInvolvesEquipmentEntity.some(
- equipment_onto.hasPiping.some(equipment_onto.BlanketingGasline) &
- equipment_onto.hasIntendedFunction.some(process_onto.Inerting)) &
- effectImpliedByCause.some(causes_onto.NoInertgasSupply |
- causes_onto.OtherSubstanceFromUpstream))]
-class PoorSeparation(Effect):
- equivalent_to = [Effect &
- ((isEffectOfDeviation.some(deviation_onto.OtherThanComposition) &
- effectImpliedByCause.some(causes_onto.ConfusionOfSubstances |
- causes_onto.OtherSubstanceFromUpstream) &
- effectInvolvesSubstance.some(
- substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium)) &
- effectInvolvesEquipmentEntity.some(equipment_onto.SettlingTankEntity &
- equipment_onto.hasIntendedFunction.some(process_onto.Separating)))
- |
- (isEffectOfDeviation.some(deviation_onto.OtherThanComposition) &
- effectInvolvesSubstance.some(
- substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium)) &
- effectImpliedByCause.some(causes_onto.ReducedDwellTime) &
- effectInvolvesEquipmentEntity.some(equipment_onto.SettlingTankEntity &
- equipment_onto.hasIntendedFunction.some(process_onto.Separating)))
- |
- (effectInvolvesSubstance.some(
- substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium)) &
- effectImpliedByCause.some(causes_onto.BypassOpened |
- causes_onto.ValveWronglyOpened |
- causes_onto.IncorrectSetPointControlValve) &
- isEffectOfDeviation.some(deviation_onto.HighFlow) &
- effectInvolvesEquipmentEntity.some(equipment_onto.SettlingTankEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.Separating | process_onto.ModeIndependent)))
- )]
-class PoolFormation(Effect):
- equivalent_to = [Effect &
- ((effectInvolvesSubstance.some(
- substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
- substance_onto.Multiphase)) &
- (effectImpliedByCause.some(causes_onto.ExternalLeakage |
- causes_onto.PumpSealFailure |
- causes_onto.DrainValveInadvertentlyOpened |
- causes_onto.HoseIncorrectlyConnected)))
- |
- (isEffectOfDeviation.some(deviation_onto.HighCorrosion) &
- effectOfPropagatedCause.value(True)))
- ] 
- 
- 
-class EmptyingOfContainer(Effect):
- equivalent_to = [Effect &
- ((effectInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.Emptying)) &
- isEffectOfDeviation.some(deviation_onto.LowLevel | deviation_onto.NoFlow | deviation_onto.LowFlow) &
- effectImpliedByCause.some(causes_onto.LossOfInflow |
- causes_onto.IncorrectFilling |
- causes_onto.ClosedInletValve))
- |
- (effectInvolvesEquipmentEntity.some(equipment_onto.SettlingTankEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.Separating)) &
- isEffectOfDeviation.some(deviation_onto.LowLevel | deviation_onto.NoFlow | deviation_onto.LowFlow) &
- effectImpliedByCause.some(causes_onto.LossOfInflow | causes_onto.ValveWronglyClosed |
- causes_onto.IncorrectFilling | causes_onto.ClosedInletValve))
- |
- (effectInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.Emptying)) &
- effectInvolvesSubstance.some(
- substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium)) &
- isEffectOfDeviation.some(deviation_onto.NoFlow) &
- effectOfPropagatedCause.value(True))
- |
- (effectInvolvesEquipmentEntity.some(equipment_onto.SettlingTankEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.ModeIndependent)) &
- effectInvolvesSubstance.some(
- substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium)) &
- isEffectOfDeviation.some(deviation_onto.NoFlow) &
- effectOfPropagatedCause.value(True)))]
-class LossOfMechanicalIntegrity(Effect):
- equivalent_to = [Effect &
- ((effectInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity |
- equipment_onto.SettlingTankEntity |
- equipment_onto.WetScrubberEntity |
- equipment_onto.PressureVesselEntity |
- equipment_onto.PressureReceiverEntity |
- equipment_onto.ReactorEntity) &
- effectImpliedByCause.some(
- causes_onto.InsufficientThermalInbreathing |
- causes_onto.DrainValveInadvertentlyOpened))
- |
- (effectImpliedByCause.some(causes_onto.MechanicalFailureOfSupport) &
- isEffectOfDeviation.some(deviation_onto.ElsewhereFlow) &
- effectInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.ModeIndependent)))
- |
- ((effectInvolvesEquipmentEntity.some((equipment_onto.StorageTankEntity) &
- equipment_onto.hasIntendedFunction.some(
- process_onto.Emptying |
- process_onto.Storing))) &
- isEffectOfDeviation.some(deviation_onto.LowPressure))
- |
- ((effectInvolvesEquipmentEntity.some(equipment_onto.SettlingTankEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.Separating |
- process_onto.ModeIndependent))) &
- isEffectOfDeviation.some(deviation_onto.LowPressure)))]
-LossOfMechanicalIntegrity.comment = ["Underpressure", "Armospheric Tank Failures: Mechanisms and an Unexpected Case Study"]
-class GasDispersion(Effect):
- equivalent_to = [Effect &
- (effectInvolvesSubstance.some(
- substance_onto.hasStateOfAggregation.some(substance_onto.Gaseous)) &
- effectImpliedByCause.some(causes_onto.ExternalLeakage))]
-class FluidCirculatesInsidePump(Effect):
- equivalent_to = [Effect &
- ((isEffectOfDeviation.some(deviation_onto.NoFlow) &
- effectInvolvesEquipmentEntity.some(
- equipment_onto.hasMaterialTransferEquipment.some(equipment_onto.CentrifugalPump) &
- equipment_onto.hasIntendedFunction.some(process_onto.DeliverConstantVolumeFlow)) &
- effectImpliedByCause.some(causes_onto.PumpingAgainstPolymerizedLine |
- causes_onto.DeadHeadingOfPump))
- |
- (isEffectOfDeviation.some(deviation_onto.NoFlow) &
- effectInvolvesEquipmentEntity.some(
- equipment_onto.hasMaterialTransferEquipment.some(equipment_onto.CentrifugalPump) &
- equipment_onto.hasOperationMode.some(equipment_onto.StartUpOperation)) &
- effectImpliedByCause.some(causes_onto.WrongMountingOfNonReturnValve)))]
-class Overheating(Effect):
- equivalent_to = [Effect &
- ((effectInvolvesEquipmentEntity.some(equipment_onto.CompressorEntity) &
- isEffectOfDeviation.some(deviation_onto.HighTemperature))
- |
- (effectInvolvesEquipmentEntity.some(equipment_onto.CompressorEntity) &
- effectImpliedByCause.some(causes_onto.MalfunctionLubricationSystem))
- |
- (effectInvolvesEquipmentEntity.some(equipment_onto.PumpEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.DeliverConstantVolumeFlow)) &
- isEffectOfDeviation.some(deviation_onto.HighTemperature) &
- effectOfPropagatedCause.value(True))
- |
- FluidCirculatesInsidePump)]
-class HeatBuildUp(effect_onto.Effect):
- equivalent_to = [effect_onto.Effect &
- effect_onto.effectImpliedByCause.some(BlockedReboilerLines)
- ]
-class ColumnFlooded(effect_onto.Effect):
- equivalent_to = [effect_onto.Effect &
- ((effect_onto.isEffectOfDeviation.some(deviation_onto.HighLevel) &
- effect_onto.effectInvolvesSubstance.some(
- substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium)) &
- effect_onto.effectInvolvesEquipmentEntity.some(equipment_onto.StabilizerColumnEntity))
- |
- (effect_onto.effectImpliedByCause.some(causes_onto.ExcessiveInflow) &
- effect_onto.effectInvolvesSubstance.some(
- substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium)) &
- effect_onto.effectInvolvesEquipmentEntity.some(equipment_onto.StabilizerColumnEntity)
- ))]
-
-
-class LiquidSlugging(effect_onto.Effect):
- equivalent_to = [effect_onto.Effect &
- (effect_onto.effectInvolvesEquipmentEntity.some(equipment_onto.hasMaterialTransferEquipment.some(
- equipment_onto.PistonCompressor | equipment_onto.ScrewCompressor)) &
- effect_onto.effectInvolvesSubstance.some(
- substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium |
- substance_onto.Refrigerant)) &
- (effect_onto.effectImpliedByCause.some(causes_onto.ContaminationByWater |
- causes_onto.OtherSubstanceFromUpstream)
- |
- effect_onto.isEffectOfDeviation.some(deviation_onto.OtherThanComposition)))]
-LiquidSlugging.comment = ["Screw compressors have a higher tolerance to liquid slugging"]
-class ExcessiveDischargeTemperature(effect_onto.Effect):
- equivalent_to = [effect_onto.Effect &
- ((effect_onto.isEffectOfDeviation.some(deviation_onto.HighTemperature) &
- effect_onto.effectInvolvesEquipmentEntity.some(equipment_onto.CompressorEntity))
- |
- (effect_onto.effectInvolvesEquipmentEntity.some(equipment_onto.CompressorEntity) &
- effect_onto.effectImpliedByCause.some(causes_onto.MalfunctionLubricationSystem)))]
-class IncreasedOilDischarge(effect_onto.Effect):
- equivalent_to = [effect_onto.Effect &
- effect_onto.effectInvolvesSubstance.some(
- substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium |
- substance_onto.Refrigerant)) &
- effect_onto.isEffectOfDeviation.some(deviation_onto.HighFlow) &
- effect_onto.effectInvolvesEquipmentEntity.some(equipment_onto.CompressorEntity &
- equipment_onto.hasSubunit.some(equipment_onto.LubricationSystem))]
-class IncompleteEvaporation(effect_onto.Effect):
- equivalent_to = [effect_onto.Effect &
- ((
- effect_onto.effectInvolvesSubstance.some(substance_onto.hasSpecificTask.some(substance_onto.Refrigerant)) &
- effect_onto.isEffectOfDeviation.some(deviation_onto.HighFlow |
- deviation_onto.LowTemperature) &
- effect_onto.effectInvolvesEquipmentEntity.some(equipment_onto.FinTubeEvaporatorEntity |
- equipment_onto.ShellTubeEvaporatorEntity))
- |
- (effect_onto.effectInvolvesSubstance.some(
- substance_onto.hasSpecificTask.some(substance_onto.HeatingMedium)) &
- effect_onto.isEffectOfDeviation.some(deviation_onto.LowTemperature) &
- effect_onto.effectInvolvesEquipmentEntity.some(equipment_onto.ShellTubeEvaporatorEntity)))]
-class IncompleteCondensation(effect_onto.Effect):
- equivalent_to = [effect_onto.Effect &
- (
- effect_onto.effectInvolvesSubstance.some(substance_onto.hasSpecificTask.some(substance_onto.Refrigerant)) &
- effect_onto.isEffectOfDeviation.some(deviation_onto.HighFlow |
- deviation_onto.HighTemperature) &
- effect_onto.effectInvolvesEquipmentEntity.some(equipment_onto.AirCooledCondenserEntity))]
-class LossOfHeatTransfer(effect_onto.Effect):
- equivalent_to = [effect_onto.Effect &
- ((effect_onto.effectInvolvesEquipmentEntity.some(equipment_onto.ShellTubeHeatExchangerEntity) &
- effect_onto.effectImpliedByCause.some(causes_onto.Fouling))
- |
- (effect_onto.effectInvolvesEquipmentEntity.some(equipment_onto.AirCooledCondenserEntity) &
- effect_onto.isEffectOfDeviation.some(deviation_onto.HighTemperature) &
- effect_onto.effectImpliedByCause.some(causes_onto.WrongRotatingSpeed |
- causes_onto.Fouling |
- causes_onto.HighAmbientTemperature |
- causes_onto.NonCondensables))
- |
- (effect_onto.effectImpliedByCause.some(NoSteamFlow)))]
-class ReducedHeatingCapacity(effect_onto.Effect):
- equivalent_to = [effect_onto.Effect &
- (effect_onto.effectInvolvesEquipmentEntity.some(equipment_onto.StabilizerColumnEntity) &
- effect_onto.isEffectOfDeviation.some(deviation_onto.LowTemperature))]
-class IncreasedHeatingCapacity(effect_onto.Effect):
- equivalent_to = [effect_onto.Effect &
- (effect_onto.effectInvolvesEquipmentEntity.some(equipment_onto.SteamDrivenReboilerEntity) &
- effect_onto.effectImpliedByCause.some(causes_onto.MoreSteamFlow))]
-class IncreasedWear(effect_onto.Effect):
- equivalent_to = [effect_onto.Effect &
- ((effect_onto.effectInvolvesEquipmentEntity.some(equipment_onto.PumpEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.DeliverConstantVolumeFlow)) &
- effect_onto.effectImpliedByCause.some(OperationBelowMinimumFlowRate)))]
-class PumpRunningDry(effect_onto.Effect):
- equivalent_to = [effect_onto.Effect &
- ((effect_onto.effectInvolvesEquipmentEntity.some(equipment_onto.PumpEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.DeliverConstantVolumeFlow)) &
- effect_onto.effectImpliedByCause.some(causes_onto.ClosedInletValve |
- causes_onto.LossOfInflow |
- causes_onto.BlockedInflowLine)))]
-PumpRunningDry.comment = [
- "https://www.worldpumps.com/operating-design/features/how-to-overcome-the-challenge-of-dry-running/"]
-class PumpDeliversNoLiquid(effect_onto.Effect):
- equivalent_to = [effect_onto.Effect &
- (effect_onto.effectInvolvesEquipmentEntity.some(equipment_onto.PumpEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.DeliverConstantVolumeFlow)) &
- effect_onto.effectImpliedByCause.some(causes_onto.MissingImpeller |
- causes_onto.EntrainedAir) &
- effect_onto.isEffectOfDeviation.some(deviation_onto.NoFlow))
- ]
-class Cavitation(effect_onto.Effect):
- equivalent_to = [effect_onto.Effect &
- ((effect_onto.effectImpliedByCause.some(InsufficientNPSH) &
- effect_onto.effectInvolvesEquipmentEntity.some(
- equipment_onto.hasIntendedFunction.some(process_onto.DeliverConstantVolumeFlow)))
- |
- (effect_onto.effectInvolvesEquipmentEntity.some(equipment_onto.PumpEntity &
- equipment_onto.hasIntendedFunction.some(process_onto.DeliverConstantVolumeFlow)) &
- effect_onto.effectOfPropagatedCause.some(True) &
- effect_onto.isEffectOfDeviation.some(deviation_onto.HighTemperature)))]
-class PoorPumpPerformance(effect_onto.Effect):
- equivalent_to = [effect_onto.Effect &
- (effect_onto.effectImpliedByCause.some(EntrainedAir | causes_onto.ImpellerFault) &
- effect_onto.isEffectOfDeviation.some(deviation_onto.LowFlow))
- ]
-
-
-
-class RunawayReaction(effect_onto.Effect):
- equivalent_to = [effect_onto.Effect &
- ((effect_onto.effectInvolvesEquipmentEntity.some(equipment_onto.ReactorEntity) &
- (effect_onto.effectImpliedByCause.some(causes_onto.CoolingFailure |
- causes_onto.ConfusionOfSubstances |
- causes_onto.NoFeed |
- causes_onto.Pollution |
- ChargingFailure |
- DosingFailure
- ))
- |
- (effect_onto.effectInvolvesEquipmentEntity.some(equipment_onto.ReactorEntity) &
- effect_onto.isEffectOfDeviation.some(deviation_onto.ReverseFlow))
- ))]
-class InsufficientAmountOfLiquidRefrigerant(effect_onto.Effect):
- equivalent_to = [effect_onto.Effect &
- (effect_onto.isEffectOfDeviation.some(deviation_onto.OtherThanComposition |
- deviation_onto.LowLevel) &
- effect_onto.effectInvolvesEquipmentEntity.some(equipment_onto.PressureReceiverEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.ModeIndependent)) &
- effect_onto.effectInvolvesSubstance.some(
- substance_onto.hasSpecificTask.some(substance_onto.Refrigerant))
- )
- ]
-class ScrubberAgentNotAvailable(effect_onto.Effect):
- equivalent_to = [effect_onto.Effect &
- ((effect_onto.effectInvolvesSubstance.some(
- substance_onto.hasSpecificTask.some(substance_onto.ScrubbingAgent)) &
- effect_onto.effectInvolvesEquipmentEntity.some(equipment_onto.WetScrubberEntity &
- equipment_onto.hasFixture.some(
- equipment_onto.LiquidDistributor) &
- equipment_onto.hasIntendedFunction.some(
- process_onto.ModeIndependent)) &
- effect_onto.effectInvolvesSubstance.some(
- substance_onto.hasStateOfAggregation.some(substance_onto.Liquid)) &
- effect_onto.isEffectOfDeviation.some(deviation_onto.NoFlow))
- |
- ((effect_onto.effectInvolvesSubstance.some(
- substance_onto.hasSpecificTask.some(substance_onto.ScrubbingAgent)) &
- effect_onto.effectInvolvesEquipmentEntity.some(equipment_onto.WetScrubberEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.ModeIndependent)) &
- effect_onto.effectImpliedByCause.some(LossOfInflow |
- BlockedInflowLine) &
- effect_onto.effectInvolvesSubstance.some(
- substance_onto.hasStateOfAggregation.some(substance_onto.Liquid)))))
- ]
-class InsufficientGasPurification(effect_onto.Effect):
- equivalent_to = [effect_onto.Effect &
- (effect_onto.effectInvolvesEquipmentEntity.some(equipment_onto.WetScrubberEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.ModeIndependent)) &
- effect_onto.effectInvolvesSubstance.some(
- substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
- substance_onto.Multiphase)) &
- effect_onto.isEffectOfDeviation.some(deviation_onto.OtherThanComposition))
- ]
-class FloodedPackedBed(effect_onto.Effect):
- equivalent_to = [effect_onto.Effect &
- (effect_onto.effectInvolvesEquipmentEntity.some(equipment_onto.WetScrubberEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.ModeIndependent)) &
- effect_onto.effectInvolvesSubstance.some(
- substance_onto.hasStateOfAggregation.some(substance_onto.Liquid)) &
- effect_onto.isEffectOfDeviation.some(deviation_onto.HighLevel))
- ]
-class AbnormalOperationCondition(effect_onto.Effect):
- equivalent_to = [effect_onto.Effect &
- (effect_onto.effectInvolvesEquipmentEntity.some(equipment_onto.WetScrubberEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.ModeIndependent)) &
- effect_onto.isEffectOfDeviation.some(deviation_onto.HighTemperature |
- deviation_onto.LowTemperature |
- deviation_onto.LowPressure |
- deviation_onto.HighPressure |
- deviation_onto.HighFlow |
- deviation_onto.LowFlow |
- deviation_onto.HighLevel |
- deviation_onto.OtherThanComposition))
- ] 
-
-
-
-
-
-
-
-
+     
+    class Fracture(Effect):
+     equivalent_to = [Effect &
+     (
+     (effectImpliedByCause.some(causes_onto.PhysicalImpact) &
+     isEffectOfDeviation.some(deviation_onto.ElsewhereFlow) &
+     effectInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.ModeIndependent)))
+     |
+     PressureExceedingDesignPressure)]
+    class FatigueFracture(Effect):
+     equivalent_to = [Effect &
+     ((isEffectOfDeviation.some(deviation_onto.HighVibration) &
+     effectImpliedByCause.some(causes_onto.MaterialDegradation))
+     |
+     (isEffectOfDeviation.some(deviation_onto.HighVibration) &
+     effectInvolvesEquipmentEntity.some(equipment_onto.PumpEntity))
+     |
+     (isEffectOfDeviation.some(deviation_onto.HighVibration) &
+     effectInvolvesEquipmentEntity.some(equipment_onto.ConnectionPipeEntity)))]
+    class BrittleFracture(Effect):
+     equivalent_to = [Effect &
+     isEffectOfDeviation.some(deviation_onto.LowTemperature) &
+     effectImpliedByCause.some(causes_onto.MaterialDegradation)]
+    BrittleFracture.comment = ["Source: Managing Cold Temperature and Brittle Fracture Hazards in Pressure "
+     "Vessels by Daniel J. Benac, Nicholas Cherolis & David Wood",
+     "Requires crack in high stress region",
+    "sudden and unexpected failure",
+    "https://www.psenterprise.com/sectors/oil-and-gas/brittle-fracture"]
+    class DrainlineFracture(Effect):
+     equivalent_to = [Effect &
+     ((isEffectOfDeviation.some(deviation_onto.OtherThanComposition) &
+     effectInvolvesSubstance.some(
+     substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
+     substance_onto.Multiphase)) &
+     effectInvolvesEquipmentEntity.some(
+     equipment_onto.hasInstrumentation.some(equipment_onto.BottomDrainValve) &
+     equipment_onto.hasIntendedFunction.some(process_onto.ModeIndependent)) &
+     effectRequiresBoundaryCondition.some(
+     boundary_onto.AmbientTemperatureCanDropBelowFreezingPoint))
+     |
+     (isEffectOfDeviation.some(deviation_onto.LowTemperature) &
+     effectInvolvesSecondDeviation.some(deviation_onto.OtherThanComposition) &
+     effectInvolvesSubstance.some(
+     substance_onto.hasStateOfAggregation.some(substance_onto.Multiphase |
+     substance_onto.Liquid)) &
+     effectInvolvesEquipmentEntity.some(
+     equipment_onto.hasInstrumentation.some(equipment_onto.BottomDrainValve) &
+     equipment_onto.hasIntendedFunction.some(process_onto.Storing | process_onto.ModeIndependent)))
+     |
+     (effectImpliedByCause.some(causes_onto.FreezeUp))
+     |
+     (isEffectOfDeviation.some(deviation_onto.LowTemperature) &
+     effectInvolvesSubstance.some(
+     substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
+     substance_onto.Multiphase)) &
+     effectInvolvesEquipmentEntity.some(
+     equipment_onto.hasInstrumentation.some(equipment_onto.BottomDrainValve)) &
+     effectRequiresBoundaryCondition.some(boundary_onto.IntroductionOfWater) &
+     effectInvolvesSiteInformation.some(
+     site_information.hasMinimumAmbientTemperatureInKelvin <= 273.15)))]
+    DrainlineFracture.comment = ["second part of definition accomplishes for double jeopardy, T_low and X_other"]
+    class InsufficientInertization(Effect):
+     equivalent_to = [Effect &
+     (effectInvolvesEquipmentEntity.some(equipment_onto.InertgasBlanketingEntity) &
+     isEffectOfDeviation.some(deviation_onto.NoFlow |
+     deviation_onto.OtherThanComposition) &
+     effectInvolvesSubstance.some(
+     substance_onto.hasSpecificTask.some(substance_onto.InertGas)))
+     |
+     (isEffectOfDeviation.some(deviation_onto.OtherThanComposition |
+     deviation_onto.NoFlow) &
+     effectInvolvesEquipmentEntity.some(
+     equipment_onto.hasPiping.some(equipment_onto.BlanketingGasline) &
+     equipment_onto.hasIntendedFunction.some(process_onto.Inerting)) &
+     effectImpliedByCause.some(causes_onto.NoInertgasSupply |
+     causes_onto.OtherSubstanceFromUpstream))]
+    class PoorSeparation(Effect):
+     equivalent_to = [Effect &
+     ((isEffectOfDeviation.some(deviation_onto.OtherThanComposition) &
+     effectImpliedByCause.some(causes_onto.ConfusionOfSubstances |
+     causes_onto.OtherSubstanceFromUpstream) &
+     effectInvolvesSubstance.some(
+     substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium)) &
+     effectInvolvesEquipmentEntity.some(equipment_onto.SettlingTankEntity &
+     equipment_onto.hasIntendedFunction.some(process_onto.Separating)))
+     |
+     (isEffectOfDeviation.some(deviation_onto.OtherThanComposition) &
+     effectInvolvesSubstance.some(
+     substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium)) &
+     effectImpliedByCause.some(causes_onto.ReducedDwellTime) &
+     effectInvolvesEquipmentEntity.some(equipment_onto.SettlingTankEntity &
+     equipment_onto.hasIntendedFunction.some(process_onto.Separating)))
+     |
+     (effectInvolvesSubstance.some(
+     substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium)) &
+     effectImpliedByCause.some(causes_onto.BypassOpened |
+     causes_onto.ValveWronglyOpened |
+     causes_onto.IncorrectSetPointControlValve) &
+     isEffectOfDeviation.some(deviation_onto.HighFlow) &
+     effectInvolvesEquipmentEntity.some(equipment_onto.SettlingTankEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.Separating | process_onto.ModeIndependent)))
+     )]
+    class PoolFormation(Effect):
+     equivalent_to = [Effect &
+     ((effectInvolvesSubstance.some(
+     substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
+     substance_onto.Multiphase)) &
+     (effectImpliedByCause.some(causes_onto.ExternalLeakage |
+     causes_onto.PumpSealFailure |
+     causes_onto.DrainValveInadvertentlyOpened |
+     causes_onto.HoseIncorrectlyConnected)))
+     |
+     (isEffectOfDeviation.some(deviation_onto.HighCorrosion) &
+     effectOfPropagatedCause.value(True)))
+     ] 
+     
+     
+    class EmptyingOfContainer(Effect):
+     equivalent_to = [Effect &
+     ((effectInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.Emptying)) &
+     isEffectOfDeviation.some(deviation_onto.LowLevel | deviation_onto.NoFlow | deviation_onto.LowFlow) &
+     effectImpliedByCause.some(causes_onto.LossOfInflow |
+     causes_onto.IncorrectFilling |
+     causes_onto.ClosedInletValve))
+     |
+     (effectInvolvesEquipmentEntity.some(equipment_onto.SettlingTankEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.Separating)) &
+     isEffectOfDeviation.some(deviation_onto.LowLevel | deviation_onto.NoFlow | deviation_onto.LowFlow) &
+     effectImpliedByCause.some(causes_onto.LossOfInflow | causes_onto.ValveWronglyClosed |
+     causes_onto.IncorrectFilling | causes_onto.ClosedInletValve))
+     |
+     (effectInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.Emptying)) &
+     effectInvolvesSubstance.some(
+     substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium)) &
+     isEffectOfDeviation.some(deviation_onto.NoFlow) &
+     effectOfPropagatedCause.value(True))
+     |
+     (effectInvolvesEquipmentEntity.some(equipment_onto.SettlingTankEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.ModeIndependent)) &
+     effectInvolvesSubstance.some(
+     substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium)) &
+     isEffectOfDeviation.some(deviation_onto.NoFlow) &
+     effectOfPropagatedCause.value(True)))]
+    class LossOfMechanicalIntegrity(Effect):
+     equivalent_to = [Effect &
+     ((effectInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity |
+     equipment_onto.SettlingTankEntity |
+     equipment_onto.WetScrubberEntity |
+     equipment_onto.PressureVesselEntity |
+     equipment_onto.PressureReceiverEntity |
+     equipment_onto.ReactorEntity) &
+     effectImpliedByCause.some(
+     causes_onto.InsufficientThermalInbreathing |
+     causes_onto.DrainValveInadvertentlyOpened))
+     |
+     (effectImpliedByCause.some(causes_onto.MechanicalFailureOfSupport) &
+     isEffectOfDeviation.some(deviation_onto.ElsewhereFlow) &
+     effectInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.ModeIndependent)))
+     |
+     ((effectInvolvesEquipmentEntity.some((equipment_onto.StorageTankEntity) &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.Emptying |
+     process_onto.Storing))) &
+     isEffectOfDeviation.some(deviation_onto.LowPressure))
+     |
+     ((effectInvolvesEquipmentEntity.some(equipment_onto.SettlingTankEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.Separating |
+     process_onto.ModeIndependent))) &
+     isEffectOfDeviation.some(deviation_onto.LowPressure)))]
+    LossOfMechanicalIntegrity.comment = ["Underpressure", "Armospheric Tank Failures: Mechanisms and an Unexpected Case Study"]
+    class GasDispersion(Effect):
+     equivalent_to = [Effect &
+     (effectInvolvesSubstance.some(
+     substance_onto.hasStateOfAggregation.some(substance_onto.Gaseous)) &
+     effectImpliedByCause.some(causes_onto.ExternalLeakage))]
+    class FluidCirculatesInsidePump(Effect):
+     equivalent_to = [Effect &
+     ((isEffectOfDeviation.some(deviation_onto.NoFlow) &
+     effectInvolvesEquipmentEntity.some(
+     equipment_onto.hasMaterialTransferEquipment.some(equipment_onto.CentrifugalPump) &
+     equipment_onto.hasIntendedFunction.some(process_onto.DeliverConstantVolumeFlow)) &
+     effectImpliedByCause.some(causes_onto.PumpingAgainstPolymerizedLine |
+     causes_onto.DeadHeadingOfPump))
+     |
+     (isEffectOfDeviation.some(deviation_onto.NoFlow) &
+     effectInvolvesEquipmentEntity.some(
+     equipment_onto.hasMaterialTransferEquipment.some(equipment_onto.CentrifugalPump) &
+     equipment_onto.hasOperationMode.some(equipment_onto.StartUpOperation)) &
+     effectImpliedByCause.some(causes_onto.WrongMountingOfNonReturnValve)))]
+    class Overheating(Effect):
+     equivalent_to = [Effect &
+     ((effectInvolvesEquipmentEntity.some(equipment_onto.CompressorEntity) &
+     isEffectOfDeviation.some(deviation_onto.HighTemperature))
+     |
+     (effectInvolvesEquipmentEntity.some(equipment_onto.CompressorEntity) &
+     effectImpliedByCause.some(causes_onto.MalfunctionLubricationSystem))
+     |
+     (effectInvolvesEquipmentEntity.some(equipment_onto.PumpEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.DeliverConstantVolumeFlow)) &
+     isEffectOfDeviation.some(deviation_onto.HighTemperature) &
+     effectOfPropagatedCause.value(True))
+     |
+     FluidCirculatesInsidePump)]
+     
+     
+with consequence_onto:
+    class HeatBuildUp(effect_onto.Effect):
+     equivalent_to = [effect_onto.Effect &
+     effect_onto.effectImpliedByCause.some(BlockedReboilerLines)
+     ]
+    class ColumnFlooded(effect_onto.Effect):
+     equivalent_to = [effect_onto.Effect &
+     ((effect_onto.isEffectOfDeviation.some(deviation_onto.HighLevel) &
+     effect_onto.effectInvolvesSubstance.some(
+     substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium)) &
+     effect_onto.effectInvolvesEquipmentEntity.some(equipment_onto.StabilizerColumnEntity))
+     |
+     (effect_onto.effectImpliedByCause.some(causes_onto.ExcessiveInflow) &
+     effect_onto.effectInvolvesSubstance.some(
+     substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium)) &
+     effect_onto.effectInvolvesEquipmentEntity.some(equipment_onto.StabilizerColumnEntity)
+     ))]
+    class LiquidSlugging(effect_onto.Effect):
+     equivalent_to = [effect_onto.Effect &
+     (effect_onto.effectInvolvesEquipmentEntity.some(equipment_onto.hasMaterialTransferEquipment.some(
+     equipment_onto.PistonCompressor | equipment_onto.ScrewCompressor)) &
+     effect_onto.effectInvolvesSubstance.some(
+     substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium |
+     substance_onto.Refrigerant)) &
+     (effect_onto.effectImpliedByCause.some(causes_onto.ContaminationByWater |
+     causes_onto.OtherSubstanceFromUpstream)
+     |
+     effect_onto.isEffectOfDeviation.some(deviation_onto.OtherThanComposition)))]
+    LiquidSlugging.comment = ["Screw compressors have a higher tolerance to liquid slugging"]
+    class ExcessiveDischargeTemperature(effect_onto.Effect):
+     equivalent_to = [effect_onto.Effect &
+     ((effect_onto.isEffectOfDeviation.some(deviation_onto.HighTemperature) &
+     effect_onto.effectInvolvesEquipmentEntity.some(equipment_onto.CompressorEntity))
+     |
+     (effect_onto.effectInvolvesEquipmentEntity.some(equipment_onto.CompressorEntity) &
+     effect_onto.effectImpliedByCause.some(causes_onto.MalfunctionLubricationSystem)))]
+    class IncreasedOilDischarge(effect_onto.Effect):
+     equivalent_to = [effect_onto.Effect &
+     effect_onto.effectInvolvesSubstance.some(
+     substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium |
+     substance_onto.Refrigerant)) &
+     effect_onto.isEffectOfDeviation.some(deviation_onto.HighFlow) &
+     effect_onto.effectInvolvesEquipmentEntity.some(equipment_onto.CompressorEntity &
+     equipment_onto.hasSubunit.some(equipment_onto.LubricationSystem))]
+    class IncompleteEvaporation(effect_onto.Effect):
+     equivalent_to = [effect_onto.Effect &
+     ((
+     effect_onto.effectInvolvesSubstance.some(substance_onto.hasSpecificTask.some(substance_onto.Refrigerant)) &
+     effect_onto.isEffectOfDeviation.some(deviation_onto.HighFlow |
+     deviation_onto.LowTemperature) &
+     effect_onto.effectInvolvesEquipmentEntity.some(equipment_onto.FinTubeEvaporatorEntity |
+     equipment_onto.ShellTubeEvaporatorEntity))
+     |
+     (effect_onto.effectInvolvesSubstance.some(
+     substance_onto.hasSpecificTask.some(substance_onto.HeatingMedium)) &
+     effect_onto.isEffectOfDeviation.some(deviation_onto.LowTemperature) &
+     effect_onto.effectInvolvesEquipmentEntity.some(equipment_onto.ShellTubeEvaporatorEntity)))]
+    class IncompleteCondensation(effect_onto.Effect):
+     equivalent_to = [effect_onto.Effect &
+     (
+     effect_onto.effectInvolvesSubstance.some(substance_onto.hasSpecificTask.some(substance_onto.Refrigerant)) &
+     effect_onto.isEffectOfDeviation.some(deviation_onto.HighFlow |
+     deviation_onto.HighTemperature) &
+     effect_onto.effectInvolvesEquipmentEntity.some(equipment_onto.AirCooledCondenserEntity))]
+    class LossOfHeatTransfer(effect_onto.Effect):
+     equivalent_to = [effect_onto.Effect &
+     ((effect_onto.effectInvolvesEquipmentEntity.some(equipment_onto.ShellTubeHeatExchangerEntity) &
+     effect_onto.effectImpliedByCause.some(causes_onto.Fouling))
+     |
+     (effect_onto.effectInvolvesEquipmentEntity.some(equipment_onto.AirCooledCondenserEntity) &
+     effect_onto.isEffectOfDeviation.some(deviation_onto.HighTemperature) &
+     effect_onto.effectImpliedByCause.some(causes_onto.WrongRotatingSpeed |
+     causes_onto.Fouling |
+     causes_onto.HighAmbientTemperature |
+     causes_onto.NonCondensables))
+     |
+     (effect_onto.effectImpliedByCause.some(NoSteamFlow)))]
+    class ReducedHeatingCapacity(effect_onto.Effect):
+     equivalent_to = [effect_onto.Effect &
+     (effect_onto.effectInvolvesEquipmentEntity.some(equipment_onto.StabilizerColumnEntity) &
+     effect_onto.isEffectOfDeviation.some(deviation_onto.LowTemperature))]
+    class IncreasedHeatingCapacity(effect_onto.Effect):
+     equivalent_to = [effect_onto.Effect &
+     (effect_onto.effectInvolvesEquipmentEntity.some(equipment_onto.SteamDrivenReboilerEntity) &
+     effect_onto.effectImpliedByCause.some(causes_onto.MoreSteamFlow))]
+    class IncreasedWear(effect_onto.Effect):
+     equivalent_to = [effect_onto.Effect &
+     ((effect_onto.effectInvolvesEquipmentEntity.some(equipment_onto.PumpEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.DeliverConstantVolumeFlow)) &
+     effect_onto.effectImpliedByCause.some(OperationBelowMinimumFlowRate)))]
+    class PumpRunningDry(effect_onto.Effect):
+     equivalent_to = [effect_onto.Effect &
+     ((effect_onto.effectInvolvesEquipmentEntity.some(equipment_onto.PumpEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.DeliverConstantVolumeFlow)) &
+     effect_onto.effectImpliedByCause.some(causes_onto.ClosedInletValve |
+     causes_onto.LossOfInflow |
+     causes_onto.BlockedInflowLine)))]
+    PumpRunningDry.comment = [
+     "https://www.worldpumps.com/operating-design/features/how-to-overcome-the-challenge-of-dry-running/"]
+    class PumpDeliversNoLiquid(effect_onto.Effect):
+     equivalent_to = [effect_onto.Effect &
+     (effect_onto.effectInvolvesEquipmentEntity.some(equipment_onto.PumpEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.DeliverConstantVolumeFlow)) &
+     effect_onto.effectImpliedByCause.some(causes_onto.MissingImpeller |
+     causes_onto.EntrainedAir) &
+     effect_onto.isEffectOfDeviation.some(deviation_onto.NoFlow))
+     ]
+    class Cavitation(effect_onto.Effect):
+     equivalent_to = [effect_onto.Effect &
+     ((effect_onto.effectImpliedByCause.some(InsufficientNPSH) &
+     effect_onto.effectInvolvesEquipmentEntity.some(
+     equipment_onto.hasIntendedFunction.some(process_onto.DeliverConstantVolumeFlow)))
+     |
+     (effect_onto.effectInvolvesEquipmentEntity.some(equipment_onto.PumpEntity &
+     equipment_onto.hasIntendedFunction.some(process_onto.DeliverConstantVolumeFlow)) &
+     effect_onto.effectOfPropagatedCause.some(True) &
+     effect_onto.isEffectOfDeviation.some(deviation_onto.HighTemperature)))]
+    class PoorPumpPerformance(effect_onto.Effect):
+     equivalent_to = [effect_onto.Effect &
+     (effect_onto.effectImpliedByCause.some(EntrainedAir | causes_onto.ImpellerFault) &
+     effect_onto.isEffectOfDeviation.some(deviation_onto.LowFlow))
+     ]
+    
+    
+    
+    class RunawayReaction(effect_onto.Effect):
+     equivalent_to = [effect_onto.Effect &
+     ((effect_onto.effectInvolvesEquipmentEntity.some(equipment_onto.ReactorEntity) &
+     (effect_onto.effectImpliedByCause.some(causes_onto.CoolingFailure |
+     causes_onto.ConfusionOfSubstances |
+     causes_onto.NoFeed |
+     causes_onto.Pollution |
+     ChargingFailure |
+     DosingFailure
+     ))
+     |
+     (effect_onto.effectInvolvesEquipmentEntity.some(equipment_onto.ReactorEntity) &
+     effect_onto.isEffectOfDeviation.some(deviation_onto.ReverseFlow))
+     ))]
+    class InsufficientAmountOfLiquidRefrigerant(effect_onto.Effect):
+     equivalent_to = [effect_onto.Effect &
+     (effect_onto.isEffectOfDeviation.some(deviation_onto.OtherThanComposition |
+     deviation_onto.LowLevel) &
+     effect_onto.effectInvolvesEquipmentEntity.some(equipment_onto.PressureReceiverEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.ModeIndependent)) &
+     effect_onto.effectInvolvesSubstance.some(
+     substance_onto.hasSpecificTask.some(substance_onto.Refrigerant))
+     )
+     ]
+    class ScrubberAgentNotAvailable(effect_onto.Effect):
+     equivalent_to = [effect_onto.Effect &
+     ((effect_onto.effectInvolvesSubstance.some(
+     substance_onto.hasSpecificTask.some(substance_onto.ScrubbingAgent)) &
+     effect_onto.effectInvolvesEquipmentEntity.some(equipment_onto.WetScrubberEntity &
+     equipment_onto.hasFixture.some(
+     equipment_onto.LiquidDistributor) &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.ModeIndependent)) &
+     effect_onto.effectInvolvesSubstance.some(
+     substance_onto.hasStateOfAggregation.some(substance_onto.Liquid)) &
+     effect_onto.isEffectOfDeviation.some(deviation_onto.NoFlow))
+     |
+     ((effect_onto.effectInvolvesSubstance.some(
+     substance_onto.hasSpecificTask.some(substance_onto.ScrubbingAgent)) &
+     effect_onto.effectInvolvesEquipmentEntity.some(equipment_onto.WetScrubberEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.ModeIndependent)) &
+     effect_onto.effectImpliedByCause.some(LossOfInflow |
+     BlockedInflowLine) &
+     effect_onto.effectInvolvesSubstance.some(
+     substance_onto.hasStateOfAggregation.some(substance_onto.Liquid)))))
+     ]
+    class InsufficientGasPurification(effect_onto.Effect):
+     equivalent_to = [effect_onto.Effect &
+     (effect_onto.effectInvolvesEquipmentEntity.some(equipment_onto.WetScrubberEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.ModeIndependent)) &
+     effect_onto.effectInvolvesSubstance.some(
+     substance_onto.hasStateOfAggregation.some(substance_onto.Liquid |
+     substance_onto.Multiphase)) &
+     effect_onto.isEffectOfDeviation.some(deviation_onto.OtherThanComposition))
+     ]
+    class FloodedPackedBed(effect_onto.Effect):
+     equivalent_to = [effect_onto.Effect &
+     (effect_onto.effectInvolvesEquipmentEntity.some(equipment_onto.WetScrubberEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.ModeIndependent)) &
+     effect_onto.effectInvolvesSubstance.some(
+     substance_onto.hasStateOfAggregation.some(substance_onto.Liquid)) &
+     effect_onto.isEffectOfDeviation.some(deviation_onto.HighLevel))
+     ]
+    class AbnormalOperationCondition(effect_onto.Effect):
+     equivalent_to = [effect_onto.Effect &
+     (effect_onto.effectInvolvesEquipmentEntity.some(equipment_onto.WetScrubberEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.ModeIndependent)) &
+     effect_onto.isEffectOfDeviation.some(deviation_onto.HighTemperature |
+     deviation_onto.LowTemperature |
+     deviation_onto.LowPressure |
+     deviation_onto.HighPressure |
+     deviation_onto.HighFlow |
+     deviation_onto.LowFlow |
+     deviation_onto.HighLevel |
+     deviation_onto.OtherThanComposition))
+     ] 
+     
+    
 #%% Appendix N - Ontology for Effects
-
-class PumpBreakdown(Consequence):
- equivalent_to = [Consequence &
- ((isConsequenceOfEffect.some(effect_onto.IncreasedWear |
- effect_onto.Cavitation |
- effect_onto.PumpRunningDry))
- |
- # Because of this restriction DangerOfBleve and PumpBreakdown do not occur simulatenously
- (isConsequenceOfEffect.some(effect_onto.Overheating) & isConsequenceOfDeviation.some(deviation_onto.HighTemperature)))]
-PumpBreakdown.comment = ["'Failure' when equipment condition reaches an unacceptable level but still operating",
- "'Breakdown' not functioning anymore",
-"There is also specific definition of the concept in the compressor_onto"]
-class CompressorBreakdown(Consequence):
- equivalent_to = [Consequence &
- (consequenceInvolvesEquipmentEntity.some(equipment_onto.CompressorEntity) &
- isConsequenceOfEffect.some(effect_onto.Overheating | effect_onto.ExcessiveDischargeTemperature |
- effect_onto.IncreasedOilDischarge | effect_onto.LiquidSlugging))]
-class ProductionDowntime(Consequence):
- equivalent_to = [Consequence &
- (isConsequenceOfEffect.some(effect_onto.CompressorNotOperating | effect_onto.PumpDeliversNoLiquid |
- effect_onto.InsufficientFilling | effect_onto.EmptyingOfContainer)
- |
- (isConsequenceOfDeviation.some(deviation_onto.NoFlow) & consequenceInvolvesEquipmentEntity.some(equipment_onto.SinkEntity))
- |
- ((isConsequenceOfDeviation.some(deviation_onto.LowLevel) &
- consequenceInvolvesEquipmentEntity.some(
- equipment_onto.hasApparatus.some(equipment_onto.AtmosphericStorageTank | equipment_onto.PressureVessel))
- ) &
- isSubsequentConsequence.some(PumpBreakdown))
- |
- isSubsequentConsequence.some(PumpBreakdown | CompressorBreakdown)
- |
- (consequenceImpliedByCause.some(causes_onto.BlockedOutflowLine) &
- isConsequenceOfDeviation.some(deviation_onto.NoFlow) &
- consequenceInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity))
- |
- (consequenceImpliedByCause.some(causes_onto.LossOfInflow | causes_onto.ValveWronglyClosed |
- causes_onto.IncorrectFilling | causes_onto.ClosedInletValve) &
- isConsequenceOfEffect.some(effect_onto.EmptyingOfContainer))
- |
- (isConsequenceOfEffect.some(effect_onto.LossOfHeatTransfer) &
- consequenceInvolvesEquipmentEntity.some(equipment_onto.SteamDrivenReboilerEntity)))]
-ProductionDowntime.comment = ["There is also specific definition of the concept in compressor_onto"]
-class ReductionOfCoolingCapacity(Consequence):
-  equivalent_to = [Consequence &
-  (isConsequenceOfEffect.some(effect_onto.LossOfHeatTransfer) &
-  consequenceInvolvesSubstance.some(substance_onto.hasSpecificTask.some(substance_onto.Refrigerant)))]
-class PROPAGATED_CONSEQUENCE(Consequence):
- equivalent_to = [Consequence &
- ((consequenceImpliedByCause.some(causes_onto.IncorrectSetPointControlValve | causes_onto.ConfusionOfSubstances |
- causes_onto.ValveWronglyOpened | causes_onto.InadvertentContamination | causes_onto.BypassOpened |
- causes_onto.ReducedFlowArea))
- |
- (consequenceImpliedByCause.some(causes_onto.ExcessiveInflow) &
- consequenceInvolvesEquipmentEntity.some(equipment_onto.InertgasBlanketingEntity))
- |
- (isConsequenceOfDeviation.some(deviation_onto.HighPressure | deviation_onto.LowFlow | deviation_onto.HighFlow |
- deviation_onto.NoFlow | deviation_onto.OtherThanComposition) &
- consequenceInvolvesEquipmentEntity.some(equipment_onto.InertgasBlanketingEntity))
- |
- (consequenceImpliedByCause.some(causes_onto.WrongTankLinedUp) &
- consequenceInvolvesEquipmentEntity.some(equipment_onto.TankTruckEntity))
- |
- (isConsequenceOfEffect.some(effect_onto.IncompleteEvaporation | effect_onto.AbnormalEvaporation) &
- consequenceInvolvesEquipmentEntity.some(equipment_onto.SteamDrivenReboilerEntity))
- |
- (isConsequenceOfDeviation.some(deviation_onto.LowTemperature) &
- consequenceInvolvesEquipmentEntity.some(equipment_onto.SteamDrivenReboilerEntity))
- |
- (isConsequenceOfDeviation.some(deviation_onto.HighPressure) & consequenceImpliedByCause.some(causes_onto.InternalLeakage))
- |
- (consequenceImpliedByCause.some(causes_onto.IncreasedInletPressure) &
- consequenceInvolvesEquipmentEntity.some(equipment_onto.InertgasBlanketingEntity))
- |
- (isConsequenceOfEffect.some(effect_onto.InsufficientInertization) &
- consequenceInvolvesEquipmentEntity.some(equipment_onto.InertgasBlanketingEntity))
- |
- (consequenceInvolvesEquipmentEntity.some(equipment_onto.hasPiping.some(equipment_onto.TankTruckHose)) &
- consequenceImpliedByCause.some(causes_onto.ContaminationInUnloadingLines))
- |
- (consequenceInvolvesEquipmentEntity.some(equipment_onto.PumpEntity) &
- consequenceImpliedByCause.some(causes_onto.PumpIncorrectlySet | causes_onto.WrongImpeller))
- |
- (consequenceInvolvesEquipmentEntity.some(equipment_onto.SteamDrivenReboilerEntity) &
- isConsequenceOfEffect.some(effect_onto.IncreasedHeatingCapacity))
- |
- (isConsequenceOfDeviation.some(deviation_onto.NoFlow) &
- consequenceImpliedByCause.some(causes_onto.ValveWronglyClosed | causes_onto.ValveIntactUnintentionallyClosed |
- causes_onto.ClosedInletValve | causes_onto.MissingImpeller |
- causes_onto.ImpellerFault | causes_onto.EntrainedAir))
- |
- (isConsequenceOfDeviation.some(deviation_onto.OtherThanComposition) &
- consequenceImpliedByCause.some(causes_onto.EntrainedAir))
- |
- (isConsequenceOfDeviation.some(deviation_onto.NoFlow | deviation_onto.LowFlow) &
- consequenceInvolvesEquipmentEntity.some(equipment_onto.SourceEntity | equipment_onto.ConnectionPipeEntity))
- |
- (isConsequenceOfDeviation.some(deviation_onto.HighPressure | deviation_onto.HighTemperature) &
- consequenceInvolvesEquipmentEntity.some(equipment_onto.SteamDrivenReboilerEntity))
- |
- (isConsequenceOfDeviation.some(deviation_onto.NoFlow) &
- consequenceInvolvesEquipmentEntity.some(equipment_onto.ValveEntity) &
- consequenceImpliedByCause.some(causes_onto.WrongMountingOfNonReturnValve)))
- |
- (consequenceInvolvesEquipmentEntity.some(equipment_onto.SourceEntity) &
- isConsequenceOfDeviation.some(deviation_onto.OtherThanComposition) &
- consequenceImpliedByCause.some(causes_onto.InadvertentContamination |
- causes_onto.OtherSubstanceFromUpstream))
- ]
-
-
-
-class PoorProductQuality(Consequence):
- equivalent_to = [Consequence &
- ((consequenceInvolvesSubstance.some(
- substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium)) &
- consequenceInvolvesEquipmentEntity.some((equipment_onto.StorageTankEntity |
- equipment_onto.PressureReceiverEntity |
- equipment_onto.StabilizerColumnEntity |
- equipment_onto.DistillationColumnEntity |
- equipment_onto.PlateHeatExchangerEntity |
- equipment_onto.PressureVesselEntity |
- equipment_onto.ShellTubeHeatExchangerEntity |
- equipment_onto.ShellTubeEvaporatorEntity) &
- equipment_onto.hasIntendedFunction.some(
- process_onto.ModeIndependent)) &
- consequenceImpliedByCause.some(causes_onto.InadvertentContamination))
- |
- (isConsequenceOfEffect.some(effect_onto.BacteriaGrowth) &
- consequenceInvolvesEquipmentEntity.some(
- equipment_onto.hasIntendedFunction.some(process_onto.Storing)))
- |
- (consequenceImpliedByCause.some(causes_onto.InadvertentContamination) &
- consequenceInvolvesEquipmentEntity.some(
- equipment_onto.hasIntendedFunction.some(process_onto.Filling)))
- |
- (isConsequenceOfEffect.some(effect_onto.AccumulationOfImpurities) &
- consequenceInvolvesEquipmentEntity.some(
- equipment_onto.hasIntendedFunction.some(process_onto.Filling |
- process_onto.ModeIndependent)))
- |
- (consequenceInvolvesSubstance.some(
- substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium)) &
- consequenceInvolvesEquipmentEntity.some(equipment_onto.SettlingTankEntity &
- equipment_onto.hasIntendedFunction.some(
- process_onto.Separating)) &
- isConsequenceOfEffect.some(effect_onto.PoorSeparation))
- |
- (isConsequenceOfDeviation.some(deviation_onto.OtherThanComposition) &
- consequenceImpliedByCause.some(causes_onto.InternalLeakage))
- )]
-class EmergenceOfIgnitionSource(Consequence):
- equivalent_to = [Consequence &
- isConsequenceOfEffect.some(effect_onto.GenerationOfElectrostaticCharge)]
-class LossOfPrimaryContainment(Consequence):
- equivalent_to = [Consequence &
- ((isConsequenceOfEffect.some(effect_onto.FatigueFracture |
- effect_onto.Fracture |
- effect_onto.LossOfMechanicalIntegrity |
- effect_onto.PotentialViolentReactionWithOxidizers |
- effect_onto.BrittleFracture |
- effect_onto.DrainlineFracture |
- effect_onto.GasDispersion |
- effect_onto.PoolFormation)
- )
- |
- (isConsequenceOfEffect.some(effect_onto.Overfilling) &
- consequenceInvolvesEquipmentEntity.some(
- equipment_onto.hasApparatus.some(equipment_onto.AtmosphericStorageTank))))
- ]
-LossOfPrimaryContainment.comment = ["LOPC is defined in API Guide to Reporting Process Safety Events, Version 3.0"]
-class FireHazard(Consequence):
- equivalent_to = [Consequence &
- (consequenceRequiresBoundaryCondition.some(boundary_onto.SufficientOxygenAvailable) &
- consequenceRequiresBoundaryCondition.some(boundary_onto.DirectIgnition) &
- isSubsequentConsequence.some(LossOfPrimaryContainment) &
- consequenceInvolvesSubstance.some(
- substance_onto.hasHazardClass.some(
- substance_onto.FlammableLiquidCategory1 |
- substance_onto.FlammableLiquidCategory2 |
- substance_onto.FlammableLiquidCategory3
- )))]
-class RiskOfExplosiveAtmosphere(Consequence):
- equivalent_to = [Consequence &
- (
- (consequenceRequiresBoundaryCondition.some(boundary_onto.LocatedOutside |
- boundary_onto.SufficientOxygenAvailable) &
- consequenceRequiresBoundaryCondition.some(boundary_onto.DelayedIgnition) &
- isSubsequentConsequence.some(LossOfPrimaryContainment) &
- consequenceInvolvesSubstance.some(
- substance_onto.hasHazardClass.some(
- substance_onto.FlammableLiquidCategory1 |
- substance_onto.FlammableLiquidCategory2 |
- substance_onto.FlammableLiquidCategory3 |
- substance_onto.FlammableGasCategory1 |
- substance_onto.FlammableGasCategory2 |
- substance_onto.PyrophoricGasCategory1 |
- substance_onto.AerosolCategory1 |
- substance_onto.AerosolCategory2
- )
- ))
- |
- (consequenceRequiresBoundaryCondition.some(boundary_onto.LocatedOutside |
- boundary_onto.SufficientOxygenAvailable) &
- isSubsequentConsequence.some(LossOfPrimaryContainment) &
- consequenceRequiresBoundaryCondition.some(boundary_onto.DelayedIgnition) &
- consequenceInvolvesSubstance.some(
- substance_onto.hasStabilityReactivityInformation.some(
- substance_onto.FormsExplosiveMixtureWithAir
- )))
- |
- (isConsequenceOfEffect.some(effect_onto.InsufficientInertization) &
- consequenceInvolvesEquipmentEntity.some(equipment_onto.AtmosphericStorageTank | equipment_onto.SettlingTankEntity) &
- consequenceRequiresBoundaryCondition.some(boundary_onto.IntroductionOfAir) &
- consequenceInvolvesSubstance.some(
- substance_onto.hasHazardClass.some(
- substance_onto.FlammableLiquidCategory1 |
- substance_onto.FlammableLiquidCategory2 |
- substance_onto.FlammableLiquidCategory3 |
- substance_onto.FlammableGasCategory1 |
- substance_onto.FlammableGasCategory2 |
- substance_onto.PyrophoricGasCategory1 |
- substance_onto.AerosolCategory1 |
- substance_onto.AerosolCategory2)))
- |
- (consequenceImpliedByCause.some(causes_onto.InternalLeakage) &
- consequenceInvolvesSubstance.some(
- substance_onto.hasStabilityReactivityInformation.some(substance_onto.FormsExplosiveMixturesWithOxidizingAgents))))]
-RiskOfExplosiveAtmosphere.comment = ["Eindringen luft, und betriebsdruck kleiner umgebungsdruck",
- "https://www.ketopumps.com/media/1342/keto-green-paper-centrifugal-pump-explosions.pdf"]
-
-class DangerOfBleve(Consequence):
- equivalent_to = [Consequence &
- (isConsequenceOfEffect.some(effect_onto.FluidCirculatesInsidePump) &
- consequenceImpliedByCause.some(causes_onto.DeadHeadingOfPump) &
- consequenceInvolvesEquipmentEntity.some(equipment_onto.hasMaterialTransferEquipment.some(equipment_onto.CentrifugalPump)))]
-DangerOfBleve.comment = ["physical explosion"]
-class NoStabilization(consequence_onto.Consequence):
- equivalent_to = [consequence_onto.Consequence &
- consequence_onto.consequenceInvolvesEquipmentEntity.some(equipment_onto.StabilizerColumnEntity) &
- consequence_onto.isConsequenceOfEffect.some(effect_onto.LossOfHeatTransfer)]
-class PoorStripping(consequence_onto.Consequence):
- equivalent_to = [consequence_onto.Consequence & consequence_onto.isConsequenceOfEffect.some(ColumnFlooded)]
-class PoorStabilization(consequence_onto.Consequence):
- equivalent_to = [consequence_onto.Consequence &
- (consequence_onto.consequenceInvolvesEquipmentEntity.some(equipment_onto.StabilizerColumnEntity) &
- consequence_onto.isConsequenceOfEffect.some(effect_onto.ReducedHeatingCapacity |
- effect_onto.LossOfHeatTransfer |
- effect_onto.IncompleteEvaporation)
- )]
-class ReductionOfCoolingCapacity(consequence_onto.Consequence):
- equivalent_to = [consequence_onto.Consequence &
- ((consequence_onto.isConsequenceOfEffect.some(LossOfHeatTransfer |
- IncompleteEvaporation) &
- consequence_onto.consequenceInvolvesSubstance.some(substance_onto.hasSpecificTask.some(substance_onto.Refrigerant)))
- |
- (
- consequence_onto.consequenceInvolvesEquipmentEntity.some(equipment_onto.PressureReceiverEntity) &
- consequence_onto.consequenceInvolvesSubstance.some(
- substance_onto.hasSpecificTask.some(substance_onto.Refrigerant)) &
- consequence_onto.isConsequenceOfEffect.some(effect_onto.AbnormalEvaporation))
- )] 
-
+    
+    class PumpBreakdown(Consequence):
+     equivalent_to = [Consequence &
+     ((isConsequenceOfEffect.some(effect_onto.IncreasedWear |
+     effect_onto.Cavitation |
+     effect_onto.PumpRunningDry))
+     |
+     # Because of this restriction DangerOfBleve and PumpBreakdown do not occur simulatenously
+     (isConsequenceOfEffect.some(effect_onto.Overheating) & isConsequenceOfDeviation.some(deviation_onto.HighTemperature)))]
+    PumpBreakdown.comment = ["'Failure' when equipment condition reaches an unacceptable level but still operating",
+     "'Breakdown' not functioning anymore",
+    "There is also specific definition of the concept in the compressor_onto"]
+    class CompressorBreakdown(Consequence):
+     equivalent_to = [Consequence &
+     (consequenceInvolvesEquipmentEntity.some(equipment_onto.CompressorEntity) &
+     isConsequenceOfEffect.some(effect_onto.Overheating | effect_onto.ExcessiveDischargeTemperature |
+     effect_onto.IncreasedOilDischarge | effect_onto.LiquidSlugging))]
+    class ProductionDowntime(Consequence):
+     equivalent_to = [Consequence &
+     (isConsequenceOfEffect.some(effect_onto.CompressorNotOperating | effect_onto.PumpDeliversNoLiquid |
+     effect_onto.InsufficientFilling | effect_onto.EmptyingOfContainer)
+     |
+     (isConsequenceOfDeviation.some(deviation_onto.NoFlow) & consequenceInvolvesEquipmentEntity.some(equipment_onto.SinkEntity))
+     |
+     ((isConsequenceOfDeviation.some(deviation_onto.LowLevel) &
+     consequenceInvolvesEquipmentEntity.some(
+     equipment_onto.hasApparatus.some(equipment_onto.AtmosphericStorageTank | equipment_onto.PressureVessel))
+     ) &
+     isSubsequentConsequence.some(PumpBreakdown))
+     |
+     isSubsequentConsequence.some(PumpBreakdown | CompressorBreakdown)
+     |
+     (consequenceImpliedByCause.some(causes_onto.BlockedOutflowLine) &
+     isConsequenceOfDeviation.some(deviation_onto.NoFlow) &
+     consequenceInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity))
+     |
+     (consequenceImpliedByCause.some(causes_onto.LossOfInflow | causes_onto.ValveWronglyClosed |
+     causes_onto.IncorrectFilling | causes_onto.ClosedInletValve) &
+     isConsequenceOfEffect.some(effect_onto.EmptyingOfContainer))
+     |
+     (isConsequenceOfEffect.some(effect_onto.LossOfHeatTransfer) &
+     consequenceInvolvesEquipmentEntity.some(equipment_onto.SteamDrivenReboilerEntity)))]
+    ProductionDowntime.comment = ["There is also specific definition of the concept in compressor_onto"]
+    class ReductionOfCoolingCapacity(Consequence):
+      equivalent_to = [Consequence &
+      (isConsequenceOfEffect.some(effect_onto.LossOfHeatTransfer) &
+      consequenceInvolvesSubstance.some(substance_onto.hasSpecificTask.some(substance_onto.Refrigerant)))]
+    class PROPAGATED_CONSEQUENCE(Consequence):
+     equivalent_to = [Consequence &
+     ((consequenceImpliedByCause.some(causes_onto.IncorrectSetPointControlValve | causes_onto.ConfusionOfSubstances |
+     causes_onto.ValveWronglyOpened | causes_onto.InadvertentContamination | causes_onto.BypassOpened |
+     causes_onto.ReducedFlowArea))
+     |
+     (consequenceImpliedByCause.some(causes_onto.ExcessiveInflow) &
+     consequenceInvolvesEquipmentEntity.some(equipment_onto.InertgasBlanketingEntity))
+     |
+     (isConsequenceOfDeviation.some(deviation_onto.HighPressure | deviation_onto.LowFlow | deviation_onto.HighFlow |
+     deviation_onto.NoFlow | deviation_onto.OtherThanComposition) &
+     consequenceInvolvesEquipmentEntity.some(equipment_onto.InertgasBlanketingEntity))
+     |
+     (consequenceImpliedByCause.some(causes_onto.WrongTankLinedUp) &
+     consequenceInvolvesEquipmentEntity.some(equipment_onto.TankTruckEntity))
+     |
+     (isConsequenceOfEffect.some(effect_onto.IncompleteEvaporation | effect_onto.AbnormalEvaporation) &
+     consequenceInvolvesEquipmentEntity.some(equipment_onto.SteamDrivenReboilerEntity))
+     |
+     (isConsequenceOfDeviation.some(deviation_onto.LowTemperature) &
+     consequenceInvolvesEquipmentEntity.some(equipment_onto.SteamDrivenReboilerEntity))
+     |
+     (isConsequenceOfDeviation.some(deviation_onto.HighPressure) & consequenceImpliedByCause.some(causes_onto.InternalLeakage))
+     |
+     (consequenceImpliedByCause.some(causes_onto.IncreasedInletPressure) &
+     consequenceInvolvesEquipmentEntity.some(equipment_onto.InertgasBlanketingEntity))
+     |
+     (isConsequenceOfEffect.some(effect_onto.InsufficientInertization) &
+     consequenceInvolvesEquipmentEntity.some(equipment_onto.InertgasBlanketingEntity))
+     |
+     (consequenceInvolvesEquipmentEntity.some(equipment_onto.hasPiping.some(equipment_onto.TankTruckHose)) &
+     consequenceImpliedByCause.some(causes_onto.ContaminationInUnloadingLines))
+     |
+     (consequenceInvolvesEquipmentEntity.some(equipment_onto.PumpEntity) &
+     consequenceImpliedByCause.some(causes_onto.PumpIncorrectlySet | causes_onto.WrongImpeller))
+     |
+     (consequenceInvolvesEquipmentEntity.some(equipment_onto.SteamDrivenReboilerEntity) &
+     isConsequenceOfEffect.some(effect_onto.IncreasedHeatingCapacity))
+     |
+     (isConsequenceOfDeviation.some(deviation_onto.NoFlow) &
+     consequenceImpliedByCause.some(causes_onto.ValveWronglyClosed | causes_onto.ValveIntactUnintentionallyClosed |
+     causes_onto.ClosedInletValve | causes_onto.MissingImpeller |
+     causes_onto.ImpellerFault | causes_onto.EntrainedAir))
+     |
+     (isConsequenceOfDeviation.some(deviation_onto.OtherThanComposition) &
+     consequenceImpliedByCause.some(causes_onto.EntrainedAir))
+     |
+     (isConsequenceOfDeviation.some(deviation_onto.NoFlow | deviation_onto.LowFlow) &
+     consequenceInvolvesEquipmentEntity.some(equipment_onto.SourceEntity | equipment_onto.ConnectionPipeEntity))
+     |
+     (isConsequenceOfDeviation.some(deviation_onto.HighPressure | deviation_onto.HighTemperature) &
+     consequenceInvolvesEquipmentEntity.some(equipment_onto.SteamDrivenReboilerEntity))
+     |
+     (isConsequenceOfDeviation.some(deviation_onto.NoFlow) &
+     consequenceInvolvesEquipmentEntity.some(equipment_onto.ValveEntity) &
+     consequenceImpliedByCause.some(causes_onto.WrongMountingOfNonReturnValve)))
+     |
+     (consequenceInvolvesEquipmentEntity.some(equipment_onto.SourceEntity) &
+     isConsequenceOfDeviation.some(deviation_onto.OtherThanComposition) &
+     consequenceImpliedByCause.some(causes_onto.InadvertentContamination |
+     causes_onto.OtherSubstanceFromUpstream))
+     ]
+    
+    
+    
+    class PoorProductQuality(Consequence):
+     equivalent_to = [Consequence &
+     ((consequenceInvolvesSubstance.some(
+     substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium)) &
+     consequenceInvolvesEquipmentEntity.some((equipment_onto.StorageTankEntity |
+     equipment_onto.PressureReceiverEntity |
+     equipment_onto.StabilizerColumnEntity |
+     equipment_onto.DistillationColumnEntity |
+     equipment_onto.PlateHeatExchangerEntity |
+     equipment_onto.PressureVesselEntity |
+     equipment_onto.ShellTubeHeatExchangerEntity |
+     equipment_onto.ShellTubeEvaporatorEntity) &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.ModeIndependent)) &
+     consequenceImpliedByCause.some(causes_onto.InadvertentContamination))
+     |
+     (isConsequenceOfEffect.some(effect_onto.BacteriaGrowth) &
+     consequenceInvolvesEquipmentEntity.some(
+     equipment_onto.hasIntendedFunction.some(process_onto.Storing)))
+     |
+     (consequenceImpliedByCause.some(causes_onto.InadvertentContamination) &
+     consequenceInvolvesEquipmentEntity.some(
+     equipment_onto.hasIntendedFunction.some(process_onto.Filling)))
+     |
+     (isConsequenceOfEffect.some(effect_onto.AccumulationOfImpurities) &
+     consequenceInvolvesEquipmentEntity.some(
+     equipment_onto.hasIntendedFunction.some(process_onto.Filling |
+     process_onto.ModeIndependent)))
+     |
+     (consequenceInvolvesSubstance.some(
+     substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium)) &
+     consequenceInvolvesEquipmentEntity.some(equipment_onto.SettlingTankEntity &
+     equipment_onto.hasIntendedFunction.some(
+     process_onto.Separating)) &
+     isConsequenceOfEffect.some(effect_onto.PoorSeparation))
+     |
+     (isConsequenceOfDeviation.some(deviation_onto.OtherThanComposition) &
+     consequenceImpliedByCause.some(causes_onto.InternalLeakage))
+     )]
+    class EmergenceOfIgnitionSource(Consequence):
+     equivalent_to = [Consequence &
+     isConsequenceOfEffect.some(effect_onto.GenerationOfElectrostaticCharge)]
+    class LossOfPrimaryContainment(Consequence):
+     equivalent_to = [Consequence &
+     ((isConsequenceOfEffect.some(effect_onto.FatigueFracture |
+     effect_onto.Fracture |
+     effect_onto.LossOfMechanicalIntegrity |
+     effect_onto.PotentialViolentReactionWithOxidizers |
+     effect_onto.BrittleFracture |
+     effect_onto.DrainlineFracture |
+     effect_onto.GasDispersion |
+     effect_onto.PoolFormation)
+     )
+     |
+     (isConsequenceOfEffect.some(effect_onto.Overfilling) &
+     consequenceInvolvesEquipmentEntity.some(
+     equipment_onto.hasApparatus.some(equipment_onto.AtmosphericStorageTank))))
+     ]
+    LossOfPrimaryContainment.comment = ["LOPC is defined in API Guide to Reporting Process Safety Events, Version 3.0"]
+    class FireHazard(Consequence):
+     equivalent_to = [Consequence &
+     (consequenceRequiresBoundaryCondition.some(boundary_onto.SufficientOxygenAvailable) &
+     consequenceRequiresBoundaryCondition.some(boundary_onto.DirectIgnition) &
+     isSubsequentConsequence.some(LossOfPrimaryContainment) &
+     consequenceInvolvesSubstance.some(
+     substance_onto.hasHazardClass.some(
+     substance_onto.FlammableLiquidCategory1 |
+     substance_onto.FlammableLiquidCategory2 |
+     substance_onto.FlammableLiquidCategory3
+     )))]
+    class RiskOfExplosiveAtmosphere(Consequence):
+     equivalent_to = [Consequence &
+     (
+     (consequenceRequiresBoundaryCondition.some(boundary_onto.LocatedOutside |
+     boundary_onto.SufficientOxygenAvailable) &
+     consequenceRequiresBoundaryCondition.some(boundary_onto.DelayedIgnition) &
+     isSubsequentConsequence.some(LossOfPrimaryContainment) &
+     consequenceInvolvesSubstance.some(
+     substance_onto.hasHazardClass.some(
+     substance_onto.FlammableLiquidCategory1 |
+     substance_onto.FlammableLiquidCategory2 |
+     substance_onto.FlammableLiquidCategory3 |
+     substance_onto.FlammableGasCategory1 |
+     substance_onto.FlammableGasCategory2 |
+     substance_onto.PyrophoricGasCategory1 |
+     substance_onto.AerosolCategory1 |
+     substance_onto.AerosolCategory2
+     )
+     ))
+     |
+     (consequenceRequiresBoundaryCondition.some(boundary_onto.LocatedOutside |
+     boundary_onto.SufficientOxygenAvailable) &
+     isSubsequentConsequence.some(LossOfPrimaryContainment) &
+     consequenceRequiresBoundaryCondition.some(boundary_onto.DelayedIgnition) &
+     consequenceInvolvesSubstance.some(
+     substance_onto.hasStabilityReactivityInformation.some(
+     substance_onto.FormsExplosiveMixtureWithAir
+     )))
+     |
+     (isConsequenceOfEffect.some(effect_onto.InsufficientInertization) &
+     consequenceInvolvesEquipmentEntity.some(equipment_onto.AtmosphericStorageTank | equipment_onto.SettlingTankEntity) &
+     consequenceRequiresBoundaryCondition.some(boundary_onto.IntroductionOfAir) &
+     consequenceInvolvesSubstance.some(
+     substance_onto.hasHazardClass.some(
+     substance_onto.FlammableLiquidCategory1 |
+     substance_onto.FlammableLiquidCategory2 |
+     substance_onto.FlammableLiquidCategory3 |
+     substance_onto.FlammableGasCategory1 |
+     substance_onto.FlammableGasCategory2 |
+     substance_onto.PyrophoricGasCategory1 |
+     substance_onto.AerosolCategory1 |
+     substance_onto.AerosolCategory2)))
+     |
+     (consequenceImpliedByCause.some(causes_onto.InternalLeakage) &
+     consequenceInvolvesSubstance.some(
+     substance_onto.hasStabilityReactivityInformation.some(substance_onto.FormsExplosiveMixturesWithOxidizingAgents))))]
+    RiskOfExplosiveAtmosphere.comment = ["Eindringen luft, und betriebsdruck kleiner umgebungsdruck",
+     "https://www.ketopumps.com/media/1342/keto-green-paper-centrifugal-pump-explosions.pdf"]
+    
+    class DangerOfBleve(Consequence):
+     equivalent_to = [Consequence &
+     (isConsequenceOfEffect.some(effect_onto.FluidCirculatesInsidePump) &
+     consequenceImpliedByCause.some(causes_onto.DeadHeadingOfPump) &
+     consequenceInvolvesEquipmentEntity.some(equipment_onto.hasMaterialTransferEquipment.some(equipment_onto.CentrifugalPump)))]
+    DangerOfBleve.comment = ["physical explosion"]
+    
+    
+    class NoStabilization(consequence_onto.Consequence):
+     equivalent_to = [consequence_onto.Consequence &
+     consequence_onto.consequenceInvolvesEquipmentEntity.some(equipment_onto.StabilizerColumnEntity) &
+     consequence_onto.isConsequenceOfEffect.some(effect_onto.LossOfHeatTransfer)]
+    class PoorStripping(consequence_onto.Consequence):
+     equivalent_to = [consequence_onto.Consequence & consequence_onto.isConsequenceOfEffect.some(ColumnFlooded)]
+    class PoorStabilization(consequence_onto.Consequence):
+     equivalent_to = [consequence_onto.Consequence &
+     (consequence_onto.consequenceInvolvesEquipmentEntity.some(equipment_onto.StabilizerColumnEntity) &
+     consequence_onto.isConsequenceOfEffect.some(effect_onto.ReducedHeatingCapacity |
+     effect_onto.LossOfHeatTransfer |
+     effect_onto.IncompleteEvaporation)
+     )]
+    class ReductionOfCoolingCapacity(consequence_onto.Consequence):
+     equivalent_to = [consequence_onto.Consequence &
+     ((consequence_onto.isConsequenceOfEffect.some(LossOfHeatTransfer |
+     IncompleteEvaporation) &
+     consequence_onto.consequenceInvolvesSubstance.some(substance_onto.hasSpecificTask.some(substance_onto.Refrigerant)))
+     |
+     (
+     consequence_onto.consequenceInvolvesEquipmentEntity.some(equipment_onto.PressureReceiverEntity) &
+     consequence_onto.consequenceInvolvesSubstance.some(
+     substance_onto.hasSpecificTask.some(substance_onto.Refrigerant)) &
+     consequence_onto.isConsequenceOfEffect.some(effect_onto.AbnormalEvaporation))
+     )] 
+    
 
 
 
 
 #%% Appendix O - Ontology for Risks
 
-class Likelihood(Thing):
- pass
-class likelihoodInvolvesCause(Likelihood >> causes_onto.Cause):
- pass
-class likelihoodInvolvesUnderlyingcause(Likelihood >> causes_onto.UnderlyingCause):
- pass
-class likelihoodInvolvesEquipment(Likelihood >> equipment_onto.EquipmentEntity):
- pass
-class likelihoodInvolvesDeviation(Likelihood >> deviation_onto.Deviation):
- pass
-class likelihoodRequiresBoundaryCondition(Likelihood >> boundary_onto.BoundaryCondition):
- pass
-class likelihoodInvolvesSiteInformation(Likelihood >> site_information.AmbientInformation):
- pass
-class SeverityCategory(Thing):
- pass
-class isSeverityOfConsequence(SeverityCategory >> consequence_onto.Consequence):
- pass
-class severityInvolvesSubstance(SeverityCategory >> substance_onto.Substance):
- pass
-class severityInvolvesEquipment(SeverityCategory >> equipment_onto.EquipmentEntity):
- pass
-class severityRequiresBoundaryCondition(SeverityCategory >> boundary_onto.BoundaryCondition):
- pass
-class RiskCategory(Thing):
- pass
-class involvesSeverity(RiskCategory >> SeverityCategory):
- pass
-class involvesLikelihood(RiskCategory >> Likelihood):
- pass
-class VeryUnlikely(Likelihood):
- pass
-
-VeryUnlikely.comment = ["corresponds to category F5", "10^-6 - 10^-4"]
-
-class Unlikely(Likelihood):
- equivalent_to = [Likelihood &
- (
- (likelihoodInvolvesUnderlyingcause.some(causes_onto.ValveFailure) &
- likelihoodInvolvesCause.some(causes_onto.ClosedInletValve))
- |
- (likelihoodInvolvesUnderlyingcause.some(causes_onto.ValveFailure) &
- likelihoodInvolvesCause.some(causes_onto.ClosedOutletValve))
- |
- likelihoodInvolvesCause.some(causes_onto.BlockedOutflowLine)
- |
- (likelihoodInvolvesCause.some(causes_onto.MechanicalFailureOfSupport) &
- likelihoodInvolvesEquipment.some(
- equipment_onto.hasApparatus.some(equipment_onto.AtmosphericStorageTank)))
- |
- likelihoodInvolvesUnderlyingcause.some(causes_onto.AbnormallyHotIntake)
- |
- (likelihoodInvolvesUnderlyingcause.some(causes_onto.SolarRadiation) &
- likelihoodInvolvesCause.some(causes_onto.ThermalExpansion |
- causes_onto.AbnormalHeatInput) &
- likelihoodInvolvesDeviation.some(deviation_onto.HighPressure) &
- likelihoodInvolvesEquipment.some(
- equipment_onto.hasApparatus.some(equipment_onto.PressureVessel))))]
- 
-Unlikely.comment = ["corresponds to category F4", "10^-4 - 10^-3"]
-
-class Possible(Likelihood):
- equivalent_to = [Likelihood &
- (
-  (
+with risk_assessment_onto:
+    
+    class Likelihood(Thing):
+     pass
+    class likelihoodInvolvesCause(Likelihood >> causes_onto.Cause):
+     pass
+    class likelihoodInvolvesUnderlyingcause(Likelihood >> causes_onto.UnderlyingCause):
+     pass
+    class likelihoodInvolvesEquipment(Likelihood >> equipment_onto.EquipmentEntity):
+     pass
+    class likelihoodInvolvesDeviation(Likelihood >> deviation_onto.Deviation):
+     pass
+    class likelihoodRequiresBoundaryCondition(Likelihood >> boundary_onto.BoundaryCondition):
+     pass
+    class likelihoodInvolvesSiteInformation(Likelihood >> site_information.AmbientInformation):
+     pass
+    class SeverityCategory(Thing):
+     pass
+    class isSeverityOfConsequence(SeverityCategory >> consequence_onto.Consequence):
+     pass
+    class severityInvolvesSubstance(SeverityCategory >> substance_onto.Substance):
+     pass
+    class severityInvolvesEquipment(SeverityCategory >> equipment_onto.EquipmentEntity):
+     pass
+    class severityRequiresBoundaryCondition(SeverityCategory >> boundary_onto.BoundaryCondition):
+     pass
+    class RiskCategory(Thing):
+     pass
+    class involvesSeverity(RiskCategory >> SeverityCategory):
+     pass
+    class involvesLikelihood(RiskCategory >> Likelihood):
+     pass
+    class VeryUnlikely(Likelihood):
+     pass
+    
+    VeryUnlikely.comment = ["corresponds to category F5", "10^-6 - 10^-4"]
+    
+    class Unlikely(Likelihood):
+     equivalent_to = [Likelihood &
+     (
+     (likelihoodInvolvesUnderlyingcause.some(causes_onto.ValveFailure) &
+     likelihoodInvolvesCause.some(causes_onto.ClosedInletValve))
+     |
+     (likelihoodInvolvesUnderlyingcause.some(causes_onto.ValveFailure) &
+     likelihoodInvolvesCause.some(causes_onto.ClosedOutletValve))
+     |
+     likelihoodInvolvesCause.some(causes_onto.BlockedOutflowLine)
+     |
+     (likelihoodInvolvesCause.some(causes_onto.MechanicalFailureOfSupport) &
+     likelihoodInvolvesEquipment.some(
+     equipment_onto.hasApparatus.some(equipment_onto.AtmosphericStorageTank)))
+     |
+     likelihoodInvolvesUnderlyingcause.some(causes_onto.AbnormallyHotIntake)
+     |
+     (likelihoodInvolvesUnderlyingcause.some(causes_onto.SolarRadiation) &
+     likelihoodInvolvesCause.some(causes_onto.ThermalExpansion |
+     causes_onto.AbnormalHeatInput) &
+     likelihoodInvolvesDeviation.some(deviation_onto.HighPressure) &
+     likelihoodInvolvesEquipment.some(
+     equipment_onto.hasApparatus.some(equipment_onto.PressureVessel))))]
+     
+    Unlikely.comment = ["corresponds to category F4", "10^-4 - 10^-3"]
+    
+    class Possible(Likelihood):
+     equivalent_to = [Likelihood &
+     (
+      (
+         (likelihoodInvolvesEquipment.some(
+             equipment_onto.hasMaterialTransferEquipment.some(equipment_onto.ScrewCompressor | equipment_onto.PistonCompressor)) &
+             likelihoodInvolvesCause.some(causes_onto.MalfunctionLubricationSystem))
+             |
+             (likelihoodInvolvesEquipment.some(
+             equipment_onto.hasMaterialTransferEquipment.some(equipment_onto.PistonCompressor | equipment_onto.ScrewCompressor |
+             equipment_onto.CentrifugalPump | equipment_onto.ReciprocatingPump)) &
+             likelihoodInvolvesDeviation.some(deviation_onto.HighTemperature))
+             |
+             (likelihoodInvolvesEquipment.some(
+             equipment_onto.hasMaterialTransferEquipment.some(equipment_onto.CentrifugalPump | equipment_onto.ReciprocatingPump)) &
+             likelihoodInvolvesCause.some(causes_onto.DeadHeadingOfPump | causes_onto.OperationBelowMinimumFlowRate))
+             |
+             (likelihoodInvolvesCause.some(causes_onto.ExcessiveInflow | causes_onto.PumpIncorrectlySet) &
+             likelihoodInvolvesEquipment.some(
+             equipment_onto.hasApparatus.some(equipment_onto.AtmosphericStorageTank | equipment_onto.PressureVessel |
+             equipment_onto.OpenVessel)))
+             |
+             likelihoodInvolvesCause.some(causes_onto.PhysicalImpact | causes_onto.ControlValveFailsOpen | causes_onto.LossOfInflow |
+             causes_onto.WrongTankLinedUp | causes_onto.LeakingDrainValve |
+             causes_onto.ContaminationByWaterAndTemperatureFallsBelowFreezingPoint |
+             causes_onto.PumpingAgainstPolymerizedLine)
+             |
+             (likelihoodInvolvesCause.some(causes_onto.MechanicalFailureOfSupport) &
+             likelihoodInvolvesEquipment.some(equipment_onto.hasApparatus.some(equipment_onto.AtmosphericStorageTank)) &
+             likelihoodInvolvesSiteInformation.some(site_information.DangerOfSeismicActivity))
+             |
+             (likelihoodInvolvesDeviation.some(deviation_onto.HighCorrosion) &
+             likelihoodInvolvesUnderlyingcause.some(causes_onto.CondensationAirHumidity) &
+             likelihoodInvolvesEquipment.some(equipment_onto.StorageTankEntity))
+             |
+             (likelihoodInvolvesCause.some(causes_onto.BlockedInflowLine) &
+             likelihoodInvolvesUnderlyingcause.some(causes_onto.DepositionOfImpurities))
+             |
+             (likelihoodInvolvesCause.some(causes_onto.ThermalExpansion) &
+             likelihoodInvolvesUnderlyingcause.some(causes_onto.BlockedPipingAndHeatInput))
+             |
+             (likelihoodInvolvesCause.some(causes_onto.AbnormalHeatInput) &
+             likelihoodInvolvesUnderlyingcause.some(causes_onto.SolarRadiation))
+             |
+             (likelihoodInvolvesDeviation.some(deviation_onto.OtherThanComposition) &
+             likelihoodInvolvesCause.some(causes_onto.OtherSubstanceFromUpstream))
+           ))
+      ]
+      
+    Possible.comment = ["corresponds to category F3", "10^-3 - 10^-2"]
+    
+    
+    
+    class Occasional(Likelihood):
+     equivalent_to = [Likelihood &
+     (likelihoodInvolvesCause.some(causes_onto.PumpSealFailure)
+     |
      (likelihoodInvolvesEquipment.some(
-         equipment_onto.hasMaterialTransferEquipment.some(equipment_onto.ScrewCompressor | equipment_onto.PistonCompressor)) &
-         likelihoodInvolvesCause.some(causes_onto.MalfunctionLubricationSystem))
-         |
-         (likelihoodInvolvesEquipment.some(
-         equipment_onto.hasMaterialTransferEquipment.some(equipment_onto.PistonCompressor | equipment_onto.ScrewCompressor |
-         equipment_onto.CentrifugalPump | equipment_onto.ReciprocatingPump)) &
-         likelihoodInvolvesDeviation.some(deviation_onto.HighTemperature))
-         |
-         (likelihoodInvolvesEquipment.some(
-         equipment_onto.hasMaterialTransferEquipment.some(equipment_onto.CentrifugalPump | equipment_onto.ReciprocatingPump)) &
-         likelihoodInvolvesCause.some(causes_onto.DeadHeadingOfPump | causes_onto.OperationBelowMinimumFlowRate))
-         |
-         (likelihoodInvolvesCause.some(causes_onto.ExcessiveInflow | causes_onto.PumpIncorrectlySet) &
-         likelihoodInvolvesEquipment.some(
-         equipment_onto.hasApparatus.some(equipment_onto.AtmosphericStorageTank | equipment_onto.PressureVessel |
-         equipment_onto.OpenVessel)))
-         |
-         likelihoodInvolvesCause.some(causes_onto.PhysicalImpact | causes_onto.ControlValveFailsOpen | causes_onto.LossOfInflow |
-         causes_onto.WrongTankLinedUp | causes_onto.LeakingDrainValve |
-         causes_onto.ContaminationByWaterAndTemperatureFallsBelowFreezingPoint |
-         causes_onto.PumpingAgainstPolymerizedLine)
-         |
-         (likelihoodInvolvesCause.some(causes_onto.MechanicalFailureOfSupport) &
-         likelihoodInvolvesEquipment.some(equipment_onto.hasApparatus.some(equipment_onto.AtmosphericStorageTank)) &
-         likelihoodInvolvesSiteInformation.some(site_information.DangerOfSeismicActivity))
-         |
-         (likelihoodInvolvesDeviation.some(deviation_onto.HighCorrosion) &
-         likelihoodInvolvesUnderlyingcause.some(causes_onto.CondensationAirHumidity) &
-         likelihoodInvolvesEquipment.some(equipment_onto.StorageTankEntity))
-         |
-         (likelihoodInvolvesCause.some(causes_onto.BlockedInflowLine) &
-         likelihoodInvolvesUnderlyingcause.some(causes_onto.DepositionOfImpurities))
-         |
-         (likelihoodInvolvesCause.some(causes_onto.ThermalExpansion) &
-         likelihoodInvolvesUnderlyingcause.some(causes_onto.BlockedPipingAndHeatInput))
-         |
-         (likelihoodInvolvesCause.some(causes_onto.AbnormalHeatInput) &
-         likelihoodInvolvesUnderlyingcause.some(causes_onto.SolarRadiation))
-         |
-         (likelihoodInvolvesDeviation.some(deviation_onto.OtherThanComposition) &
-         likelihoodInvolvesCause.some(causes_onto.OtherSubstanceFromUpstream))
-       ))
-  ]
-  
-Possible.comment = ["corresponds to category F3", "10^-3 - 10^-2"]
-
-
-
-class Occasional(Likelihood):
- equivalent_to = [Likelihood &
- (likelihoodInvolvesCause.some(causes_onto.PumpSealFailure)
- |
- (likelihoodInvolvesEquipment.some(
- equipment_onto.hasApparatus.some(equipment_onto.AtmosphericStorageTank |
- equipment_onto.OpenVessel |
- equipment_onto.PressureVessel)) &
- likelihoodInvolvesCause.some(causes_onto.ExcessiveInflow |
- causes_onto.IncorrectIndicationOfFillingLevel))
- |
- (likelihoodInvolvesEquipment.some(
- equipment_onto.hasMaterialTransferEquipment.some(equipment_onto.CentrifugalPump)) &
- likelihoodInvolvesDeviation.some(deviation_onto.HighVibration))
- |
- (likelihoodInvolvesCause.some(causes_onto.WaterHammer) &
- likelihoodInvolvesUnderlyingcause.some(causes_onto.RapidlyClosingValve))
- |
- (likelihoodInvolvesEquipment.some(
- equipment_onto.hasMaterialTransferEquipment.some(equipment_onto.CentrifugalPump)) &
- likelihoodInvolvesCause.some(causes_onto.EntrainedAir |
- causes_onto.ImpellerFault))
- |
- (likelihoodInvolvesUnderlyingcause.some(causes_onto.ExternalFire))
- |
- (likelihoodInvolvesCause.some(causes_onto.MissingImpeller) &
- likelihoodInvolvesUnderlyingcause.some(causes_onto.MaintenanceError))
- |
- (likelihoodInvolvesCause.some(causes_onto.PumpIncorrectlySet) &
- likelihoodInvolvesUnderlyingcause.some(causes_onto.OperationalError))
- |
- (likelihoodInvolvesEquipment.some(
- equipment_onto.hasMaterialTransferEquipment.some(equipment_onto.CentrifugalPump)) &
- likelihoodInvolvesUnderlyingcause.some(causes_onto.SuddenlyStoppingPump | causes_onto.SuddenStartingPump))
- |
- (likelihoodInvolvesUnderlyingcause.some(causes_onto.CondensationAirHumidity) &
- likelihoodInvolvesCause.some(causes_onto.ContaminationByWater) &
- likelihoodInvolvesEquipment.some(equipment_onto.StorageTankEntity))
- |
- (likelihoodInvolvesUnderlyingcause.some(causes_onto.LongStorageTimeOfStabilizer) &
- likelihoodInvolvesCause.some(causes_onto.TooLittleStabilizer))
- |
- likelihoodInvolvesCause.some(causes_onto.ValveIntactUnintentionallyClosed |
- causes_onto.InsufficientNPSH |
- causes_onto.ReducedDwellTime)
- |
- (likelihoodInvolvesUnderlyingcause.some(causes_onto.OperationalError) &
- likelihoodInvolvesCause.some(causes_onto.DrainValveInadvertentlyOpened))
- |
- (likelihoodInvolvesUnderlyingcause.some(causes_onto.OperationalError) &
- likelihoodInvolvesEquipment.some(equipment_onto.PumpEntity) &
- likelihoodInvolvesCause.some(causes_onto.ClosedInletValve))
- |
- (likelihoodInvolvesCause.some(causes_onto.ValveWronglyOpened) &
- likelihoodInvolvesUnderlyingcause.some(causes_onto.OperationalError))
- |
- likelihoodInvolvesCause.some(causes_onto.DeadHeadingOfPump)
- |
- (likelihoodInvolvesCause.some(causes_onto.InadvertentContamination) &
- likelihoodInvolvesUnderlyingcause.some(causes_onto.IntroductionOfRainwater | causes_onto.ContaminationInTankTruck))
- |
- likelihoodInvolvesCause.some(causes_onto.InadvertentContamination)
- |
- (likelihoodInvolvesUnderlyingcause.some(causes_onto.IntroductionOfRainwater) &
- likelihoodInvolvesCause.some(causes_onto.ContaminationInUnloadingLines)))]
-Occasional.comment = ["corresponds to category F2", "10^-2 - 10^-1"]
-class Likely(Likelihood):
- equivalent_to = [Likelihood &
- ((likelihoodInvolvesCause.some(causes_onto.ExternalLeakage) &
- likelihoodInvolvesUnderlyingcause.some(causes_onto.HoseIncorrectlyConnected |
- causes_onto.BrokenHose |
- causes_onto.MaintenanceError |
- causes_onto.LossOfLeakTightness))
- |
- likelihoodInvolvesUnderlyingcause.some(causes_onto.FailureControlLoop |
- causes_onto.MalfunctionPressureController |
- causes_onto.PressureIndicatorControllerFailure |
- causes_onto.FlowIndicatorControllerFailure |
- causes_onto.MalfunctionFlowController |
- causes_onto.MalfunctionControlAir |
- causes_onto.LevelIndicatorControllerFailure |
- causes_onto.PowerFailure)
- |
- likelihoodInvolvesCause.some(causes_onto.NoInertgasSupply |
- causes_onto.ExcessiveFluidWithdrawal |
- causes_onto.PumpOperationFailure)
- |
- (likelihoodInvolvesCause.some(causes_onto.IncorrectSetPointControlValve) &
- likelihoodInvolvesUnderlyingcause.some(causes_onto.OperationalError))
- |
- (likelihoodInvolvesCause.some(causes_onto.ValveClosedPressureBuildUpInPiping) &
- likelihoodInvolvesUnderlyingcause.some(causes_onto.OperationalError))
- |
- (likelihoodInvolvesCause.some(causes_onto.ExcessiveInflow) &
- likelihoodInvolvesUnderlyingcause.some(causes_onto.OperationalError))
- |
- (likelihoodInvolvesCause.some(causes_onto.BypassOpened) &
- likelihoodInvolvesUnderlyingcause.some(causes_onto.OperationalError))
- |
- (likelihoodRequiresBoundaryCondition.some(boundary_onto.LocatedOutside) &
- likelihoodInvolvesUnderlyingcause.some(causes_onto.SolarRadiation) &
- likelihoodInvolvesEquipment.some(equipment_onto.StorageTankEntity) &
- likelihoodInvolvesCause.some(causes_onto.ThermalExpansion)))]
-Likely.comment = ["corresponds to category F1", "10^-1 - 1^0"]
-class VeryLikely(Likelihood):
- equivalent_to = [Likelihood &
- (
- (likelihoodInvolvesUnderlyingcause.some(causes_onto.AmbientTemperatureChange))
- |
- (likelihoodInvolvesCause.some(causes_onto.InsufficientThermalOutbreathing) &
- likelihoodInvolvesEquipment.some(equipment_onto.hasApparatus.some(
- equipment_onto.AtmosphericStorageTank)))
- |
- (likelihoodInvolvesCause.some(causes_onto.LiquidTransferWithoutCompensation) &
- likelihoodInvolvesEquipment.some(equipment_onto.hasApparatus.some(
- equipment_onto.AtmosphericStorageTank))))]
-VeryLikely.comment = ["corresponds to category F0", "> 1 p.a."] 
-
-
-class Catastrophic(SeverityCategory):
- equivalent_to = [SeverityCategory &
- ((isSeverityOfConsequence.some(consequence_onto.LossOfPrimaryContainment) &
- severityRequiresBoundaryCondition.some(
- boundary_onto.SeveralPeoplePresentInTheNearField))
- |
- (isSeverityOfConsequence.some(consequence_onto.LossOfPrimaryContainment) &
- severityRequiresBoundaryCondition.some(
- boundary_onto.SeveralPeoplePresentInTheNearField))
- |
- (isSeverityOfConsequence.some(consequence_onto.LossOfPrimaryContainment) &
- severityRequiresBoundaryCondition.some(
- boundary_onto.SeveralPeoplePresentInTheNearField) &
- severityInvolvesSubstance.some(substance_onto.hasHazardClass.some(
- substance_onto.PyrophoricGasCategory1))
- ))]
-Catastrophic.comment = ["corresponds to category S0"]
-class Severe(SeverityCategory):
- equivalent_to = [SeverityCategory &
- ((isSeverityOfConsequence.some(consequence_onto.DangerOfBleve) &
- severityInvolvesEquipment.some(equipment_onto.hasMaterialTransferEquipment.some(
- equipment_onto.CentrifugalPump)) &
- severityRequiresBoundaryCondition.some(boundary_onto.PersonnelPresentInTheNearField))
- |
- (severityRequiresBoundaryCondition.some(boundary_onto.PersonnelPresentInTheNearField) &
- severityInvolvesSubstance.some(substance_onto.hasHazardClass.some(
- substance_onto.FlammableLiquidCategory1 |
- substance_onto.FlammableLiquidCategory2)) &
- isSeverityOfConsequence.some(consequence_onto.LossOfPrimaryContainment))
- |
- (severityInvolvesEquipment.some(equipment_onto.StorageTankEntity) &
- severityRequiresBoundaryCondition.some(boundary_onto.PersonnelPresentInTheNearField) &
- isSeverityOfConsequence.some(consequence_onto.LossOfPrimaryContainment) &
- severityInvolvesSubstance.some(substance_onto.hasHazardClass.some(
- substance_onto.FlammableLiquidCategory1 |
- substance_onto.FlammableLiquidCategory2)))
- |
- (severityRequiresBoundaryCondition.some(boundary_onto.PersonnelPresentInTheNearField) &
- isSeverityOfConsequence.some(consequence_onto.EmergenceOfIgnitionSource) &
- severityInvolvesSubstance.some(substance_onto.hasHazardClass.some(
- substance_onto.FlammableLiquidCategory1 |
- substance_onto.FlammableLiquidCategory2
- )))
- |
- (isSeverityOfConsequence.some(consequence_onto.LossOfPrimaryContainment) &
- severityRequiresBoundaryCondition.some(boundary_onto.PersonnelPresentInTheNearField) &
- severityInvolvesSubstance.some(substance_onto.hasHazardClass.some(
- substance_onto.SpecificTargetOrganToxicitySingleExposureCategory1 |
- substance_onto.SpecificTargetOrganToxicityRepeatedExposureCategory1 |
- substance_onto.AspirationHazardCategory1 |
- substance_onto.ReproductiveToxicityCategory1 |
- substance_onto.SkinCorrosionIrritationCategory1
- )))
- |
- (severityRequiresBoundaryCondition.some(boundary_onto.PersonnelPresentInTheNearField) &
- isSeverityOfConsequence.some(consequence_onto.RiskOfExplosiveAtmosphere) &
- severityInvolvesSubstance.some(substance_onto.hasHazardClass.some(
- substance_onto.FlammableLiquidCategory1 |
- substance_onto.FlammableLiquidCategory2 |
- substance_onto.FlammableGasCategory1 |
- substance_onto.FlammableGasCategory2
- ))))]
-Severe.comment = ["corresponds to category S1"]
-class Serious(SeverityCategory):
- equivalent_to = [SeverityCategory &
- (isSeverityOfConsequence.some(consequence_onto.LossOfPrimaryContainment) &
- severityInvolvesSubstance.some(substance_onto.hasHazardClass.some(
- substance_onto.SpecificTargetOrganToxicitySingleExposureCategory3 |
- substance_onto.SpecificTargetOrganToxicityRepeatedExposureCategory2 |
- substance_onto.SpecificTargetOrganToxicitySingleExposureCategory2 |
- substance_onto.SpecificTargetOrganToxicityRepeatedExposureCategory3 |
- substance_onto.ReproductiveToxicityCategory2 |
- substance_onto.FlammableLiquidCategory3 |
- substance_onto.SkinCorrosionIrritationCategory2 |
- substance_onto.SkinCorrosionIrritationCategory3
- )))]
-Serious.comment = ["corresponds to category S2"]
-class Significant(SeverityCategory):
- pass
-Significant.comment = ["corresponds to category S3"]
-class Minor(SeverityCategory):
- equivalent_to = [SeverityCategory &
- (
- (isSeverityOfConsequence.some(consequence_onto.ProductionDowntime) |
- isSeverityOfConsequence.some(consequence_onto.PoorProductQuality) |
- isSeverityOfConsequence.some(consequence_onto.PumpBreakdown) |
- isSeverityOfConsequence.some(consequence_onto.CompressorBreakdown))
- )]
-Minor.comment = ["corresponds to category S4"]
-
-# === Risk category definitions
-class A(RiskCategory):
- equivalent_to = [RiskCategory &
- ((involvesLikelihood.some(VeryLikely) &
- involvesSeverity.some(Catastrophic))
- |
- (involvesLikelihood.some(Likely) &
- involvesSeverity.some(Catastrophic))
- |
- (involvesLikelihood.some(VeryLikely) &
- involvesSeverity.some(Severe))
- )]
-class B(RiskCategory):
- equivalent_to = [RiskCategory &
- ((involvesLikelihood.some(VeryLikely) &
- involvesSeverity.some(Serious))
- |
- (involvesLikelihood.some(VeryLikely) &
- involvesSeverity.some(Significant))
- |
- (involvesLikelihood.some(Likely) &
- involvesSeverity.some(Serious))
- |
- (involvesLikelihood.some(Likely) &
- involvesSeverity.some(Severe))
- |
- (involvesLikelihood.some(Occasional) &
- involvesSeverity.some(Serious))
- |
- (involvesLikelihood.some(Occasional) &
- involvesSeverity.some(Severe))
- |
- (involvesLikelihood.some(Occasional) &
- involvesSeverity.some(Catastrophic))
- |
- (involvesLikelihood.some(Possible) &
- involvesSeverity.some(Catastrophic))
- |
- (involvesLikelihood.some(Possible) &
- involvesSeverity.some(Severe))
- |
- (involvesLikelihood.some(Unlikely) &
- involvesSeverity.some(Catastrophic))
- )]
-class C(RiskCategory):
- equivalent_to = [RiskCategory &
- ((involvesLikelihood.some(VeryLikely) &
- involvesSeverity.some(Minor))
- |
- (involvesLikelihood.some(Likely) &
- involvesSeverity.some(Minor))
- |
- (involvesLikelihood.some(Likely) &
- involvesSeverity.some(Significant))
- |
- (involvesLikelihood.some(Occasional) &
- involvesSeverity.some(Significant))
- |
- (involvesLikelihood.some(Possible) &
- involvesSeverity.some(Serious))
- |
- (involvesLikelihood.some(Unlikely) &
- involvesSeverity.some(Serious))
- |
- (involvesLikelihood.some(Unlikely) &
- involvesSeverity.some(Severe))
- |
- (involvesLikelihood.some(VeryUnlikely) &
- involvesSeverity.some(Catastrophic))
- |
- (involvesLikelihood.some(VeryUnlikely) &
- involvesSeverity.some(Severe))
- )]
-class D(RiskCategory):
- equivalent_to = [RiskCategory &
- ((involvesLikelihood.some(Occasional) &
- involvesSeverity.some(Minor))
- |
- (involvesLikelihood.some(Possible) &
- involvesSeverity.some(Minor))
- |
- (involvesLikelihood.some(Possible) &
- involvesSeverity.some(Significant))
- |
- (involvesLikelihood.some(Unlikely) &
- involvesSeverity.some(Minor))
- |
- (involvesLikelihood.some(Unlikely) &
- involvesSeverity.some(Significant))
- |
- (involvesLikelihood.some(VeryUnlikely) &
- involvesSeverity.some(Serious))
- |
- (involvesLikelihood.some(VeryUnlikely) &
- involvesSeverity.some(Significant))
- |
- (involvesLikelihood.some(VeryUnlikely) &
- involvesSeverity.some(Minor))
- )] 
-
+     equipment_onto.hasApparatus.some(equipment_onto.AtmosphericStorageTank |
+     equipment_onto.OpenVessel |
+     equipment_onto.PressureVessel)) &
+     likelihoodInvolvesCause.some(causes_onto.ExcessiveInflow |
+     causes_onto.IncorrectIndicationOfFillingLevel))
+     |
+     (likelihoodInvolvesEquipment.some(
+     equipment_onto.hasMaterialTransferEquipment.some(equipment_onto.CentrifugalPump)) &
+     likelihoodInvolvesDeviation.some(deviation_onto.HighVibration))
+     |
+     (likelihoodInvolvesCause.some(causes_onto.WaterHammer) &
+     likelihoodInvolvesUnderlyingcause.some(causes_onto.RapidlyClosingValve))
+     |
+     (likelihoodInvolvesEquipment.some(
+     equipment_onto.hasMaterialTransferEquipment.some(equipment_onto.CentrifugalPump)) &
+     likelihoodInvolvesCause.some(causes_onto.EntrainedAir |
+     causes_onto.ImpellerFault))
+     |
+     (likelihoodInvolvesUnderlyingcause.some(causes_onto.ExternalFire))
+     |
+     (likelihoodInvolvesCause.some(causes_onto.MissingImpeller) &
+     likelihoodInvolvesUnderlyingcause.some(causes_onto.MaintenanceError))
+     |
+     (likelihoodInvolvesCause.some(causes_onto.PumpIncorrectlySet) &
+     likelihoodInvolvesUnderlyingcause.some(causes_onto.OperationalError))
+     |
+     (likelihoodInvolvesEquipment.some(
+     equipment_onto.hasMaterialTransferEquipment.some(equipment_onto.CentrifugalPump)) &
+     likelihoodInvolvesUnderlyingcause.some(causes_onto.SuddenlyStoppingPump | causes_onto.SuddenStartingPump))
+     |
+     (likelihoodInvolvesUnderlyingcause.some(causes_onto.CondensationAirHumidity) &
+     likelihoodInvolvesCause.some(causes_onto.ContaminationByWater) &
+     likelihoodInvolvesEquipment.some(equipment_onto.StorageTankEntity))
+     |
+     (likelihoodInvolvesUnderlyingcause.some(causes_onto.LongStorageTimeOfStabilizer) &
+     likelihoodInvolvesCause.some(causes_onto.TooLittleStabilizer))
+     |
+     likelihoodInvolvesCause.some(causes_onto.ValveIntactUnintentionallyClosed |
+     causes_onto.InsufficientNPSH |
+     causes_onto.ReducedDwellTime)
+     |
+     (likelihoodInvolvesUnderlyingcause.some(causes_onto.OperationalError) &
+     likelihoodInvolvesCause.some(causes_onto.DrainValveInadvertentlyOpened))
+     |
+     (likelihoodInvolvesUnderlyingcause.some(causes_onto.OperationalError) &
+     likelihoodInvolvesEquipment.some(equipment_onto.PumpEntity) &
+     likelihoodInvolvesCause.some(causes_onto.ClosedInletValve))
+     |
+     (likelihoodInvolvesCause.some(causes_onto.ValveWronglyOpened) &
+     likelihoodInvolvesUnderlyingcause.some(causes_onto.OperationalError))
+     |
+     likelihoodInvolvesCause.some(causes_onto.DeadHeadingOfPump)
+     |
+     (likelihoodInvolvesCause.some(causes_onto.InadvertentContamination) &
+     likelihoodInvolvesUnderlyingcause.some(causes_onto.IntroductionOfRainwater | causes_onto.ContaminationInTankTruck))
+     |
+     likelihoodInvolvesCause.some(causes_onto.InadvertentContamination)
+     |
+     (likelihoodInvolvesUnderlyingcause.some(causes_onto.IntroductionOfRainwater) &
+     likelihoodInvolvesCause.some(causes_onto.ContaminationInUnloadingLines)))]
+    Occasional.comment = ["corresponds to category F2", "10^-2 - 10^-1"]
+    class Likely(Likelihood):
+     equivalent_to = [Likelihood &
+     ((likelihoodInvolvesCause.some(causes_onto.ExternalLeakage) &
+     likelihoodInvolvesUnderlyingcause.some(causes_onto.HoseIncorrectlyConnected |
+     causes_onto.BrokenHose |
+     causes_onto.MaintenanceError |
+     causes_onto.LossOfLeakTightness))
+     |
+     likelihoodInvolvesUnderlyingcause.some(causes_onto.FailureControlLoop |
+     causes_onto.MalfunctionPressureController |
+     causes_onto.PressureIndicatorControllerFailure |
+     causes_onto.FlowIndicatorControllerFailure |
+     causes_onto.MalfunctionFlowController |
+     causes_onto.MalfunctionControlAir |
+     causes_onto.LevelIndicatorControllerFailure |
+     causes_onto.PowerFailure)
+     |
+     likelihoodInvolvesCause.some(causes_onto.NoInertgasSupply |
+     causes_onto.ExcessiveFluidWithdrawal |
+     causes_onto.PumpOperationFailure)
+     |
+     (likelihoodInvolvesCause.some(causes_onto.IncorrectSetPointControlValve) &
+     likelihoodInvolvesUnderlyingcause.some(causes_onto.OperationalError))
+     |
+     (likelihoodInvolvesCause.some(causes_onto.ValveClosedPressureBuildUpInPiping) &
+     likelihoodInvolvesUnderlyingcause.some(causes_onto.OperationalError))
+     |
+     (likelihoodInvolvesCause.some(causes_onto.ExcessiveInflow) &
+     likelihoodInvolvesUnderlyingcause.some(causes_onto.OperationalError))
+     |
+     (likelihoodInvolvesCause.some(causes_onto.BypassOpened) &
+     likelihoodInvolvesUnderlyingcause.some(causes_onto.OperationalError))
+     |
+     (likelihoodRequiresBoundaryCondition.some(boundary_onto.LocatedOutside) &
+     likelihoodInvolvesUnderlyingcause.some(causes_onto.SolarRadiation) &
+     likelihoodInvolvesEquipment.some(equipment_onto.StorageTankEntity) &
+     likelihoodInvolvesCause.some(causes_onto.ThermalExpansion)))]
+    Likely.comment = ["corresponds to category F1", "10^-1 - 1^0"]
+    class VeryLikely(Likelihood):
+     equivalent_to = [Likelihood &
+     (
+     (likelihoodInvolvesUnderlyingcause.some(causes_onto.AmbientTemperatureChange))
+     |
+     (likelihoodInvolvesCause.some(causes_onto.InsufficientThermalOutbreathing) &
+     likelihoodInvolvesEquipment.some(equipment_onto.hasApparatus.some(
+     equipment_onto.AtmosphericStorageTank)))
+     |
+     (likelihoodInvolvesCause.some(causes_onto.LiquidTransferWithoutCompensation) &
+     likelihoodInvolvesEquipment.some(equipment_onto.hasApparatus.some(
+     equipment_onto.AtmosphericStorageTank))))]
+    VeryLikely.comment = ["corresponds to category F0", "> 1 p.a."] 
+    
+    
+    class Catastrophic(SeverityCategory):
+     equivalent_to = [SeverityCategory &
+     ((isSeverityOfConsequence.some(consequence_onto.LossOfPrimaryContainment) &
+     severityRequiresBoundaryCondition.some(
+     boundary_onto.SeveralPeoplePresentInTheNearField))
+     |
+     (isSeverityOfConsequence.some(consequence_onto.LossOfPrimaryContainment) &
+     severityRequiresBoundaryCondition.some(
+     boundary_onto.SeveralPeoplePresentInTheNearField))
+     |
+     (isSeverityOfConsequence.some(consequence_onto.LossOfPrimaryContainment) &
+     severityRequiresBoundaryCondition.some(
+     boundary_onto.SeveralPeoplePresentInTheNearField) &
+     severityInvolvesSubstance.some(substance_onto.hasHazardClass.some(
+     substance_onto.PyrophoricGasCategory1))
+     ))]
+    Catastrophic.comment = ["corresponds to category S0"]
+    class Severe(SeverityCategory):
+     equivalent_to = [SeverityCategory &
+     ((isSeverityOfConsequence.some(consequence_onto.DangerOfBleve) &
+     severityInvolvesEquipment.some(equipment_onto.hasMaterialTransferEquipment.some(
+     equipment_onto.CentrifugalPump)) &
+     severityRequiresBoundaryCondition.some(boundary_onto.PersonnelPresentInTheNearField))
+     |
+     (severityRequiresBoundaryCondition.some(boundary_onto.PersonnelPresentInTheNearField) &
+     severityInvolvesSubstance.some(substance_onto.hasHazardClass.some(
+     substance_onto.FlammableLiquidCategory1 |
+     substance_onto.FlammableLiquidCategory2)) &
+     isSeverityOfConsequence.some(consequence_onto.LossOfPrimaryContainment))
+     |
+     (severityInvolvesEquipment.some(equipment_onto.StorageTankEntity) &
+     severityRequiresBoundaryCondition.some(boundary_onto.PersonnelPresentInTheNearField) &
+     isSeverityOfConsequence.some(consequence_onto.LossOfPrimaryContainment) &
+     severityInvolvesSubstance.some(substance_onto.hasHazardClass.some(
+     substance_onto.FlammableLiquidCategory1 |
+     substance_onto.FlammableLiquidCategory2)))
+     |
+     (severityRequiresBoundaryCondition.some(boundary_onto.PersonnelPresentInTheNearField) &
+     isSeverityOfConsequence.some(consequence_onto.EmergenceOfIgnitionSource) &
+     severityInvolvesSubstance.some(substance_onto.hasHazardClass.some(
+     substance_onto.FlammableLiquidCategory1 |
+     substance_onto.FlammableLiquidCategory2
+     )))
+     |
+     (isSeverityOfConsequence.some(consequence_onto.LossOfPrimaryContainment) &
+     severityRequiresBoundaryCondition.some(boundary_onto.PersonnelPresentInTheNearField) &
+     severityInvolvesSubstance.some(substance_onto.hasHazardClass.some(
+     substance_onto.SpecificTargetOrganToxicitySingleExposureCategory1 |
+     substance_onto.SpecificTargetOrganToxicityRepeatedExposureCategory1 |
+     substance_onto.AspirationHazardCategory1 |
+     substance_onto.ReproductiveToxicityCategory1 |
+     substance_onto.SkinCorrosionIrritationCategory1
+     )))
+     |
+     (severityRequiresBoundaryCondition.some(boundary_onto.PersonnelPresentInTheNearField) &
+     isSeverityOfConsequence.some(consequence_onto.RiskOfExplosiveAtmosphere) &
+     severityInvolvesSubstance.some(substance_onto.hasHazardClass.some(
+     substance_onto.FlammableLiquidCategory1 |
+     substance_onto.FlammableLiquidCategory2 |
+     substance_onto.FlammableGasCategory1 |
+     substance_onto.FlammableGasCategory2
+     ))))]
+    Severe.comment = ["corresponds to category S1"]
+    class Serious(SeverityCategory):
+     equivalent_to = [SeverityCategory &
+     (isSeverityOfConsequence.some(consequence_onto.LossOfPrimaryContainment) &
+     severityInvolvesSubstance.some(substance_onto.hasHazardClass.some(
+     substance_onto.SpecificTargetOrganToxicitySingleExposureCategory3 |
+     substance_onto.SpecificTargetOrganToxicityRepeatedExposureCategory2 |
+     substance_onto.SpecificTargetOrganToxicitySingleExposureCategory2 |
+     substance_onto.SpecificTargetOrganToxicityRepeatedExposureCategory3 |
+     substance_onto.ReproductiveToxicityCategory2 |
+     substance_onto.FlammableLiquidCategory3 |
+     substance_onto.SkinCorrosionIrritationCategory2 |
+     substance_onto.SkinCorrosionIrritationCategory3
+     )))]
+    Serious.comment = ["corresponds to category S2"]
+    class Significant(SeverityCategory):
+     pass
+    Significant.comment = ["corresponds to category S3"]
+    class Minor(SeverityCategory):
+     equivalent_to = [SeverityCategory &
+     (
+     (isSeverityOfConsequence.some(consequence_onto.ProductionDowntime) |
+     isSeverityOfConsequence.some(consequence_onto.PoorProductQuality) |
+     isSeverityOfConsequence.some(consequence_onto.PumpBreakdown) |
+     isSeverityOfConsequence.some(consequence_onto.CompressorBreakdown))
+     )]
+    Minor.comment = ["corresponds to category S4"]
+    
+    # === Risk category definitions
+    class A(RiskCategory):
+     equivalent_to = [RiskCategory &
+     ((involvesLikelihood.some(VeryLikely) &
+     involvesSeverity.some(Catastrophic))
+     |
+     (involvesLikelihood.some(Likely) &
+     involvesSeverity.some(Catastrophic))
+     |
+     (involvesLikelihood.some(VeryLikely) &
+     involvesSeverity.some(Severe))
+     )]
+    class B(RiskCategory):
+     equivalent_to = [RiskCategory &
+     ((involvesLikelihood.some(VeryLikely) &
+     involvesSeverity.some(Serious))
+     |
+     (involvesLikelihood.some(VeryLikely) &
+     involvesSeverity.some(Significant))
+     |
+     (involvesLikelihood.some(Likely) &
+     involvesSeverity.some(Serious))
+     |
+     (involvesLikelihood.some(Likely) &
+     involvesSeverity.some(Severe))
+     |
+     (involvesLikelihood.some(Occasional) &
+     involvesSeverity.some(Serious))
+     |
+     (involvesLikelihood.some(Occasional) &
+     involvesSeverity.some(Severe))
+     |
+     (involvesLikelihood.some(Occasional) &
+     involvesSeverity.some(Catastrophic))
+     |
+     (involvesLikelihood.some(Possible) &
+     involvesSeverity.some(Catastrophic))
+     |
+     (involvesLikelihood.some(Possible) &
+     involvesSeverity.some(Severe))
+     |
+     (involvesLikelihood.some(Unlikely) &
+     involvesSeverity.some(Catastrophic))
+     )]
+    class C(RiskCategory):
+     equivalent_to = [RiskCategory &
+     ((involvesLikelihood.some(VeryLikely) &
+     involvesSeverity.some(Minor))
+     |
+     (involvesLikelihood.some(Likely) &
+     involvesSeverity.some(Minor))
+     |
+     (involvesLikelihood.some(Likely) &
+     involvesSeverity.some(Significant))
+     |
+     (involvesLikelihood.some(Occasional) &
+     involvesSeverity.some(Significant))
+     |
+     (involvesLikelihood.some(Possible) &
+     involvesSeverity.some(Serious))
+     |
+     (involvesLikelihood.some(Unlikely) &
+     involvesSeverity.some(Serious))
+     |
+     (involvesLikelihood.some(Unlikely) &
+     involvesSeverity.some(Severe))
+     |
+     (involvesLikelihood.some(VeryUnlikely) &
+     involvesSeverity.some(Catastrophic))
+     |
+     (involvesLikelihood.some(VeryUnlikely) &
+     involvesSeverity.some(Severe))
+     )]
+    class D(RiskCategory):
+     equivalent_to = [RiskCategory &
+     ((involvesLikelihood.some(Occasional) &
+     involvesSeverity.some(Minor))
+     |
+     (involvesLikelihood.some(Possible) &
+     involvesSeverity.some(Minor))
+     |
+     (involvesLikelihood.some(Possible) &
+     involvesSeverity.some(Significant))
+     |
+     (involvesLikelihood.some(Unlikely) &
+     involvesSeverity.some(Minor))
+     |
+     (involvesLikelihood.some(Unlikely) &
+     involvesSeverity.some(Significant))
+     |
+     (involvesLikelihood.some(VeryUnlikely) &
+     involvesSeverity.some(Serious))
+     |
+     (involvesLikelihood.some(VeryUnlikely) &
+     involvesSeverity.some(Significant))
+     |
+     (involvesLikelihood.some(VeryUnlikely) &
+     involvesSeverity.some(Minor))
+     )] 
+    
 
 
 
 
 #%% Appendix P - Ontology for Safeguards
 
-class AddCorrosionInhibitor(Safeguard):
- equivalent_to = [Safeguard &
- (safeguardOfDeviation.some(deviation_onto.HighCorrosion) &
- safeguardInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity))]
-class OverFlowValveAndKickBackLine(Safeguard):
- equivalent_to = [Safeguard &
- safeguardPreventsEffect.some(effect_onto.FluidCirculatesInsidePump | effect_onto.Overheating)]
-class ImplementQuickConnectSystem(Safeguard):
- equivalent_to = [Safeguard &
- safeguardPreventsCause.some(causes_onto.WrongTankLinedUp) &
- safeguardPreventsUnderlyingCause.some(causes_onto.OperationalError)]
-class ImplementFrequentDrainingOff(Safeguard):
- equivalent_to = [Safeguard &
- safeguardInvolvesEquipmentEntity.some(equipment_onto.SettlingTankEntity) &
- safeguardPreventsEffect.some(effect_onto.PoorSeparation)]
-class OverfillProtection(Safeguard):
- equivalent_to = [Safeguard &
- safeguardDependsOnRiskCategory.some(risk_assessment_onto.B | risk_assessment_onto.A) &
- safeguardPreventsEffect.some(effect_onto.Overfilling)]
-class PressureReliefValve(Safeguard):
- equivalent_to = [Safeguard &
- ((safeguardInvolvesEquipmentEntity.some(equipment_onto.PressureVesselEntity | equipment_onto.PumpEntity |
- equipment_onto.ShellTubeHeatExchangerEntity) &
- safeguardPreventsEffect.some(effect_onto.Fracture))
- |
- (safeguardInvolvesEquipmentEntity.some(equipment_onto.PressureVesselEntity |
- equipment_onto.CompressorEntity |
- equipment_onto.SettlingTankEntity |
- equipment_onto.ShellTubeHeatExchangerEntity) &
- safeguardOfDeviation.some(deviation_onto.HighPressure))
- |
- (safeguardPreventsEffect.some(effect_onto.UnintendedExothermicPolymerization) &
- safeguardInvolvesEquipmentEntity.some(equipment_onto.PressureVesselEntity |
- equipment_onto.SettlingTankEntity |
- equipment_onto.ShellTubeHeatExchangerEntity |
- equipment_onto.StorageTankEntity)))]
-PressureReliefValve.comment = ["Must be certified for protecting pressure above 0.5 bar(g)"]
-class AutomaticWaterDetectionSystem(Safeguard):
- equivalent_to = [Safeguard &
- safeguardInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity) &
- safeguardDependsOnRiskCategory.some(risk_assessment_onto.A | risk_assessment_onto.B) &
- safeguardPreventsCause.some(causes_onto.ContaminationByWater)]
-class ImplementVibrationDampener(Safeguard):
- equivalent_to = [Safeguard &
- (safeguardInvolvesEquipmentEntity.some(equipment_onto.PumpEntity | equipment_onto.CompressorEntity) &
- safeguardOfDeviation.some(deviation_onto.HighVibration))]
-class ImplementNoFlowAlarm(Safeguard):
- equivalent_to = [Safeguard &
- (safeguardPreventsEffect.some(effect_onto.InsufficientInertization) &
- safeguardPreventsCause.some(causes_onto.NoInertgasSupply | causes_onto.ValveIntactUnintentionallyClosed |
- causes_onto.ValveWronglyClosed) &
- safeguardDependsOnRiskCategory.some(risk_assessment_onto.A | risk_assessment_onto.B)
- |
- (safeguardInvolvesEquipmentEntity.some(equipment_onto.PumpEntity) &
- safeguardPreventsCause.some(causes_onto.MissingImpeller | causes_onto.DeadHeadingOfPump) &
- safeguardDependsOnRiskCategory.some(risk_assessment_onto.A | risk_assessment_onto.B)))]
-class ImplementNoFlowWarning(Safeguard):
- equivalent_to = [Safeguard &
- safeguardInvolvesEquipmentEntity.some(equipment_onto.PumpEntity) &
- safeguardPreventsCause.some(causes_onto.MissingImpeller) &
- safeguardDependsOnRiskCategory.some(risk_assessment_onto.C | risk_assessment_onto.D)]
-class PeriodicalSampleTaking(Safeguard):
- equivalent_to = [Safeguard &
- safeguardPreventsCause.some(causes_onto.ContaminationByWater |
- causes_onto.WrongTankLinedUp |
- causes_onto.InadvertentContamination |
- causes_onto.TooLittleStabilizer |
- causes_onto.TooLittleInhibitor)]
-class PressureVacuumReliefValve(Safeguard):
- equivalent_to = [Safeguard &
- ((safeguardInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity) &
- safeguardPreventsEffect.some(effect_onto.LossOfMechanicalIntegrity))
- |
- (safeguardInvolvesEquipmentEntity.some(equipment_onto.hasApparatus.some(equipment_onto.AtmosphericStorageTank)) &
- safeguardPreventsCause.some(causes_onto.InsufficientThermalOutbreathing) &
- safeguardPreventsEffect.some(effect_onto.Fracture))
- |
- (safeguardInvolvesEquipmentEntity.some(equipment_onto.hasApparatus.some(equipment_onto.AtmosphericStorageTank)) &
- safeguardOfDeviation.some(deviation_onto.HighPressure) &
- safeguardPreventsEffect.some(effect_onto.Fracture)))]
-PressureVacuumReliefValve.comment = ["also known as 'conservation vent valve'"]
-class CollectingBasin(Safeguard):
- equivalent_to = [Safeguard &
- (safeguardMitigatesConsequence.some(consequence_onto.LossOfPrimaryContainment) &
- safeguardInvolvesEquipmentEntity.some(equipment_onto.PressureVesselEntity | equipment_onto.PressureReceiverEntity))]
-class ValveLockedClosed(Safeguard):
- equivalent_to = [Safeguard &
- (safeguardPreventsCause.some(causes_onto.BypassOpened)
- |
- (safeguardPreventsCause.some(causes_onto.DrainValveInadvertentlyOpened) &
- safeguardPreventsEffect.some(effect_onto.PoolFormation)))]
-class SwingCheckValve(Safeguard):
- equivalent_to = [Safeguard &
- (safeguardPreventsCause.some(causes_onto.WaterHammer) &
- safeguardInvolvesEquipmentEntity.some(equipment_onto.ConnectionPipeEntity))]
-class SurgeReliefValve(Safeguard):
- equivalent_to = [Safeguard &
- (safeguardPreventsCause.some(causes_onto.WaterHammer) &
- safeguardInvolvesEquipmentEntity.some(equipment_onto.ConnectionPipeEntity |
- equipment_onto.PumpEntity))] 
- 
- 
-class FlareSystem(Safeguard):
- equivalent_to = [Safeguard &
- safeguardInvolvesEquipmentEntity.some(
- equipment_onto.hasApparatus.some(equipment_onto.PressureVessel)) &
- impliesSafeguard.some(PressureReliefValve) &
- safeguardInvolvesSubstance.some(
- substance_onto.hasHazardClass.some(
- substance_onto.FlammableLiquidCategory1 |
- substance_onto.FlammableLiquidCategory2 |
- substance_onto.FlammableLiquidCategory3 |
- substance_onto.FlammableGasCategory1 |
- substance_onto.FlammableGasCategory2 |
- substance_onto.PyrophoricGasCategory1 |
- substance_onto.AerosolCategory1 |
- substance_onto.AerosolCategory2
- ))]
-class IncreaseClosingTimeOfValve(Safeguard):
- equivalent_to = [Safeguard &
- safeguardPreventsCause.some(causes_onto.WaterHammer)]
-class PulsationDampener(Safeguard):
- equivalent_to = [Safeguard &
- (safeguardPreventsCause.some(causes_onto.WaterHammer) &
- safeguardInvolvesEquipmentEntity.some(equipment_onto.ConnectionPipeEntity))]
-class ConsiderMaterialSelection(Safeguard):
- equivalent_to = [Safeguard &
- safeguardPreventsEffect.some(effect_onto.GenerationOfElectrostaticCharge) |
- safeguardOfDeviation.some(deviation_onto.HighCorrosion)]
-class GasBalanceLine(Safeguard):
- equivalent_to = [Safeguard &
- safeguardPreventsCause.some(causes_onto.LiquidTransferWithoutCompensation) &
- safeguardInvolvesEquipmentEntity.some(
- equipment_onto.hasApparatus.some(equipment_onto.AtmosphericStorageTank))]
-class IncreaseSafetyIntegrityLevel(Safeguard):
- equivalent_to = [Safeguard &
- safeguardDependsOnRiskCategory.some(risk_assessment_onto.C |
- risk_assessment_onto.B) &
- safeguardPreventsUnderlyingCause.some(causes_onto.LevelIndicatorControllerFailure)
- ]
-class ThermalProtectionTrip(Safeguard):
- equivalent_to = [Safeguard &
- (safeguardInvolvesEquipmentEntity.some(equipment_onto.PumpEntity | equipment_onto.CompressorEntity) &
- (safeguardOfDeviation.some(deviation_onto.HighTemperature) |
- (safeguardPreventsEffect.some(effect_onto.Overheating |
- effect_onto.FluidCirculatesInsidePump))
- |
- (safeguardOfDeviation.some(deviation_onto.HighTemperature) &
- safeguardPreventsEffect.some(effect_onto.ExcessiveDischargeTemperature))))
- ]
-class SoftStartStopControl(Safeguard):
- equivalent_to = [Safeguard &
- (safeguardInvolvesEquipmentEntity.some(equipment_onto.PumpEntity) &
- safeguardPreventsCause.some(causes_onto.WaterHammer))
- ]
-class InstallHighLevelAlarm(Safeguard):
- equivalent_to = [Safeguard &
- safeguardDependsOnRiskCategory.some(risk_assessment_onto.C |
- risk_assessment_onto.D) &
- safeguardPreventsEffect.some(effect_onto.Overfilling)]
-class InstallHighTemperatureAlarm(Safeguard):
- equivalent_to = [Safeguard &
- (safeguardInvolvesEquipmentEntity.some(equipment_onto.hasApparatus.some(
- equipment_onto.AtmosphericStorageTank |
- equipment_onto.PressureVessel)) &
- safeguardPreventsEffect.some(effect_onto.UnintendedExothermicPolymerization) &
- safeguardInvolvesSubstance.some(
- substance_onto.hasStabilityReactivityInformation.some(
- substance_onto.PolymerizesExothermicallyWhenExposedToHeat)))]
-class ProvideLeakageMonitoring(Safeguard):
- equivalent_to = [Safeguard &
- safeguardInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity) &
- safeguardPreventsEffect.some(effect_onto.PoolFormation)]
-class ProvideAntiCorrosionCoating(Safeguard):
- equivalent_to = [Safeguard &
- safeguardInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity) &
- safeguardOfDeviation.some(deviation_onto.HighCorrosion)]
-class ImplementLowLevelAlarm(Safeguard):
- equivalent_to = [Safeguard &
- ((safeguardOfDeviation.some(deviation_onto.LowLevel) &
- safeguardInvolvesEquipmentEntity.some(
- equipment_onto.hasApparatus.some(equipment_onto.PressureVessel |
- equipment_onto.AtmosphericStorageTank)) &
- safeguardDependsOnRiskCategory.some(risk_assessment_onto.A | risk_assessment_onto.B))
- |
- (safeguardOfDeviation.some(deviation_onto.LowLevel) &
- safeguardPreventsCause.some(causes_onto.LossOfInflow |
- causes_onto.IncorrectFilling |
-causes_onto.ClosedInletValve) &
- safeguardDependsOnRiskCategory.some(risk_assessment_onto.A | risk_assessment_onto.B))
- |
- (safeguardPreventsEffect.some(effect_onto.EmptyingOfContainer) &
- safeguardDependsOnRiskCategory.some(risk_assessment_onto.A | risk_assessment_onto.B)))]
-class ImplementLowLevelWarning(Safeguard):
- equivalent_to = [Safeguard &
- ((safeguardOfDeviation.some(deviation_onto.LowLevel) &
- safeguardInvolvesEquipmentEntity.some(
- equipment_onto.hasApparatus.some(equipment_onto.PressureVessel | equipment_onto.AtmosphericStorageTank)) &
- safeguardDependsOnRiskCategory.some(risk_assessment_onto.C | risk_assessment_onto.D))
- |
- (safeguardOfDeviation.some(deviation_onto.LowLevel) &
- safeguardPreventsCause.some(causes_onto.LossOfInflow | causes_onto.IncorrectFilling | causes_onto.ClosedInletValve) &
- safeguardDependsOnRiskCategory.some(risk_assessment_onto.C | risk_assessment_onto.D))
- |
- (safeguardPreventsEffect.some(effect_onto.EmptyingOfContainer) &
- safeguardDependsOnRiskCategory.some(risk_assessment_onto.C | risk_assessment_onto.D)))
- ]
-class ValveLockedOpen(Safeguard):
- equivalent_to = [Safeguard &
- safeguardPreventsCause.some(causes_onto.DeadHeadingOfPump | causes_onto.ClosedInletValve)]
- 
- 
-class InstallPhysicalBarrierAroundTheEquipment(Safeguard):
- equivalent_to = [Safeguard &
- safeguardInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity) &
- safeguardPreventsCause.some(causes_onto.PhysicalImpact)]
-class InstallPressureLimitationValve(Safeguard):
- equivalent_to = [Safeguard &
- (safeguardPreventsCause.some(causes_onto.IncorrectSetPointControlValve) &
- safeguardOfDeviation.some(deviation_onto.HighPressure))
- |
- (safeguardInvolvesEquipmentEntity.some(equipment_onto.InertgasBlanketingEntity) &
- safeguardOfDeviation.some(deviation_onto.HighPressure))]
-class InstallRestrictiveFlowOrifice(Safeguard):
- equivalent_to = [Safeguard &
- (safeguardPreventsCause.some(causes_onto.ExcessiveInflow) &
- safeguardInvolvesEquipmentEntity.some(equipment_onto.InertgasBlanketingEntity))]
-class InstallCheckValve(Safeguard):
- equivalent_to = [Safeguard &
- (safeguardOfDeviation.some(deviation_onto.ReverseFlow)
- |
- (safeguardOfDeviation.some(deviation_onto.ElsewhereFlow) &
- safeguardInvolvesEquipmentEntity.some(equipment_onto.ConnectionPipeEntity)))]
-class QuenchSystem(Safeguard):
- equivalent_to = [Safeguard &
- (safeguardPreventsEffect.some(effect_onto.UnintendedExothermicPolymerization) &
- safeguardInvolvesEquipmentEntity.some(equipment_onto.PressureVesselEntity |
- equipment_onto.SettlingTankEntity |
- equipment_onto.ReactorEntity |
- equipment_onto.ShellTubeHeatExchangerEntity |
- equipment_onto.StorageTankEntity))]
-class VacuumProofDesign(Safeguard):
- equivalent_to = [Safeguard &
- (safeguardInvolvesEquipmentEntity.some(equipment_onto.PressureReceiverEntity |
- equipment_onto.SettlingTankEntity |
- equipment_onto.PressureVesselEntity) &
- safeguardOfDeviation.some(deviation_onto.LowPressure) &
- safeguardPreventsEffect.some(effect_onto.LossOfMechanicalIntegrity) &
- safeguardDependsOnRiskCategory.some(risk_assessment_onto.A | risk_assessment_onto.B))]
-class HighPointVent(Safeguard):
- equivalent_to = [Safeguard &
- (safeguardInvolvesEquipmentEntity.some(equipment_onto.PumpEntity) &
- safeguardOfDeviation.some(deviation_onto.OtherThanComposition | deviation_onto.NoFlow | deviation_onto.LowFlow) &
- safeguardPreventsCause.some(causes_onto.EntrainedAir))]
-class CheckIfFreeBlowOffPossible(Safeguard):
- equivalent_to = [Safeguard &
- (safeguardInvolvesEquipmentEntity.some(equipment_onto.PumpEntity) &
- safeguardOfDeviation.some(deviation_onto.OtherThanComposition | deviation_onto.NoFlow | deviation_onto.LowFlow) &
- safeguardPreventsCause.some(causes_onto.EntrainedAir))]
-CheckIfFreeBlowOffPossible.comment = ["Depends directly on HighPointVent"]
-class UseSealingCaps(Safeguard):
- equivalent_to = [Safeguard &
- safeguardPreventsCause.some(causes_onto.ContaminationInUnloadingLines)]
-class DetermineSafetyRelatedOperatingInstructions(Safeguard):
- equivalent_to = [Safeguard &
- (safeguardPreventsEffect.some(effect_onto.PotentialViolentReactionWithOxidizers)
- |
- safeguardPreventsUnderlyingCause.some(causes_onto.HoseIncorrectlyConnected |
- causes_onto.IncorrectSetPointControlValve |
- causes_onto.IncorrectPressureAdjustment))]
-class EmergencyPressureReliefValve(Safeguard):
- equivalent_to = [Safeguard &
- (safeguardPreventsEffect.some(effect_onto.Fracture) &
- safeguardPreventsUnderlyingCause.some(causes_onto.ExternalFire) &
- safeguardInvolvesEquipmentEntity.some(equipment_onto.hasApparatus.some(
- equipment_onto.AtmosphericStorageTank |
- equipment_onto.OpenVessel)))]
-EmergencyPressureReliefValve.comment = ["Located on low pressure storage tanks"] # Here I have added the .comment, this was not in the original code.
-class AddStabilizer(Safeguard):
- equivalent_to = [Safeguard &
- safeguardPreventsEffect.some(effect_onto.UnintendedExothermicPolymerization)]
-class FailsafeFeedStop(Safeguard):
- equivalent_to = [Safeguard &
- safeguardPreventsEffect.some(effect_onto.InsufficientInertization)]
-class FlameArrestor(Safeguard):
- equivalent_to = [Safeguard &
- (safeguardInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity |
- equipment_onto.SettlingTankEntity) &
- safeguardMitigatesConsequence.some(consequence_onto.RiskOfExplosiveAtmosphere) &
- safeguardInvolvesSubstance.some(substance_onto.hasHazardClass.some(
- substance_onto.FlammableLiquidCategory1 |
- substance_onto.FlammableLiquidCategory2 |
- substance_onto.FlammableLiquidCategory3)))]
-FlameArrestor.comment = [
- "methanol tank, should be protected with flame arrestor and nitrogen blanketing (more than 3000 m³, API2000)"]
-class RegularPlantInspection(Safeguard):
- equivalent_to = [Safeguard &
- ((safeguardPreventsCause.some(causes_onto.ExternalLeakage) | safeguardPreventsEffect.some(effect_onto.PoolFormation))
- |
- safeguardMitigatesConsequence.some(consequence_onto.LossOfPrimaryContainment))
- ]
-class ElaborationOfMaintenanceConcept(Safeguard):
- equivalent_to = [Safeguard &
- ((safeguardPreventsCause.some(causes_onto.PumpSealFailure) & safeguardPreventsEffect.some(effect_onto.PoolFormation))
- |
- (safeguardPreventsUnderlyingCause.some(causes_onto.LossOfLeakTightness | causes_onto.BrokenHose) &
- safeguardPreventsCause.some(causes_onto.ExternalLeakage))
- |
- (safeguardPreventsUnderlyingCause.some(causes_onto.ControlValveFailsClosed |
- causes_onto.ControlValveFailsOpen) &
- safeguardDependsOnRiskCategory.some(risk_assessment_onto.C | risk_assessment_onto.D))
- )]
-class LimitationOfTheFlowVelocity(Safeguard):
- equivalent_to = [Safeguard &
- safeguardPreventsEffect.some(effect_onto.GenerationOfElectrostaticCharge)
- ] 
 
-
-class ConsiderMinimumTankDistance(Safeguard):
- equivalent_to = [Safeguard &
- (safeguardInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity) &
- safeguardMitigatesConsequence.some(consequence_onto.LossOfPrimaryContainment) &
- safeguardPreventsEffect.some(effect_onto.LossOfMechanicalIntegrity | effect_onto.Fracture) &
- safeguardInvolvesSubstance.some(substance_onto.hasFlashpointInKelvin <= 273.15 + 55.0))]
-ConsiderMinimumTankDistance.comment = ["TRGS 509, pp. 37, <= 55 °C"]
-class CheckPressureClassPiping(Safeguard):
- equivalent_to = [Safeguard &
- (safeguardPreventsEffect.some(effect_onto.Fracture) &
- safeguardInvolvesEquipmentEntity.some(equipment_onto.ConnectionPipeEntity | equipment_onto.ValveEntity) &
- safeguardOfDeviation.some(deviation_onto.HighPressure))]
-class UseNormallyOpenValve(Safeguard):
- equivalent_to = [Safeguard &
- (safeguardPreventsCause.some(causes_onto.ValveWronglyClosed) & safeguardPreventsEffect.some(effect_onto.EmptyingOfContainer))]
-class AvoidingBlockedLiquids(Safeguard):
- equivalent_to = [Safeguard &
- (safeguardInvolvesEquipmentEntity.some(equipment_onto.ConnectionPipeEntity) &
- safeguardPreventsCause.some(causes_onto.AbnormalHeatInput))]
-class InstallHeatTracingSystem(Safeguard):
- equivalent_to = [Safeguard &
- (safeguardPreventsEffect.some(effect_onto.DrainlineFracture) &
- safeguardPreventsCause.some(causes_onto.ContaminationByWaterAndTemperatureFallsBelowFreezingPoint))]
-class InstallThermalExpansionReliefValve(Safeguard):
- equivalent_to = [Safeguard &
- (safeguardPreventsEffect.some(effect_onto.PressureExceedingDesignPressure) &
- safeguardPreventsCause.some(causes_onto.ThermalExpansion) &
- safeguardPreventsUnderlyingCause.some(causes_onto.BlockedPipingAndHeatInput))]
-class StandardOperationProcedure(Safeguard):
- equivalent_to = [Safeguard &
- (safeguardPreventsCause.some(causes_onto.DrainValveInadvertentlyOpened | causes_onto.OperationBelowMinimumFlowRate)
- |
- (safeguardPreventsUnderlyingCause.some(causes_onto.OperationalError) &
- safeguardDependsOnRiskCategory.some(risk_assessment_onto.C | risk_assessment_onto.D))
- |
- (safeguardPreventsUnderlyingCause.some(causes_onto.MaintenanceError) &
- safeguardDependsOnRiskCategory.some(risk_assessment_onto.C | risk_assessment_onto.D)))]
-class ProvideGroundingOfPlant(Safeguard):
- equivalent_to = [Safeguard & safeguardPreventsEffect.some(effect_onto.GenerationOfElectrostaticCharge)]
-class PeriodicInspection(safeguard_onto.Safeguard):
- equivalent_to = [safeguard_onto.Safeguard & safeguard_onto.safeguardPreventsCause.some(MalfunctionLubricationSystem)]
-class ImprovedOilSeparation(safeguard_onto.Safeguard):
- equivalent_to = [safeguard_onto.Safeguard & safeguard_onto.safeguardPreventsEffect.some(IncreasedOilDischarge)]
-class QuickActionStopValve(safeguard_onto.Safeguard):
- equivalent_to = [safeguard_onto.Safeguard &
- safeguard_onto.safeguardInvolvesEquipmentEntity.some(equipment_onto.AirCooledCondenserEntity) &
- safeguard_onto.safeguardOfDeviation.some(deviation_onto.ElsewhereFlow)
- ]
-class PurgerUnit(safeguard_onto.Safeguard):
- equivalent_to = [safeguard_onto.Safeguard &
- safeguard_onto.safeguardPreventsCause.some(causes_onto.NonCondensables)]
-class OverflowValve(safeguard_onto.Safeguard):
- equivalent_to = [safeguard_onto.Safeguard &
- ((safeguard_onto.safeguardInvolvesEquipmentEntity.some(equipment_onto.PumpEntity |
- equipment_onto.hasMaterialTransferEquipment.some(equipment_onto.CentrifugalPump |
- equipment_onto.ReciprocatingPump)))
- & safeguard_onto.safeguardPreventsEffect.some(effect_onto.FluidCirculatesInsidePump) &
- safeguard_onto.safeguardPreventsCause.some(DeadHeadingOfPump | causes_onto.ValveIntactUnintentionallyClosed))]
-class MinimumFlowProtectionSystem(safeguard_onto.Safeguard):
- equivalent_to = [safeguard_onto.Safeguard &
- (safeguard_onto.safeguardPreventsCause.some(OperationBelowMinimumFlowRate) &
- safeguard_onto.safeguardDependsOnRiskCategory.some(risk_assessment_onto.A | risk_assessment_onto.B) &
- safeguard_onto.safeguardInvolvesEquipmentEntity.some(equipment_onto.PumpEntity))]
-MinimumFlowProtectionSystem.comment = ["e.g. continues bypass, automatic recirculation valve"]
-class LowFlowProtectionTrip(safeguard_onto.Safeguard):
- equivalent_to = [safeguard_onto.Safeguard &
- (safeguard_onto.safeguardPreventsCause.some(OperationBelowMinimumFlowRate) &
- safeguard_onto.safeguardOfDeviation.some(deviation_onto.LowFlow))]
-class DryRunProtection(safeguard_onto.Safeguard):
- equivalent_to = [safeguard_onto.Safeguard &
- (safeguard_onto.safeguardInvolvesEquipmentEntity.some(equipment_onto.PumpEntity) &
- safeguard_onto.safeguardPreventsEffect.some(PumpRunningDry))]
-class InstallPumpInducer(safeguard_onto.Safeguard):
- equivalent_to = [safeguard_onto.Safeguard &
- (safeguard_onto.safeguardPreventsEffect.some(Cavitation) &
- safeguard_onto.safeguardInvolvesEquipmentEntity.some(equipment_onto.PumpEntity))]
-class IncreaseSuctionPressure(safeguard_onto.Safeguard):
- equivalent_to = [safeguard_onto.Safeguard &
- (safeguard_onto.safeguardPreventsEffect.some(Cavitation) &
- safeguard_onto.safeguardPreventsCause.some(InsufficientNPSH) &
- safeguard_onto.safeguardInvolvesEquipmentEntity.some(equipment_onto.PumpEntity))]
-class DefineMaximumFillLevel(safeguard_onto.Safeguard):
- equivalent_to = [safeguard_onto.Safeguard &
- (safeguard_onto.safeguardInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity) &
- safeguard_onto.safeguardPreventsEffect.some(effect_onto.Overfilling))]
-class TemperatureControllerHighAlarm(safeguard_onto.Safeguard):
- equivalent_to = [safeguard_onto.Safeguard &
- (safeguard_onto.safeguardPreventsCause.some(causes_onto.AbnormallyHotIntake | CoolingFailure) &
- safeguard_onto.safeguardOfDeviation.some(deviation_onto.HighTemperature))]
-class EmergencyCooling(safeguard_onto.Safeguard):
- equivalent_to = [safeguard_onto.Safeguard &
- (safeguard_onto.safeguardPreventsCause.some(CoolingFailure) &
- safeguard_onto.safeguardOfDeviation.some(deviation_onto.HighTemperature))]
-class EmergencyStabilization(safeguard_onto.Safeguard):
- equivalent_to = [safeguard_onto.Safeguard &
- (safeguard_onto.safeguardInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity |
- equipment_onto.SettlingTankEntity |
- equipment_onto.ReactorEntity |
- equipment_onto.PressureVesselEntity |
- equipment_onto.PressureReceiverEntity) &
- safeguard_onto.safeguardPreventsEffect.some(effect_onto.UnintendedExothermicPolymerization))]
+with safeguard_onto:
+    class AddCorrosionInhibitor(Safeguard):
+     equivalent_to = [Safeguard &
+     (safeguardOfDeviation.some(deviation_onto.HighCorrosion) &
+     safeguardInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity))]
+    class OverFlowValveAndKickBackLine(Safeguard):
+     equivalent_to = [Safeguard &
+     safeguardPreventsEffect.some(effect_onto.FluidCirculatesInsidePump | effect_onto.Overheating)]
+    class ImplementQuickConnectSystem(Safeguard):
+     equivalent_to = [Safeguard &
+     safeguardPreventsCause.some(causes_onto.WrongTankLinedUp) &
+     safeguardPreventsUnderlyingCause.some(causes_onto.OperationalError)]
+    class ImplementFrequentDrainingOff(Safeguard):
+     equivalent_to = [Safeguard &
+     safeguardInvolvesEquipmentEntity.some(equipment_onto.SettlingTankEntity) &
+     safeguardPreventsEffect.some(effect_onto.PoorSeparation)]
+    class OverfillProtection(Safeguard):
+     equivalent_to = [Safeguard &
+     safeguardDependsOnRiskCategory.some(risk_assessment_onto.B | risk_assessment_onto.A) &
+     safeguardPreventsEffect.some(effect_onto.Overfilling)]
+    class PressureReliefValve(Safeguard):
+     equivalent_to = [Safeguard &
+     ((safeguardInvolvesEquipmentEntity.some(equipment_onto.PressureVesselEntity | equipment_onto.PumpEntity |
+     equipment_onto.ShellTubeHeatExchangerEntity) &
+     safeguardPreventsEffect.some(effect_onto.Fracture))
+     |
+     (safeguardInvolvesEquipmentEntity.some(equipment_onto.PressureVesselEntity |
+     equipment_onto.CompressorEntity |
+     equipment_onto.SettlingTankEntity |
+     equipment_onto.ShellTubeHeatExchangerEntity) &
+     safeguardOfDeviation.some(deviation_onto.HighPressure))
+     |
+     (safeguardPreventsEffect.some(effect_onto.UnintendedExothermicPolymerization) &
+     safeguardInvolvesEquipmentEntity.some(equipment_onto.PressureVesselEntity |
+     equipment_onto.SettlingTankEntity |
+     equipment_onto.ShellTubeHeatExchangerEntity |
+     equipment_onto.StorageTankEntity)))]
+    PressureReliefValve.comment = ["Must be certified for protecting pressure above 0.5 bar(g)"]
+    class AutomaticWaterDetectionSystem(Safeguard):
+     equivalent_to = [Safeguard &
+     safeguardInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity) &
+     safeguardDependsOnRiskCategory.some(risk_assessment_onto.A | risk_assessment_onto.B) &
+     safeguardPreventsCause.some(causes_onto.ContaminationByWater)]
+    class ImplementVibrationDampener(Safeguard):
+     equivalent_to = [Safeguard &
+     (safeguardInvolvesEquipmentEntity.some(equipment_onto.PumpEntity | equipment_onto.CompressorEntity) &
+     safeguardOfDeviation.some(deviation_onto.HighVibration))]
+    class ImplementNoFlowAlarm(Safeguard):
+     equivalent_to = [Safeguard &
+     (safeguardPreventsEffect.some(effect_onto.InsufficientInertization) &
+     safeguardPreventsCause.some(causes_onto.NoInertgasSupply | causes_onto.ValveIntactUnintentionallyClosed |
+     causes_onto.ValveWronglyClosed) &
+     safeguardDependsOnRiskCategory.some(risk_assessment_onto.A | risk_assessment_onto.B)
+     |
+     (safeguardInvolvesEquipmentEntity.some(equipment_onto.PumpEntity) &
+     safeguardPreventsCause.some(causes_onto.MissingImpeller | causes_onto.DeadHeadingOfPump) &
+     safeguardDependsOnRiskCategory.some(risk_assessment_onto.A | risk_assessment_onto.B)))]
+    class ImplementNoFlowWarning(Safeguard):
+     equivalent_to = [Safeguard &
+     safeguardInvolvesEquipmentEntity.some(equipment_onto.PumpEntity) &
+     safeguardPreventsCause.some(causes_onto.MissingImpeller) &
+     safeguardDependsOnRiskCategory.some(risk_assessment_onto.C | risk_assessment_onto.D)]
+    class PeriodicalSampleTaking(Safeguard):
+     equivalent_to = [Safeguard &
+     safeguardPreventsCause.some(causes_onto.ContaminationByWater |
+     causes_onto.WrongTankLinedUp |
+     causes_onto.InadvertentContamination |
+     causes_onto.TooLittleStabilizer |
+     causes_onto.TooLittleInhibitor)]
+    class PressureVacuumReliefValve(Safeguard):
+     equivalent_to = [Safeguard &
+     ((safeguardInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity) &
+     safeguardPreventsEffect.some(effect_onto.LossOfMechanicalIntegrity))
+     |
+     (safeguardInvolvesEquipmentEntity.some(equipment_onto.hasApparatus.some(equipment_onto.AtmosphericStorageTank)) &
+     safeguardPreventsCause.some(causes_onto.InsufficientThermalOutbreathing) &
+     safeguardPreventsEffect.some(effect_onto.Fracture))
+     |
+     (safeguardInvolvesEquipmentEntity.some(equipment_onto.hasApparatus.some(equipment_onto.AtmosphericStorageTank)) &
+     safeguardOfDeviation.some(deviation_onto.HighPressure) &
+     safeguardPreventsEffect.some(effect_onto.Fracture)))]
+    PressureVacuumReliefValve.comment = ["also known as 'conservation vent valve'"]
+    class CollectingBasin(Safeguard):
+     equivalent_to = [Safeguard &
+     (safeguardMitigatesConsequence.some(consequence_onto.LossOfPrimaryContainment) &
+     safeguardInvolvesEquipmentEntity.some(equipment_onto.PressureVesselEntity | equipment_onto.PressureReceiverEntity))]
+    class ValveLockedClosed(Safeguard):
+     equivalent_to = [Safeguard &
+     (safeguardPreventsCause.some(causes_onto.BypassOpened)
+     |
+     (safeguardPreventsCause.some(causes_onto.DrainValveInadvertentlyOpened) &
+     safeguardPreventsEffect.some(effect_onto.PoolFormation)))]
+    class SwingCheckValve(Safeguard):
+     equivalent_to = [Safeguard &
+     (safeguardPreventsCause.some(causes_onto.WaterHammer) &
+     safeguardInvolvesEquipmentEntity.some(equipment_onto.ConnectionPipeEntity))]
+    class SurgeReliefValve(Safeguard):
+     equivalent_to = [Safeguard &
+     (safeguardPreventsCause.some(causes_onto.WaterHammer) &
+     safeguardInvolvesEquipmentEntity.some(equipment_onto.ConnectionPipeEntity |
+     equipment_onto.PumpEntity))] 
+     
+     
+    class FlareSystem(Safeguard):
+     equivalent_to = [Safeguard &
+     safeguardInvolvesEquipmentEntity.some(
+     equipment_onto.hasApparatus.some(equipment_onto.PressureVessel)) &
+     impliesSafeguard.some(PressureReliefValve) &
+     safeguardInvolvesSubstance.some(
+     substance_onto.hasHazardClass.some(
+     substance_onto.FlammableLiquidCategory1 |
+     substance_onto.FlammableLiquidCategory2 |
+     substance_onto.FlammableLiquidCategory3 |
+     substance_onto.FlammableGasCategory1 |
+     substance_onto.FlammableGasCategory2 |
+     substance_onto.PyrophoricGasCategory1 |
+     substance_onto.AerosolCategory1 |
+     substance_onto.AerosolCategory2
+     ))]
+    class IncreaseClosingTimeOfValve(Safeguard):
+     equivalent_to = [Safeguard &
+     safeguardPreventsCause.some(causes_onto.WaterHammer)]
+    class PulsationDampener(Safeguard):
+     equivalent_to = [Safeguard &
+     (safeguardPreventsCause.some(causes_onto.WaterHammer) &
+     safeguardInvolvesEquipmentEntity.some(equipment_onto.ConnectionPipeEntity))]
+    class ConsiderMaterialSelection(Safeguard):
+     equivalent_to = [Safeguard &
+     safeguardPreventsEffect.some(effect_onto.GenerationOfElectrostaticCharge) |
+     safeguardOfDeviation.some(deviation_onto.HighCorrosion)]
+    class GasBalanceLine(Safeguard):
+     equivalent_to = [Safeguard &
+     safeguardPreventsCause.some(causes_onto.LiquidTransferWithoutCompensation) &
+     safeguardInvolvesEquipmentEntity.some(
+     equipment_onto.hasApparatus.some(equipment_onto.AtmosphericStorageTank))]
+    class IncreaseSafetyIntegrityLevel(Safeguard):
+     equivalent_to = [Safeguard &
+     safeguardDependsOnRiskCategory.some(risk_assessment_onto.C |
+     risk_assessment_onto.B) &
+     safeguardPreventsUnderlyingCause.some(causes_onto.LevelIndicatorControllerFailure)
+     ]
+    class ThermalProtectionTrip(Safeguard):
+     equivalent_to = [Safeguard &
+     (safeguardInvolvesEquipmentEntity.some(equipment_onto.PumpEntity | equipment_onto.CompressorEntity) &
+     (safeguardOfDeviation.some(deviation_onto.HighTemperature) |
+     (safeguardPreventsEffect.some(effect_onto.Overheating |
+     effect_onto.FluidCirculatesInsidePump))
+     |
+     (safeguardOfDeviation.some(deviation_onto.HighTemperature) &
+     safeguardPreventsEffect.some(effect_onto.ExcessiveDischargeTemperature))))
+     ]
+    class SoftStartStopControl(Safeguard):
+     equivalent_to = [Safeguard &
+     (safeguardInvolvesEquipmentEntity.some(equipment_onto.PumpEntity) &
+     safeguardPreventsCause.some(causes_onto.WaterHammer))
+     ]
+    class InstallHighLevelAlarm(Safeguard):
+     equivalent_to = [Safeguard &
+     safeguardDependsOnRiskCategory.some(risk_assessment_onto.C |
+     risk_assessment_onto.D) &
+     safeguardPreventsEffect.some(effect_onto.Overfilling)]
+    class InstallHighTemperatureAlarm(Safeguard):
+     equivalent_to = [Safeguard &
+     (safeguardInvolvesEquipmentEntity.some(equipment_onto.hasApparatus.some(
+     equipment_onto.AtmosphericStorageTank |
+     equipment_onto.PressureVessel)) &
+     safeguardPreventsEffect.some(effect_onto.UnintendedExothermicPolymerization) &
+     safeguardInvolvesSubstance.some(
+     substance_onto.hasStabilityReactivityInformation.some(
+     substance_onto.PolymerizesExothermicallyWhenExposedToHeat)))]
+    class ProvideLeakageMonitoring(Safeguard):
+     equivalent_to = [Safeguard &
+     safeguardInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity) &
+     safeguardPreventsEffect.some(effect_onto.PoolFormation)]
+    class ProvideAntiCorrosionCoating(Safeguard):
+     equivalent_to = [Safeguard &
+     safeguardInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity) &
+     safeguardOfDeviation.some(deviation_onto.HighCorrosion)]
+    class ImplementLowLevelAlarm(Safeguard):
+     equivalent_to = [Safeguard &
+     ((safeguardOfDeviation.some(deviation_onto.LowLevel) &
+     safeguardInvolvesEquipmentEntity.some(
+     equipment_onto.hasApparatus.some(equipment_onto.PressureVessel |
+     equipment_onto.AtmosphericStorageTank)) &
+     safeguardDependsOnRiskCategory.some(risk_assessment_onto.A | risk_assessment_onto.B))
+     |
+     (safeguardOfDeviation.some(deviation_onto.LowLevel) &
+     safeguardPreventsCause.some(causes_onto.LossOfInflow |
+     causes_onto.IncorrectFilling |
+    causes_onto.ClosedInletValve) &
+     safeguardDependsOnRiskCategory.some(risk_assessment_onto.A | risk_assessment_onto.B))
+     |
+     (safeguardPreventsEffect.some(effect_onto.EmptyingOfContainer) &
+     safeguardDependsOnRiskCategory.some(risk_assessment_onto.A | risk_assessment_onto.B)))]
+    class ImplementLowLevelWarning(Safeguard):
+     equivalent_to = [Safeguard &
+     ((safeguardOfDeviation.some(deviation_onto.LowLevel) &
+     safeguardInvolvesEquipmentEntity.some(
+     equipment_onto.hasApparatus.some(equipment_onto.PressureVessel | equipment_onto.AtmosphericStorageTank)) &
+     safeguardDependsOnRiskCategory.some(risk_assessment_onto.C | risk_assessment_onto.D))
+     |
+     (safeguardOfDeviation.some(deviation_onto.LowLevel) &
+     safeguardPreventsCause.some(causes_onto.LossOfInflow | causes_onto.IncorrectFilling | causes_onto.ClosedInletValve) &
+     safeguardDependsOnRiskCategory.some(risk_assessment_onto.C | risk_assessment_onto.D))
+     |
+     (safeguardPreventsEffect.some(effect_onto.EmptyingOfContainer) &
+     safeguardDependsOnRiskCategory.some(risk_assessment_onto.C | risk_assessment_onto.D)))
+     ]
+    class ValveLockedOpen(Safeguard):
+     equivalent_to = [Safeguard &
+     safeguardPreventsCause.some(causes_onto.DeadHeadingOfPump | causes_onto.ClosedInletValve)]
+     
+     
+    class InstallPhysicalBarrierAroundTheEquipment(Safeguard):
+     equivalent_to = [Safeguard &
+     safeguardInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity) &
+     safeguardPreventsCause.some(causes_onto.PhysicalImpact)]
+    class InstallPressureLimitationValve(Safeguard):
+     equivalent_to = [Safeguard &
+     (safeguardPreventsCause.some(causes_onto.IncorrectSetPointControlValve) &
+     safeguardOfDeviation.some(deviation_onto.HighPressure))
+     |
+     (safeguardInvolvesEquipmentEntity.some(equipment_onto.InertgasBlanketingEntity) &
+     safeguardOfDeviation.some(deviation_onto.HighPressure))]
+    class InstallRestrictiveFlowOrifice(Safeguard):
+     equivalent_to = [Safeguard &
+     (safeguardPreventsCause.some(causes_onto.ExcessiveInflow) &
+     safeguardInvolvesEquipmentEntity.some(equipment_onto.InertgasBlanketingEntity))]
+    class InstallCheckValve(Safeguard):
+     equivalent_to = [Safeguard &
+     (safeguardOfDeviation.some(deviation_onto.ReverseFlow)
+     |
+     (safeguardOfDeviation.some(deviation_onto.ElsewhereFlow) &
+     safeguardInvolvesEquipmentEntity.some(equipment_onto.ConnectionPipeEntity)))]
+    class QuenchSystem(Safeguard):
+     equivalent_to = [Safeguard &
+     (safeguardPreventsEffect.some(effect_onto.UnintendedExothermicPolymerization) &
+     safeguardInvolvesEquipmentEntity.some(equipment_onto.PressureVesselEntity |
+     equipment_onto.SettlingTankEntity |
+     equipment_onto.ReactorEntity |
+     equipment_onto.ShellTubeHeatExchangerEntity |
+     equipment_onto.StorageTankEntity))]
+    class VacuumProofDesign(Safeguard):
+     equivalent_to = [Safeguard &
+     (safeguardInvolvesEquipmentEntity.some(equipment_onto.PressureReceiverEntity |
+     equipment_onto.SettlingTankEntity |
+     equipment_onto.PressureVesselEntity) &
+     safeguardOfDeviation.some(deviation_onto.LowPressure) &
+     safeguardPreventsEffect.some(effect_onto.LossOfMechanicalIntegrity) &
+     safeguardDependsOnRiskCategory.some(risk_assessment_onto.A | risk_assessment_onto.B))]
+    class HighPointVent(Safeguard):
+     equivalent_to = [Safeguard &
+     (safeguardInvolvesEquipmentEntity.some(equipment_onto.PumpEntity) &
+     safeguardOfDeviation.some(deviation_onto.OtherThanComposition | deviation_onto.NoFlow | deviation_onto.LowFlow) &
+     safeguardPreventsCause.some(causes_onto.EntrainedAir))]
+    class CheckIfFreeBlowOffPossible(Safeguard):
+     equivalent_to = [Safeguard &
+     (safeguardInvolvesEquipmentEntity.some(equipment_onto.PumpEntity) &
+     safeguardOfDeviation.some(deviation_onto.OtherThanComposition | deviation_onto.NoFlow | deviation_onto.LowFlow) &
+     safeguardPreventsCause.some(causes_onto.EntrainedAir))]
+    CheckIfFreeBlowOffPossible.comment = ["Depends directly on HighPointVent"]
+    class UseSealingCaps(Safeguard):
+     equivalent_to = [Safeguard &
+     safeguardPreventsCause.some(causes_onto.ContaminationInUnloadingLines)]
+    class DetermineSafetyRelatedOperatingInstructions(Safeguard):
+     equivalent_to = [Safeguard &
+     (safeguardPreventsEffect.some(effect_onto.PotentialViolentReactionWithOxidizers)
+     |
+     safeguardPreventsUnderlyingCause.some(causes_onto.HoseIncorrectlyConnected |
+     causes_onto.IncorrectSetPointControlValve |
+     causes_onto.IncorrectPressureAdjustment))]
+    class EmergencyPressureReliefValve(Safeguard):
+     equivalent_to = [Safeguard &
+     (safeguardPreventsEffect.some(effect_onto.Fracture) &
+     safeguardPreventsUnderlyingCause.some(causes_onto.ExternalFire) &
+     safeguardInvolvesEquipmentEntity.some(equipment_onto.hasApparatus.some(
+     equipment_onto.AtmosphericStorageTank |
+     equipment_onto.OpenVessel)))]
+    EmergencyPressureReliefValve.comment = ["Located on low pressure storage tanks"] # Here I have added the .comment, this was not in the original code.
+    class AddStabilizer(Safeguard):
+     equivalent_to = [Safeguard &
+     safeguardPreventsEffect.some(effect_onto.UnintendedExothermicPolymerization)]
+    class FailsafeFeedStop(Safeguard):
+     equivalent_to = [Safeguard &
+     safeguardPreventsEffect.some(effect_onto.InsufficientInertization)]
+    class FlameArrestor(Safeguard):
+     equivalent_to = [Safeguard &
+     (safeguardInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity |
+     equipment_onto.SettlingTankEntity) &
+     safeguardMitigatesConsequence.some(consequence_onto.RiskOfExplosiveAtmosphere) &
+     safeguardInvolvesSubstance.some(substance_onto.hasHazardClass.some(
+     substance_onto.FlammableLiquidCategory1 |
+     substance_onto.FlammableLiquidCategory2 |
+     substance_onto.FlammableLiquidCategory3)))]
+    FlameArrestor.comment = [
+     "methanol tank, should be protected with flame arrestor and nitrogen blanketing (more than 3000 m³, API2000)"]
+    class RegularPlantInspection(Safeguard):
+     equivalent_to = [Safeguard &
+     ((safeguardPreventsCause.some(causes_onto.ExternalLeakage) | safeguardPreventsEffect.some(effect_onto.PoolFormation))
+     |
+     safeguardMitigatesConsequence.some(consequence_onto.LossOfPrimaryContainment))
+     ]
+    class ElaborationOfMaintenanceConcept(Safeguard):
+     equivalent_to = [Safeguard &
+     ((safeguardPreventsCause.some(causes_onto.PumpSealFailure) & safeguardPreventsEffect.some(effect_onto.PoolFormation))
+     |
+     (safeguardPreventsUnderlyingCause.some(causes_onto.LossOfLeakTightness | causes_onto.BrokenHose) &
+     safeguardPreventsCause.some(causes_onto.ExternalLeakage))
+     |
+     (safeguardPreventsUnderlyingCause.some(causes_onto.ControlValveFailsClosed |
+     causes_onto.ControlValveFailsOpen) &
+     safeguardDependsOnRiskCategory.some(risk_assessment_onto.C | risk_assessment_onto.D))
+     )]
+    class LimitationOfTheFlowVelocity(Safeguard):
+     equivalent_to = [Safeguard &
+     safeguardPreventsEffect.some(effect_onto.GenerationOfElectrostaticCharge)
+     ] 
+    
+    
+    class ConsiderMinimumTankDistance(Safeguard):
+     equivalent_to = [Safeguard &
+     (safeguardInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity) &
+     safeguardMitigatesConsequence.some(consequence_onto.LossOfPrimaryContainment) &
+     safeguardPreventsEffect.some(effect_onto.LossOfMechanicalIntegrity | effect_onto.Fracture) &
+     safeguardInvolvesSubstance.some(substance_onto.hasFlashpointInKelvin <= 273.15 + 55.0))]
+    ConsiderMinimumTankDistance.comment = ["TRGS 509, pp. 37, <= 55 °C"]
+    class CheckPressureClassPiping(Safeguard):
+     equivalent_to = [Safeguard &
+     (safeguardPreventsEffect.some(effect_onto.Fracture) &
+     safeguardInvolvesEquipmentEntity.some(equipment_onto.ConnectionPipeEntity | equipment_onto.ValveEntity) &
+     safeguardOfDeviation.some(deviation_onto.HighPressure))]
+    class UseNormallyOpenValve(Safeguard):
+     equivalent_to = [Safeguard &
+     (safeguardPreventsCause.some(causes_onto.ValveWronglyClosed) & safeguardPreventsEffect.some(effect_onto.EmptyingOfContainer))]
+    class AvoidingBlockedLiquids(Safeguard):
+     equivalent_to = [Safeguard &
+     (safeguardInvolvesEquipmentEntity.some(equipment_onto.ConnectionPipeEntity) &
+     safeguardPreventsCause.some(causes_onto.AbnormalHeatInput))]
+    class InstallHeatTracingSystem(Safeguard):
+     equivalent_to = [Safeguard &
+     (safeguardPreventsEffect.some(effect_onto.DrainlineFracture) &
+     safeguardPreventsCause.some(causes_onto.ContaminationByWaterAndTemperatureFallsBelowFreezingPoint))]
+    class InstallThermalExpansionReliefValve(Safeguard):
+     equivalent_to = [Safeguard &
+     (safeguardPreventsEffect.some(effect_onto.PressureExceedingDesignPressure) &
+     safeguardPreventsCause.some(causes_onto.ThermalExpansion) &
+     safeguardPreventsUnderlyingCause.some(causes_onto.BlockedPipingAndHeatInput))]
+    class StandardOperationProcedure(Safeguard):
+     equivalent_to = [Safeguard &
+     (safeguardPreventsCause.some(causes_onto.DrainValveInadvertentlyOpened | causes_onto.OperationBelowMinimumFlowRate)
+     |
+     (safeguardPreventsUnderlyingCause.some(causes_onto.OperationalError) &
+     safeguardDependsOnRiskCategory.some(risk_assessment_onto.C | risk_assessment_onto.D))
+     |
+     (safeguardPreventsUnderlyingCause.some(causes_onto.MaintenanceError) &
+     safeguardDependsOnRiskCategory.some(risk_assessment_onto.C | risk_assessment_onto.D)))]
+    class ProvideGroundingOfPlant(Safeguard):
+     equivalent_to = [Safeguard & safeguardPreventsEffect.some(effect_onto.GenerationOfElectrostaticCharge)]
+     
+with pse_onto:
+    class PeriodicInspection(safeguard_onto.Safeguard):
+     equivalent_to = [safeguard_onto.Safeguard & safeguard_onto.safeguardPreventsCause.some(MalfunctionLubricationSystem)]
+    class ImprovedOilSeparation(safeguard_onto.Safeguard):
+     equivalent_to = [safeguard_onto.Safeguard & safeguard_onto.safeguardPreventsEffect.some(IncreasedOilDischarge)]
+    class QuickActionStopValve(safeguard_onto.Safeguard):
+     equivalent_to = [safeguard_onto.Safeguard &
+     safeguard_onto.safeguardInvolvesEquipmentEntity.some(equipment_onto.AirCooledCondenserEntity) &
+     safeguard_onto.safeguardOfDeviation.some(deviation_onto.ElsewhereFlow)
+     ]
+    class PurgerUnit(safeguard_onto.Safeguard):
+     equivalent_to = [safeguard_onto.Safeguard &
+     safeguard_onto.safeguardPreventsCause.some(causes_onto.NonCondensables)]
+    class OverflowValve(safeguard_onto.Safeguard):
+     equivalent_to = [safeguard_onto.Safeguard &
+     ((safeguard_onto.safeguardInvolvesEquipmentEntity.some(equipment_onto.PumpEntity |
+     equipment_onto.hasMaterialTransferEquipment.some(equipment_onto.CentrifugalPump |
+     equipment_onto.ReciprocatingPump)))
+     & safeguard_onto.safeguardPreventsEffect.some(effect_onto.FluidCirculatesInsidePump) &
+     safeguard_onto.safeguardPreventsCause.some(DeadHeadingOfPump | causes_onto.ValveIntactUnintentionallyClosed))]
+    class MinimumFlowProtectionSystem(safeguard_onto.Safeguard):
+     equivalent_to = [safeguard_onto.Safeguard &
+     (safeguard_onto.safeguardPreventsCause.some(OperationBelowMinimumFlowRate) &
+     safeguard_onto.safeguardDependsOnRiskCategory.some(risk_assessment_onto.A | risk_assessment_onto.B) &
+     safeguard_onto.safeguardInvolvesEquipmentEntity.some(equipment_onto.PumpEntity))]
+    MinimumFlowProtectionSystem.comment = ["e.g. continues bypass, automatic recirculation valve"]
+    class LowFlowProtectionTrip(safeguard_onto.Safeguard):
+     equivalent_to = [safeguard_onto.Safeguard &
+     (safeguard_onto.safeguardPreventsCause.some(OperationBelowMinimumFlowRate) &
+     safeguard_onto.safeguardOfDeviation.some(deviation_onto.LowFlow))]
+    class DryRunProtection(safeguard_onto.Safeguard):
+     equivalent_to = [safeguard_onto.Safeguard &
+     (safeguard_onto.safeguardInvolvesEquipmentEntity.some(equipment_onto.PumpEntity) &
+     safeguard_onto.safeguardPreventsEffect.some(PumpRunningDry))]
+    class InstallPumpInducer(safeguard_onto.Safeguard):
+     equivalent_to = [safeguard_onto.Safeguard &
+     (safeguard_onto.safeguardPreventsEffect.some(Cavitation) &
+     safeguard_onto.safeguardInvolvesEquipmentEntity.some(equipment_onto.PumpEntity))]
+    class IncreaseSuctionPressure(safeguard_onto.Safeguard):
+     equivalent_to = [safeguard_onto.Safeguard &
+     (safeguard_onto.safeguardPreventsEffect.some(Cavitation) &
+     safeguard_onto.safeguardPreventsCause.some(InsufficientNPSH) &
+     safeguard_onto.safeguardInvolvesEquipmentEntity.some(equipment_onto.PumpEntity))]
+    class DefineMaximumFillLevel(safeguard_onto.Safeguard):
+     equivalent_to = [safeguard_onto.Safeguard &
+     (safeguard_onto.safeguardInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity) &
+     safeguard_onto.safeguardPreventsEffect.some(effect_onto.Overfilling))]
+    class TemperatureControllerHighAlarm(safeguard_onto.Safeguard):
+     equivalent_to = [safeguard_onto.Safeguard &
+     (safeguard_onto.safeguardPreventsCause.some(causes_onto.AbnormallyHotIntake | CoolingFailure) &
+     safeguard_onto.safeguardOfDeviation.some(deviation_onto.HighTemperature))]
+    class EmergencyCooling(safeguard_onto.Safeguard):
+     equivalent_to = [safeguard_onto.Safeguard &
+     (safeguard_onto.safeguardPreventsCause.some(CoolingFailure) &
+     safeguard_onto.safeguardOfDeviation.some(deviation_onto.HighTemperature))]
+    class EmergencyStabilization(safeguard_onto.Safeguard):
+     equivalent_to = [safeguard_onto.Safeguard &
+     (safeguard_onto.safeguardInvolvesEquipmentEntity.some(equipment_onto.StorageTankEntity |
+     equipment_onto.SettlingTankEntity |
+     equipment_onto.ReactorEntity |
+     equipment_onto.PressureVesselEntity |
+     equipment_onto.PressureReceiverEntity) &
+     safeguard_onto.safeguardPreventsEffect.some(effect_onto.UnintendedExothermicPolymerization))]
  
  
 
