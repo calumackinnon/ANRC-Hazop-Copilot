@@ -6995,15 +6995,16 @@ with pse_onto:
 
 #%% Appendix Q - Inference and Analysis
 
+# Jonathan
 def equipment_based_hazard_specific_deviation(deviation, args):
     
     # === Input
-    process_unit = args[0]
-    substance = args[1]
-    environment = args[2]
-    subsequent_deviation_loop = args[3]
-    subsequent_deviations = args[4]
-    stack_elements = args[5]
+    process_unit                = args[0]
+    substance                   = args[1]
+    environment                 = args[2]
+    subsequent_deviation_loop   = args[3]
+    subsequent_deviations       = args[4]
+    stack_elements              = args[5]
     
     # === Loop over causes =====================================================================================
     preliminary_scenario_list = []
@@ -7040,6 +7041,7 @@ def equipment_based_hazard_specific_deviation(deviation, args):
                 
     if cause and cause.is_a:
         cause_lst = prep.get_inferred_results(cause)
+        
         for idx, cause_ in enumerate(cause_lst):
             underlying_causes, effect, consequence, = assemble_concept_instance(substance,
                                                                             process_unit,
@@ -7093,7 +7095,7 @@ def equipment_based_hazard_specific_deviation(deviation, args):
         ) 
 
     
-    
+# Zhouxiang
 def infer_follow_up(process_unit,
                     substance,
                     deviation,
@@ -7425,7 +7427,7 @@ def infer_follow_up(process_unit,
                 subsequent_deviations.append(dev)
 
 
-
+# Calum
 # infer.py
 def propagation_based_analysis(plant_graph, order, propagation_stacks):
     # create copy of original plant layout and remove edges that are not in 'order' list
@@ -8195,10 +8197,13 @@ if __name__ == '__main__':
         elif graph_type == GraphType.JunctionSystem or \
                 graph_type == GraphType.ComplexSystem or \
                 graph_type == GraphType.RecycleFlowSystem:
+                    
             for stream in newly_arranged_graphs:
+                
                 propagation_based_analysis(process_plant_model, 
                                                  stream, 
                                                  stack_elements)
+                
         else:
             print("Case not covered by any strategy!")
 
