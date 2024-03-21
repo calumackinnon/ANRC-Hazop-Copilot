@@ -120,7 +120,7 @@ go = None
      which would help resolve the apparent indentation confusion with a method
      infer_follow_up(...) and which would delineate where ontology definitions
      begin and end within the rest of this code.
-     """ #TODO This also means I have to undo commenting the duplicates out, as these intentionally build upon one another as described via the webpage.
+""" 
 
 class OntologyOperations():
     
@@ -3052,6 +3052,7 @@ class effectOfPropagatedCause(Effect >> bool, FunctionalProperty):
  pass
 class effectImpliedByUnderlyingcause(Effect >> causes_onto.UnderlyingCause):
  pass
+
 # === Consequence ========================================
 class Consequence(Thing):
  pass
@@ -3098,6 +3099,7 @@ class safeguardDependsOnRiskCategory(Safeguard >> risk_assessment_onto.RiskCateg
  pass
 class impliesSafeguard(Safeguard >> Safeguard, AsymmetricProperty):
  pass
+
 # === Disjoint statement
 AllDisjoint([deviation_onto.Deviation,
  causes_onto.Cause,
@@ -3108,18 +3110,18 @@ AllDisjoint([deviation_onto.Deviation,
  risk_assessment_onto.Likelihood,
  risk_assessment_onto.SeverityCategory,
  risk_assessment_onto.RiskCategory])
-# === Deviation ========================================
 
+# === Deviation ========================================
 # class Deviation(Thing):
-#  pass
+#   pass
 # Deviation.label = ["deviation"]
 # Deviation.comment = ["describes (process) deviation from intention",
-#  "CCPS glossary: 'process condition outside of established design limits'",
+#   "CCPS glossary: 'process condition outside of established design limits'",
 # "describes fault event in the sequence of events of a scenario"]
 # class hasGuideword(Deviation >> Guideword):
-#  pass
+#   pass
 # class hasParameter(Deviation >> Parameter):
-#  pass
+#   pass
 
 
 
@@ -3147,6 +3149,7 @@ class OtherThan(Guideword):
  pass
 class Reverse(Guideword):
  pass
+
 # === Parameters ========================================
 class Parameter(Thing):
  pass
@@ -3168,12 +3171,14 @@ class Corrosion(Parameter):
  pass
 class Time(Parameter):
  pass
+
 # === Deviation ========================================
 class Deviation(Thing):
  pass
 Deviation.label = ["deviation"]
-Deviation.comment = ["describes (process) deviation from intention", "CCPS glossary: 'process condition outside of established design limits'",
- "describes fault event in the sequence of events of a scenario"]
+Deviation.comment = ["describes (process) deviation from intention", 
+    "CCPS glossary: 'process condition outside of established design limits'",
+    "describes fault event in the sequence of events of a scenario"]
 class hasGuideword(Deviation >> Guideword):
  pass
 class hasParameter(Deviation >> Parameter):
@@ -3259,8 +3264,8 @@ class hasConnectionType(Port >> ConnectionType, FunctionalProperty):
  pass
 class hasName(Port >> str, FunctionalProperty):
  pass
-# class portEquippedWithInstrumentation(Port >> PlantItem, FunctionalProperty):
-#  pass
+class portEquippedWithInstrumentation(Port >> PlantItem, FunctionalProperty):
+  pass
 
 # === Control instance
 class ControlInstance(Thing):
@@ -3336,6 +3341,7 @@ class ScrewCompressor(Compressor):
 class PistonCompressor(Compressor):
  pass
 PistonCompressor.comment = ["piston compressor", "positive-displacement compressor"]
+
 # ==== APPARATUS
 class Apparatus(StructuralPlantItem):
  pass
@@ -3357,6 +3363,7 @@ class PumpCasing(Casing):
  pass
 class CompressorCasing(Casing):
  pass
+
 # === INSTRUMENTATION
 class Instrumentation(FunctionalPlantItem):
  pass
@@ -3404,11 +3411,10 @@ class PneumaticActuator(Actuator):
  pass
 class ManualActuator(Actuator):
  pass
+
 # === FIXTURE
 class Fixture(StructuralPlantItem):
  pass
-
-
 class NoFixture(Fixture):
  pass
 class Jacket(Fixture):
@@ -3438,6 +3444,7 @@ class Impeller(Fixture):
  pass
 class Stirrer(Fixture):
  pass
+
 # === OPERATION RELATED EQUIPMENT
 class Subunit(FunctionalPlantItem):
  pass
@@ -3550,6 +3557,7 @@ class AirCooledCondenserEntity(EquipmentEntity):
  pass
 class FinTubeEvaporatorEntity(EquipmentEntity):
  pass
+
 # === Relations
 class hasFixture(EquipmentEntity >> Fixture):
  pass
@@ -4904,10 +4912,10 @@ class AbnormallyHotIntake(UnderlyingCause):
  )] 
  
  
-# class DepositionOfImpurities(UnderlyingCause):
-#  equivalent_to = [UnderlyingCause &
-#  isUnderlyingcauseOfCause.some(BlockedInflowLine |
-#  ReducedFlowArea)]
+class DepositionOfImpurities(UnderlyingCause):
+  equivalent_to = [UnderlyingCause &
+  isUnderlyingcauseOfCause.some(BlockedInflowLine |
+  ReducedFlowArea)]
 class LevelIndicatorControllerFailure(UnderlyingCause):
  equivalent_to = [UnderlyingCause &
  (isUnderlyingcauseOfCause.some(ValveWronglyClosed |
@@ -5884,10 +5892,10 @@ class ProductionDowntime(Consequence):
  (isConsequenceOfEffect.some(effect_onto.LossOfHeatTransfer) &
  consequenceInvolvesEquipmentEntity.some(equipment_onto.SteamDrivenReboilerEntity)))]
 ProductionDowntime.comment = ["There is also specific definition of the concept in compressor_onto"]
-# class ReductionOfCoolingCapacity(Consequence):
-#  equivalent_to = [Consequence &
-#  (isConsequenceOfEffect.some(effect_onto.LossOfHeatTransfer) &
-#  consequenceInvolvesSubstance.some(substance_onto.hasSpecificTask.some(substance_onto.Refrigerant)))]
+class ReductionOfCoolingCapacity(Consequence):
+  equivalent_to = [Consequence &
+  (isConsequenceOfEffect.some(effect_onto.LossOfHeatTransfer) &
+  consequenceInvolvesSubstance.some(substance_onto.hasSpecificTask.some(substance_onto.Refrigerant)))]
 class PROPAGATED_CONSEQUENCE(Consequence):
  equivalent_to = [Consequence &
  ((consequenceImpliedByCause.some(causes_onto.IncorrectSetPointControlValve | causes_onto.ConfusionOfSubstances |
