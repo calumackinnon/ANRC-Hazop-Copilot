@@ -15,6 +15,8 @@ This is described at https://docs.python.org/3/library/unittest.html.
 """
 
 import unittest
+# from appendicesAll import create_process_plant_hexane_storage_tank
+import boundary_onto
 
 class TestNewUnitTests(unittest.TestCase):
     
@@ -53,14 +55,20 @@ class TestTheGivenMainFunction(unittest.TestCase):
     
     def testModelCreation(self):
         
-        process_plant_model = model.create_hazid_benchmark_1()
+        # process_plant_model = model.create_hazid_benchmark_1()
+        process_plant_model = appendicesAll.create_process_plant_hexane_storage_tank()
+        self.assertNotNone(process_plant_model)
+        
+    def testCreateOlefinModel(self):
+        
+        process_plant_model = appendicesAll.create_olefin_feed_section()
         self.assertNotNone(process_plant_model)
         
     def testGraphType(self):
         
-        process_plant_model = model.create_hazid_benchmark_1()
+        process_plant_model = appendicesAll.create_hazid_benchmark_1()
         graphType = appendicesAll.findTypeOf(process_plant_model)
-        self.assertIsInstance(graphType, GraphType)
+        self.assertIsInstance(graphType, appendicesAll.GraphType)
 
 
 
