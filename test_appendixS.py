@@ -16,12 +16,55 @@ This is described at https://docs.python.org/3/library/unittest.html.
 
 import unittest
 
-#%% Appendix S - Unit Tests
-
 class TestNewUnitTests(unittest.TestCase):
     
-    def test_assertTrue(self):
-        self.assertTrue('FOO'.isupper())
+    def test_UnitTestsCanAssertTrue(self):
+        """
+        Test the ability to run unit tests using
+        python -m unittest discover
+
+        Returns
+        -------
+        None.
+
+        """
+        self.assertTrue('FOO'.isupper()) # Test the ability to run unit tests.
+        
+    def testTheNameOfThis(self):
+        self.assertTrue(True) # Check this test is run without an underscore.
+        
+    def checkAnotherTestWillRun(self):
+        self.assertTrue(True) # This does not run without a title like 'test*'.
+        
+    def testAnObjectCanBeMade(self):
+        
+        someNewCause = boundary_onto.UpstreamProcessInvolved()
+        self.assertIsNotNone(someNewCause) # Can an object be created?
+
+class TestTheGivenMainFunction(unittest.TestCase):
+    
+    processModel = None
+    
+    def setUp(self): # Called before every test* method.
+        pass
+    
+    def tearDown(self): # Called after every test* method.
+        pass
+    
+    def testModelCreation(self):
+        
+        process_plant_model = model.create_hazid_benchmark_1()
+        self.assertNotNone(process_plant_model)
+        
+    def testGraphType(self):
+        
+        process_plant_model = model.create_hazid_benchmark_1()
+        graphType = appendicesAll.findTypeOf(process_plant_model)
+        self.assertIsInstance(graphType, GraphType)
+
+
+
+#%% Appendix S - Unit Tests
 
 class TestUnderlyingCauses(unittest.TestCase):
     

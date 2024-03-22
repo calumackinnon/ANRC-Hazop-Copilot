@@ -8,6 +8,7 @@ and  https://owlready2.readthedocs.io/en/latest/install.html#installation-in-spy
 @author: qrb15201
 """
 from owlready2 import *
+from owlready2 import Thing
 
 onto = get_ontology("http://test.org/onto.owl")
 

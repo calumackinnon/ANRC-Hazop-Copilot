@@ -165,15 +165,15 @@ output = Output()
 
 
 class GraphType(Enum):
-    SingleLineSystem = 0
-    MultiCycleSystem = 1
-    RecycleFlowSystem = 2
-    JunctionSystem = 3
+    SingleLineSystem = 0      #covered
+    MultiCycleSystem = 1      #covered
+    RecycleFlowSystem = 2      #covered
+    JunctionSystem = 3      #covered
     BranchSystem = 4
     JunctionSystemRatiosAllZero = 5 # This has been created in response to
     # the structure of the code in the determine_propagation_strategy() method.
     SingleCycleSystem = 6 
-    ComplexSystem = 7
+    ComplexSystem = 7      #covered
  
 # === Function to identify ratio pattern [0, 1, .., 1, 0]
 def identify_single_line(out_in_ratios):
@@ -7093,17 +7093,17 @@ def infer_follow_up(process_unit,
             for underlying_cause in underlying_cause_list:
                 for consequence in scenario[prep.DictName.consequence].is_instance_of:
                     for effect in scenario[prep.DictName.effect].is_instance_of:
-                        extended_scenarion_list.append({prep.DictName.cause: scenario[prep.DictName.cause],
+                        extended_scenarion_list.append({prep.DictName.cause:            scenario[prep.DictName.cause],
                                                         prep.DictName.underlying_cause: underlying_cause(),
-                                                        prep.DictName.effect: effect(),
-                                                        prep.DictName.consequence: consequence()})
+                                                        prep.DictName.effect:           effect(),
+                                                        prep.DictName.consequence:      consequence()})
         else:
             for consequence in scenario[prep.DictName.consequence].is_instance_of:
                 for effect in scenario[prep.DictName.effect].is_instance_of:
-                    extended_scenarion_list.append({prep.DictName.cause: scenario[prep.DictName.cause],
-                                                    prep.DictName.effect: effect(),
-                                                    prep.DictName.underlying_cause: scenario[prep.DictName.underlying_cause],
-                                                    prep.DictName.consequence: consequence()})
+                    extended_scenarion_list.append({prep.DictName.cause:                scenario[prep.DictName.cause],
+                                                    prep.DictName.effect:               effect(),
+                                                    prep.DictName.underlying_cause:     scenario[prep.DictName.underlying_cause],
+                                                    prep.DictName.consequence:          consequence()})
         
     scenario_list = extended_scenarion_list
     
@@ -8073,6 +8073,45 @@ def create_olefin_feed_section():
 
 #%% Appendix C - Main
 
+def equipmentBasedEvaluation(process_plant_model, stack):
+    
+    for index in range(len(process_plant_model.nodes)):
+        equipment_specific_prop_scenarios = []
+        
+        equipment_entity = process_plant_model.nodes[index]["data"]
+        
+        # Add port information to equipment entity
+        for key, value in process_plant_model.nodes[index]["ports"].items():
+            equipment_entity.onto_object.hasPort.append(value.onto_object)
+            
+            # Add port information to equipment entity
+            if value.port_instrumentation:
+                equipment_entity.onto_object.hasInstrumentation.append(value.port_instrumentation)
+                
+        process_unit_obj = equipment_entity.onto_object.is_a[0]
+        
+        # === continue in case of source and sink, since they are not relevant in
+        # equipment-based mode to save reasoner calls
+        if process_unit_obj == equipment_onto.SinkEntity:
+            continue
+        
+        substances = process_plant_model.nodes[index]["substances"]
+        environment = process_plant_model.nodes[index]["environment"]
+        deviations = config.deviation_selector(process_unit_obj)
+        
+        # === Infer hazards
+        equipment_based_analysis( equipment_entity,
+                                        deviations,
+                                        substances,
+                                        environment,
+                                        equipment_specific_prop_scenarios )
+
+        stack.append({"{0}".format(equipment_entity.name): equipment_entity,
+                               pre_processing.DictName.scenario: equipment_specific_prop_scenarios})
+        
+    return stack
+
+    
 if __name__ == '__main__':
     
     # === save all ontologies
@@ -8083,102 +8122,91 @@ if __name__ == '__main__':
     start_time = time.time()
     
     # === Process model
-    process_plant_model = model.create_hazid_benchmark_1()
+    # process_plant_model = model.create_hazid_benchmark_1()
+    process_plant_model = create_process_plant_hexane_storage_tank()
     
-    deviation_number = None
+    # deviation_number = None
     stack_elements = []
     
-    # === Tearing strategy/strategy for defining order of process equipment/start-end point
-    if len(process_plant_model.nodes) > 1:
-        
-        # The following single method is now subdivided into 3 for clarity.
-        # graph_type, newly_arranged_graphs, intersections = determine_propagation_strategy(process_plant_model)
-        graph_type = findTypeOf(process_plant_model)
-        newly_arranged_graphs = replicate(process_plant_model, graph_type)
-        intersections = getIntersectionNode(process_plant_model, graph_type)
-        
-        print(list(newly_arranged_graphs))
-
     if config.EQUIPMENT_BASED_EVALUATION:
         
-        for index in range(len(process_plant_model.nodes)):
-            equipment_specific_prop_scenarios = []
-            
-            equipment_entity = process_plant_model.nodes[index]["data"]
-            
-            # Add port information to equipment entity
-            for key, value in process_plant_model.nodes[index]["ports"].items():
-                equipment_entity.onto_object.hasPort.append(value.onto_object)
-                
-                # Add port information to equipment entity
-                if value.port_instrumentation:
-                    equipment_entity.onto_object.hasInstrumentation.append(value.port_instrumentation)
-                    
-            process_unit_obj = equipment_entity.onto_object.is_a[0]
-            
-            # === continue in case of source and sink, since they are not relevant in
-            # equipment-based mode to save reasoner calls
-            if process_unit_obj == equipment_onto.SinkEntity:
-                continue
-            
-            substances = process_plant_model.nodes[index]["substances"]
-            environment = process_plant_model.nodes[index]["environment"]
-            deviations = config.deviation_selector(process_unit_obj)
-            
-            # === Infer hazards
-            equipment_based_analysis( equipment_entity,
-                                            deviations,
-                                            substances,
-                                            environment,
-                                            equipment_specific_prop_scenarios )
-    
-            stack_elements.append({"{0}".format(equipment_entity.name): equipment_entity,
-                                   pre_processing.DictName.scenario: equipment_specific_prop_scenarios})
+        stack_elements = equipmentBasedEvaluation(process_plant_model, stack_elements)
 
     # === Entry point for hazard/malfunction propagation
     if config.PROPAGATION_BASED_EVALUATION:
         
-        if graph_type == GraphType.SingleLineSystem:
-            propagation_based_analysis(process_plant_model, 
-                                             newly_arranged_graphs, 
-                                             stack_elements)
+        # === Tearing strategy/strategy for defining order of process equipment/start-end point
+        if len(process_plant_model.nodes) > 1:
             
-        elif graph_type == GraphType.MultiCycleSystem:
+            # The following single method is now subdivided into 3 for clarity.
+            # graph_type, newly_arranged_graphs, intersections = determine_propagation_strategy(process_plant_model)
+            graph_type = findTypeOf(process_plant_model)
+            newly_arranged_graphs = replicate(process_plant_model, graph_type)
+            intersections = getIntersectionNode(process_plant_model, graph_type)
             
-            for index, cycle in enumerate(newly_arranged_graphs):
-                # intersection of cycles
-                intersection_node_index = cycle.index(intersections)
-    
-                # start first cycle one node after intersection and following nodes at intersection
-                if index == 0:
-                    intersection_node_index += 1
+            print(list(newly_arranged_graphs))    
 
-                # === Change order of graph [intersection + 1] as starting node
-                new_order = []
-                for node in go.starting_with(cycle, intersection_node_index):
-                    new_order.append(node)
-    
-                propagation_based_analysis(process_plant_model,
-                                                 new_order,
-                                                 stack_elements)
-    
-        elif graph_type == GraphType.JunctionSystem or \
-                graph_type == GraphType.ComplexSystem or \
-                graph_type == GraphType.RecycleFlowSystem:
-                    
-            for stream in newly_arranged_graphs:
-                
+        
+        match graph_type:
+            case GraphType.SingleLineSystem:
+        # if graph_type == GraphType.SingleLineSystem:
+            
                 propagation_based_analysis(process_plant_model, 
-                                                 stream, 
-                                                 stack_elements)
+                                           newly_arranged_graphs, 
+                                           stack_elements)
+            
+        # elif graph_type == GraphType.MultiCycleSystem:
+            case GraphType.MultiCycleSystem:
                 
-        else:
-            print("Case not covered by any strategy!")
+                for index, cycle in enumerate(newly_arranged_graphs):
+                    # intersection of cycles
+                    intersection_node_index = cycle.index(intersections)
+        
+                    # start first cycle one node after intersection and following nodes at intersection
+                    if index == 0:
+                        intersection_node_index += 1
+    
+                    # === Change order of graph [intersection + 1] as starting node
+                    new_order = []
+                    for node in go.starting_with(cycle, intersection_node_index):
+                        new_order.append(node)
+        
+                    propagation_based_analysis(process_plant_model,
+                                               new_order,
+                                               stack_elements)
+                
+            case GraphType.JunctionSystem:
+        # elif graph_type == GraphType.JunctionSystem or \
+        #         graph_type == GraphType.ComplexSystem or \
+        #         graph_type == GraphType.RecycleFlowSystem:
+                    
+                for stream in newly_arranged_graphs:
+                    propagation_based_analysis(process_plant_model, 
+                                               stream, 
+                                               stack_elements)
+                    
+            case GraphType.ComplexSystem:
+                
+                for stream in newly_arranged_graphs:
+                    propagation_based_analysis(process_plant_model, 
+                                               stream, 
+                                               stack_elements)
+
+            case GraphType.RecycleFlowSystem:
+                
+                for stream in newly_arranged_graphs:
+                    propagation_based_analysis(process_plant_model, 
+                                               stream, 
+                                               stack_elements)
+                    
+            case _:
+        # else:
+                print("Case not covered by any strategy!")
 
     # === remove duplicates and sort results table
     results = pre_processing.cleanup_result_list(results)
     results = sorted(results, key=lambda k: k["process_equipment_id"])
-
+    
     # === Hazop table
     if results:
         counter = 0
