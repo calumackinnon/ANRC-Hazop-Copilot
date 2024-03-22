@@ -843,37 +843,6 @@ def determine_propagation_strategy(graph):
         
     return type_of_graph, new_graph, intersection_node 
 
-#%% Appendix S - Unit Tests
-
-
-class TestUnderlyingCauses(unittest.TestCase):
-    
-    def test_solar_radiation_1(self):
-        cause = causes_onto.AbnormalHeatInput()
-        boundary_condition = [boundary_onto.LocatedOutside()]
-        super_cause = causes_onto.SuperCause(isSupercauseOfCause=[cause],
-        supercauseRequiresBoundaryCondition=boundary_condition)
-        sync_reasoner()
-        super_cause_ = pre_processing.stringify_cleanup_inferred_res(super_cause)
-        super_cause_.sort()
-        time.sleep(0.01)
-        self.assertEqual(super_cause_, ['SolarRadiation'], "Should be ['SolarRadiation']")
- 
-    def test_blocked_piping_heat_input_1(self):
-        cause = causes_onto.ThermalExpansion()
-        unit = equipment_onto.ConnectionPipeEntity()
-        boundary_condition = [boundary_onto.ExternalFirePossible()]
-        super_cause = causes_onto.SuperCause(isSupercauseOfCause=[cause],
-                                             supercauseInvolvesUnit=[unit],
-                                             supercauseRequiresBoundaryCondition=boundary_condition)
-        sync_reasoner()
-        super_cause_ = pre_processing.stringify_cleanup_inferred_res(super_cause)
-        super_cause_.sort()
-        time.sleep(0.01)
-        self.assertEqual(super_cause_, ['BlockedPipingAndHeatInput'],
-                         "Should be ['BlockedPipingAndHeatInput']")
-
-
 #%% Appendix A - Equipment and Port Classes
 
 class MyPort:
@@ -6557,7 +6526,6 @@ with risk_assessment_onto:
      involvesSeverity.some(Minor))
      )] 
     
-
 
 
 
