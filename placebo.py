@@ -23,14 +23,18 @@ with onto:
 
     class Placebo(Drug):
         equivalent_to = [Drug & Not(has_for_active_principle.some(ActivePrinciple))]
+        # I read this as, it is a Drug, and has no asspciated ActivePrinciple
+        
         def take(self): print("I took a placebo")
 
     class SingleActivePrincipleDrug(Drug):
         equivalent_to = [Drug & has_for_active_principle.exactly(1, ActivePrinciple)]
+        
         def take(self): print("I took a drug with a single active principle")
 
     class DrugAssociation(Drug):
         equivalent_to = [Drug & has_for_active_principle.min(2, ActivePrinciple)]
+        
         def take(self): print("I took a drug with %s active principles" % len(self.active_principles))
 
 acetaminophen   = ActivePrinciple("acetaminophen")
