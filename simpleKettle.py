@@ -157,7 +157,7 @@ with onto:
     class EmptyCup(Cup):
         equivalent_to = [Cup & Not(containsSubstance.some(Substance))]
         
-def putIn(c, addition):
+def putIn(c, addition): #TODO - understand this (JF)
     
     if isinstance(addition, Container):
         return contains(c, addition)
@@ -167,7 +167,7 @@ def putIn(c, addition):
 # contains() or containsSubstance()
 #%% Create the Individuals (In other words, define inputs for a given scenario)
 
-hasRelations = []
+hasRelations = [] #TODO - understand this (JF)
 
 tepid = Water(21)
 lukewarm = Water(35)
@@ -175,7 +175,7 @@ boiled = Water(98)
 
 pours = [tepid, lukewarm, boiled]
 
-tealeaves = Tea()
+tealeaves = Tea() 
 semiskimmedmilk = Milk()
 # hasRelations.append( putIn() )
 
@@ -226,13 +226,13 @@ if 'y' == answer:
     cup3 = Cup(ingredients = [])
     tray = [cup1, cup2, cup3]
     
-    close_world(Substance)
+    close_world(Substance) #TODO - understand this (JF)
 
-    AllDifferent(tray)
+    AllDifferent(tray) #TODO - understand this (JF)
 
 #%% 6. Pose Queries by Doing the reasoning (In other words, do the processing).
 
-sync_reasoner()
+sync_reasoner() #TODO - understand this (JF)
 
 print('onto made')
 
@@ -241,6 +241,7 @@ print(onto)
 if 'y' == answer:
     for cup in tray:
         # for each in cup.allSubstances():
-        cup.taste() # ask a specific query to the knowledge
+        cup.taste() # ask a specific query to the knowledge #TODO - understand this (JF) -
+                    # I think that cup() lacks the method .taste() as this was only defined for Substances
     
     
