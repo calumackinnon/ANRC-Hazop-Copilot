@@ -37,6 +37,8 @@ with onto:
         
         def take(self): print("I took a drug with %s active principles" % len(self.active_principles))
 
+# Create the individuals
+
 acetaminophen   = ActivePrinciple("acetaminophen")
 amoxicillin     = ActivePrinciple("amoxicillin")
 clavulanic_acid = ActivePrinciple("clavulanic_acid")

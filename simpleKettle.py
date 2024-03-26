@@ -110,7 +110,8 @@ with onto:
     class Tea(Substance):                               pass # Tea leaves
     class Cinnamon(Substance):                          pass # Why not?
 
-    class hasTemperature(Substance >> float):           pass
+    class hasTemperature(Substance >> float):           
+        python_name = "heat_to"
 
     class TeaMixture(Substance):
         equivalent_to = [Water & Tea]
@@ -152,10 +153,21 @@ with onto:
     
     class contains(Container >> Container):             pass
 
-    class containsSubstance(Container >> Substance):    pass
+    class containsSubstance(Container >> Substance):    
+        python_name = "ingredients"
 
     class EmptyCup(Cup):
         equivalent_to = [Cup & Not(containsSubstance.some(Substance))]
+        
+    class AcceptableCup(Cup):
+        equivalent_to = [EmptyCup | containsSubstance.some(Substance)]
+        
+    class UnacceptableCup(Cup):
+        equipvalent_to = [Not(AcceptableCup)]
+        
+    class mixWith(Substance >> Substance): 
+        python_name = "mix"
+            
         
 def putIn(c, addition): #TODO - understand this (JF)
     
@@ -169,11 +181,13 @@ def putIn(c, addition): #TODO - understand this (JF)
 
 hasRelations = [] #TODO - understand this (JF)
 
-tepid = Water(21)
-lukewarm = Water(35)
-boiled = Water(98)
+tepid = Water(heat_to = 21.0)
+lukewarm = Water(heat_to = 35.0)
+boiled = Water(heat_to = 98.0)
 
 pours = [tepid, lukewarm, boiled]
+AllDifferent(pours)
+
 
 tealeaves = Tea() 
 semiskimmedmilk = Milk()
@@ -238,10 +252,11 @@ print('onto made')
 
 print(onto)
 
-if 'y' == answer:
-    for cup in tray:
-        # for each in cup.allSubstances():
-        cup.taste() # ask a specific query to the knowledge #TODO - understand this (JF) -
-                    # I think that cup() lacks the method .taste() as this was only defined for Substances
-    
+# if 'y' == answer:
+#     for cup in tray:
+#         # for each in cup.allSubstances():
+#         s = cup.containsSubstance() # ask a specific query to the knowledge #TODO - understand this (JF) -
+#                     # I think that cup() lacks the method .taste() as this was only defined for Substances
+#         s.taste()
+
     
