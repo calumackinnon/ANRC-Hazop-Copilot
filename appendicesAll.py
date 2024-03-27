@@ -3915,10 +3915,10 @@ with causes_onto:
      equipment_onto.PressureVessel)))]
     class NoFeed(Cause):
      equivalent_to = [Cause &
-     (isCauseOfDeviation.some(deviation_onto.NoFlow) &
-     causeInvolvesSubstance.some(substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium)) &
-     causeInvolvesEquipmentEntity.some(equipment_onto.StabilizerColumnEntity |
-     equipment_onto.ReactorEntity))]
+                      (isCauseOfDeviation.some(deviation_onto.NoFlow) &
+                       causeInvolvesSubstance.some(substance_onto.hasSpecificTask.some(substance_onto.ProcessMedium)) &
+                       causeInvolvesEquipmentEntity.some(equipment_onto.StabilizerColumnEntity |
+                                                         equipment_onto.ReactorEntity))]
     class WrongMountingOfNonReturnValve(Cause):
      equivalent_to = [Cause &
      (isCauseOfDeviation.some(deviation_onto.NoFlow) &

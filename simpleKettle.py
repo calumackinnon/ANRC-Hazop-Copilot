@@ -30,132 +30,149 @@ from owlready2 import *
 
 #%% 2. Make an Ontology (i.e., define the outputs / possible outcomes)
 
-onto = get_ontology("http://test.org/onto.owl")
+# Some code creates a world as detailed at https://owlready2.readthedocs.io/en/latest/world.html#using-several-isolated-worlds
+if 'y' == input('Want to create a new world to reason within? (y/n) (hint: do this once to set up the environment.)'):
+    #     kitchen = World(filename='/world/quadstore.sqlite3')
+    #     onto = kitchen.get_ontology("http://test.org/onto.owl").load()
 
-with onto:
-
-    # Owlready provides the following types of restrictions 
-    # (they have the same names as in Protégé):
+    onto = get_ontology("http://test.org/onto.owl")
     
-    # some : Property.some(Range_Class)
-    # only : Property.only(Range_Class)
-    # min : Property.min(cardinality, Range_Class)
-    # max : Property.max(cardinality, Range_Class)
-    # exactly : Property.exactly(cardinality, Range_Class)
-    # value : Property.value(Range_Individual / Literal value)
-    # has_self : Property.has_self(Boolean value)
+    with onto:
     
-    class Equipment(Thing):             pass
-    # class Container(Equipment):     
-    #     containsList = []
+        # Owlready provides the following types of restrictions 
+        # (they have the same names as in Protégé):
         
-    #     def putIn(self, item):
-    #         self.containsList.append(item)
+        # some : Property.some(Range_Class)
+        # only : Property.only(Range_Class)
+        # min : Property.min(cardinality, Range_Class)
+        # max : Property.max(cardinality, Range_Class)
+        # exactly : Property.exactly(cardinality, Range_Class)
+        # value : Property.value(Range_Individual / Literal value)
+        # has_self : Property.has_self(Boolean value)
+        
+        class Equipment(Thing):             pass
+        # class Container(Equipment):     
+        #     containsList = []
             
-    #     def allSubstances(self):
-            
-    #         if len(self.containsList) <= 0:
-    #             return [] # base case
-            
-    #         substanceList = []
-    #         for item in self.containsList:
+        #     def putIn(self, item):
+        #         self.containsList.append(item)
                 
-    #             print(item)
+        #     def allSubstances(self):
                 
-    #             # Each item is either Substance or Container
-    #             if isinstance(item, Container):
+        #         if len(self.containsList) <= 0:
+        #             return [] # base case
+                
+        #         substanceList = []
+        #         for item in self.containsList:
                     
-    #                 # get the next thing it contains and recurse
-    #                 substances = item.allSubstances() #TODO Error
-    #                 for s in substances:
-    #                     substanceList.append(s)
+        #             print(item)
+                    
+        #             # Each item is either Substance or Container
+        #             if isinstance(item, Container):
                         
-    #             else: # item is a Substance
-    #                 substanceList.append(item)
+        #                 # get the next thing it contains and recurse
+        #                 substances = item.allSubstances() #TODO Error
+        #                 for s in substances:
+        #                     substanceList.append(s)
+                            
+        #             else: # item is a Substance
+        #                 substanceList.append(item)
+                
+        #         return substanceList
             
-    #         return substanceList
-        
-    class Container(Equipment): pass
-    class Kettle(Container):
-        
-        def boil(self):
+        class Container(Equipment): pass
+        class Kettle(Container):
             
-            #TODO This should find any contained substance and set it's temp.
+            def boil(self):
+                
+                #TODO This should find any contained substance and set it's temp.
+                pass
+                
+        class Bag(Container):                               pass
+        class Bowl(Container):                              pass
+        class Box(Container):                               pass
+        class Cup(Container):                               pass
+        class Fridge(Container):                            pass
+        class Jug(Container):                               pass
+        class Teapot(Container):                            pass
+    
+        class Substance(Thing):         
+            
+            def diffuse(self):
+                
+                print('A substance is contained.')
+                
+            def setTemperature(self, temp):
+                self.temperature = temp
+                
+            def getTemperature(self, temp):
+                return self.temperature
+        
+        class Water(Substance): # A subclass inherits from a superclass in ontology
             pass
+        class Sugar(Substance):                             pass
+        class Milk(Substance):                              pass
+        class Tea(Substance):                               pass # Tea leaves
+        class Cinnamon(Substance):                          pass # Why not?
+    
+        class hasTemperature(Substance >> float):           
+            python_name = "heat_to"
+    
+        class TeaMixture(Substance):
+            equivalent_to = [Water & Tea]
             
-    class Bag(Container):                               pass
-    class Bowl(Container):                              pass
-    class Box(Container):                               pass
-    class Cup(Container):                               pass
-    class Fridge(Container):                            pass
-    class Jug(Container):                               pass
-    class Teapot(Container):                            pass
-
-    class Substance(Thing):         
+            def taste(self):
+                print('Tasting...')
         
-        def diffuse(self):
+        class WeakTea(TeaMixture):
             
-            print('A substance is contained.')
+            equivalent_to = [TeaMixture & hasTemperature.max(50.0)]
             
-        def setTemperature(self, temp):
-            self.temperature = temp
+            def taste(self):
+                print('This is weak tea.')
+        
+        # class Tea(TeaMixture):
+        #     equivalent_to = [TeaMixture & hasTemperature.min(80.0)]
             
-        def getTemperature(self, temp):
-            return self.temperature
-    
-    class Water(Substance): # A subclass inherits from a superclass in ontology
-        pass
-    class Sugar(Substance):                             pass
-    class Milk(Substance):                              pass
-    class Tea(Substance):                               pass # Tea leaves
-    class Cinnamon(Substance):                          pass # Why not?
-
-    class hasTemperature(Substance >> float):           pass
-
-    class TeaMixture(Substance):
-        equivalent_to = [Water & Tea]
+        #     def diffuse(self): print('This is as expected.')
         
-        def taste(self):
-            print('Tasting...')
-    
-    class WeakTea(TeaMixture):
+        class WhiteTea(TeaMixture):
+            equivalent_to = [TeaMixture & Milk & hasTemperature.min(80.0)]
+            
+            def taste(self): print('This is milk tea.')
         
-        equivalent_to = [TeaMixture & hasTemperature.max(50.0)]
+        class BlackTea(TeaMixture):
+            equivalent_to = [TeaMixture & hasTemperature.min(80.0)]
+    
+            def taste(self): print('This is Airplane tea.')
         
-        def taste(self):
-            print('This is weak tea.')
+        class BuildersTea(TeaMixture):
+            equivalent_to = [TeaMixture & hasTemperature.min(90.0)]
     
-    # class Tea(TeaMixture):
-    #     equivalent_to = [TeaMixture & hasTemperature.min(80.0)]
+            def taste(self): print('Don\'t stop for winter.')
         
-    #     def diffuse(self): print('This is as expected.')
+        class NutrimaticTea(TeaMixture):
+            equivalent_to = [TeaMixture & Cinnamon & hasTemperature.min(80.0)]
     
-    class WhiteTea(TeaMixture):
-        equivalent_to = [TeaMixture & Milk & hasTemperature.min(80.0)]
+            def taste(self): print('This is almost, but not quite, entirely unlike tea.')
         
-        def taste(self): print('This is milk tea.')
+        class contains(Container >> Container):             pass
     
-    class BlackTea(TeaMixture):
-        equivalent_to = [TeaMixture & hasTemperature.min(80.0)]
-
-        def taste(self): print('This is Airplane tea.')
+        class containsSubstance(Container >> Substance):    
+            python_name = "ingredients"
     
-    class BuildersTea(TeaMixture):
-        equivalent_to = [TeaMixture & hasTemperature.min(90.0)]
-
-        def taste(self): print('Don\'t stop for winter.')
-    
-    class NutrimaticTea(TeaMixture):
-        equivalent_to = [TeaMixture & Cinnamon & hasTemperature.min(80.0)]
-
-        def taste(self): print('This is almost, but not quite, entirely unlike tea.')
-    
-    class contains(Container >> Container):             pass
-
-    class containsSubstance(Container >> Substance):    pass
-
-    class EmptyCup(Cup):
-        equivalent_to = [Cup & Not(containsSubstance.some(Substance))]
+        class EmptyCup(Cup):
+            equivalent_to = [Cup & Not(containsSubstance.some(Substance))]
+            
+        class AcceptableCup(Cup):
+            equivalent_to = [EmptyCup | containsSubstance.some(Substance)]
+            
+        class UnacceptableCup(Cup):
+            equipvalent_to = [Not(AcceptableCup)]
+            
+        class mixWith(Substance >> Substance): 
+            python_name = "mix"
+                
         
 def putIn(c, addition): #TODO - understand this (JF)
     
@@ -166,14 +183,17 @@ def putIn(c, addition): #TODO - understand this (JF)
         
 # contains() or containsSubstance()
 #%% Create the Individuals (In other words, define inputs for a given scenario)
-
+''' According to https://owlready2.readthedocs.io/en/latest/onto.html#accessing-the-content-of-an-ontology
+    
 hasRelations = [] #TODO - understand this (JF)
 
-tepid = Water(21)
-lukewarm = Water(35)
-boiled = Water(98)
+tepid = Water(21.0)
+lukewarm = Water(35.0)
+boiled = Water(98.0)
 
 pours = [tepid, lukewarm, boiled]
+AllDifferent(pours)
+
 
 tealeaves = Tea() 
 semiskimmedmilk = Milk()
@@ -242,10 +262,11 @@ print('onto made')
 
 print(onto)
 
-if 'y' == answer:
-    for cup in tray:
-        # for each in cup.allSubstances():
-        cup.taste() # ask a specific query to the knowledge #TODO - understand this (JF) -
-                    # I think that cup() lacks the method .taste() as this was only defined for Substances
-    
+# if 'y' == answer:
+#     for cup in tray:
+#         # for each in cup.allSubstances():
+#         s = cup.containsSubstance() # ask a specific query to the knowledge #TODO - understand this (JF) -
+#                     # I think that cup() lacks the method .taste() as this was only defined for Substances
+#         s.taste()
+
     
