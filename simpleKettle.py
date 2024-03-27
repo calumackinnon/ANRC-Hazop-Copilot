@@ -56,13 +56,13 @@ if 'y' == input('Want to create a new world to reason within? (y/n) (hint: do th
         
         class Equipment(Thing):             pass
             
-        class Container(Equipment): 
+        class Container(Equipment): pass
             
-            def drink(self):
+            # def drink(self):
                 
-                # substance = 
-                # return substance
-                pass
+            #     substance = 
+            #     return substance
+            #     # pass
             
         class Kettle(Container):
             
@@ -74,11 +74,15 @@ if 'y' == input('Want to create a new world to reason within? (y/n) (hint: do th
         class Bag(Container):                               pass
         class Bowl(Container):                              pass
         class Box(Container):                               pass
-        class Cup(Container):                               pass
         class Fridge(Container):                            pass
         class Jug(Container):                               pass
         class Teapot(Container):                            pass
+        class Cup(Container):                               
+            def drink(self): 
+                # substance = 
+                print('This cup has been drunk.')
     
+    #%%
         class Substance(Thing):         
             
             def diffuse(self):
@@ -98,6 +102,7 @@ if 'y' == input('Want to create a new world to reason within? (y/n) (hint: do th
         class Milk(Substance):                              pass
         class Tea(Substance):                               pass # Tea leaves
         class Cinnamon(Substance):                          pass # Why not?
+    
     
         class hasTemperature(Substance >> float):           
             python_name = "heat_to"
@@ -139,6 +144,10 @@ if 'y' == input('Want to create a new world to reason within? (y/n) (hint: do th
             equivalent_to = [TeaMixture & Cinnamon & hasTemperature.min(80.0)]
     
             def taste(self): print('This is almost, but not quite, entirely unlike tea.')
+            
+        # class HerbalTea(TeaMixture):
+            
+        #     def taste(self): print('This tea tastes herbal.')
         
         class contains(Container >> Container):             pass
     
@@ -149,12 +158,16 @@ if 'y' == input('Want to create a new world to reason within? (y/n) (hint: do th
             equivalent_to = [Cup & Not(containsSubstance.some(Substance))]
             
         class AcceptableCup(Cup):
-            equivalent_to = [EmptyCup | (containsSubstance.some(TeaMixture)
-                                         & Not(containsSubstance.some(Cinnamon))
-                                         )]
+            equivalent_to = [containsSubstance.some(TeaMixture)
+                            & Not(containsSubstance.some(Cinnamon))
+                            ]
+            
+            def drink(self): print('This cup tastes good.')
             
         class UnacceptableCup(Cup):
             equipvalent_to = [Not(AcceptableCup)]
+            
+            def drink(self): print('This cup does not taste good.')
             
         class mixWith(Substance >> Substance): 
             python_name = "mix"
@@ -198,6 +211,8 @@ AllDifferent(pours)
 
 tealeaves = Tea() 
 semiskimmedmilk = Milk()
+cinnamon = Cinnamon()
+
 # hasRelations.append( putIn() )
 
 #%% 5. Configure A Specific Scenario
@@ -245,6 +260,7 @@ if 'y' == answer:
     cup1 = Cup(ingredients = [tealeaves, tepid])
     cup2 = Cup(ingredients = [tealeaves, lukewarm, semiskimmedmilk])
     cup3 = Cup(ingredients = [])
+    cup4 = Cup(ingredients = [boiled, tealeaves, cinnamon])
     tray = [cup1, cup2, cup3]
     
     close_world(Substance) #TODO - understand this (JF)
@@ -263,6 +279,14 @@ print('onto made')
 
 print(onto)
 
+
+# onto.containsSubstance.get_relations()
+# substance = cup1.drink()
+# substance.taste()
+cup1.drink()
+cup2.drink()
+cup3.drink()
+cup4.drink()
 
 
 # for cup in tray:
