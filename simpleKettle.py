@@ -228,7 +228,11 @@ if 'y' == answer:
     
     close_world(Substance) #TODO - understand this (JF)
 
+<<<<<<< Updated upstream
     AllDifferent(tray) #TODO - understand this (JF)
+=======
+    AllDifferent(tyray)
+>>>>>>> Stashed changes
 
 #%% 6. Pose Queries by Doing the reasoning (In other words, do the processing).
 
