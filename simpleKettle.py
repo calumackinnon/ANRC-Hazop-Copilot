@@ -38,49 +38,32 @@ if 'y' == input('Want to create a new world to reason within? (y/n) (hint: do th
     onto = get_ontology("http://test.org/onto.owl")
     
     with onto:
-    
-        # Owlready provides the following types of restrictions 
-        # (they have the same names as in Protégé):
         
-        # some : Property.some(Range_Class)
-        # only : Property.only(Range_Class)
-        # min : Property.min(cardinality, Range_Class)
-        # max : Property.max(cardinality, Range_Class)
-        # exactly : Property.exactly(cardinality, Range_Class)
-        # value : Property.value(Range_Individual / Literal value)
-        # has_self : Property.has_self(Boolean value)
+        ''' RESTRICTIONS
+        Owlready provides the following types of restrictions 
+        (they have the same names as in Protégé):
+        
+        some :      Property.some(Range_Class)
+        only :      Property.only(Range_Class)
+        min :       Property.min(cardinality, Range_Class)
+        max :       Property.max(cardinality, Range_Class)
+        exactly :   Property.exactly(cardinality, Range_Class)
+        value :     Property.value(Range_Individual / Literal value)
+        has_self :  Property.has_self(Boolean value)
+        
+        As given at https://owlready2.readthedocs.io/en/latest/restriction.html
+        '''
         
         class Equipment(Thing):             pass
-        # class Container(Equipment):     
-        #     containsList = []
             
-        #     def putIn(self, item):
-        #         self.containsList.append(item)
-                
-        #     def allSubstances(self):
-                
-        #         if len(self.containsList) <= 0:
-        #             return [] # base case
-                
-        #         substanceList = []
-        #         for item in self.containsList:
-                    
-        #             print(item)
-                    
-        #             # Each item is either Substance or Container
-        #             if isinstance(item, Container):
-                        
-        #                 # get the next thing it contains and recurse
-        #                 substances = item.allSubstances() #TODO Error
-        #                 for s in substances:
-        #                     substanceList.append(s)
-                            
-        #             else: # item is a Substance
-        #                 substanceList.append(item)
-                
-        #         return substanceList
+        class Container(Equipment): 
             
-        class Container(Equipment): pass
+            def drink(self):
+                
+                # substance = 
+                # return substance
+                pass
+            
         class Kettle(Container):
             
             def boil(self):
@@ -110,6 +93,7 @@ if 'y' == input('Want to create a new world to reason within? (y/n) (hint: do th
         
         class Water(Substance): # A subclass inherits from a superclass in ontology
             pass
+        
         class Sugar(Substance):                             pass
         class Milk(Substance):                              pass
         class Tea(Substance):                               pass # Tea leaves
@@ -165,7 +149,9 @@ if 'y' == input('Want to create a new world to reason within? (y/n) (hint: do th
             equivalent_to = [Cup & Not(containsSubstance.some(Substance))]
             
         class AcceptableCup(Cup):
-            equivalent_to = [EmptyCup | containsSubstance.some(Substance)]
+            equivalent_to = [EmptyCup | (containsSubstance.some(TeaMixture)
+                                         & Not(containsSubstance.some(Cinnamon))
+                                         )]
             
         class UnacceptableCup(Cup):
             equipvalent_to = [Not(AcceptableCup)]
@@ -182,8 +168,23 @@ def putIn(c, addition): #TODO - understand this (JF)
         return containsSubstance(c, addition)
         
 # contains() or containsSubstance()
+
+
+# The AllDisjoint([]) statement states classes do not overlap on a Venn diagram
+AllDisjoint([AcceptableCup, UnacceptableCup])
+AllDisjoint([Kettle, Bag, Bowl, Cup, Box, Fridge, Jug, Teapot])
+# So here I mean that all the containers are different, and that each cup is 
+# strictly either AcceptableCup or UnacceptableCup, but can be any of the other
+# classes at the same time. This is needed to structure the classification.
+
+
+
+
 #%% Create the Individuals (In other words, define inputs for a given scenario)
 ''' According to https://owlready2.readthedocs.io/en/latest/onto.html#accessing-the-content-of-an-ontology
+    the objects created in this part can be checked with a console command like
+    list(default_world.individuals())
+'''
     
 hasRelations = [] #TODO - understand this (JF)
 
@@ -248,21 +249,26 @@ if 'y' == answer:
     
     close_world(Substance) #TODO - understand this (JF)
 
+    # The AllDifferent([]) command is like AllDisjoint([]) but for individuals.
+    # https://owlready2.readthedocs.io/en/latest/disjoint.html#different-individuals
     AllDifferent(tray) #TODO - understand this (JF)
 
 #%% 6. Pose Queries by Doing the reasoning (In other words, do the processing).
 
+# sync_reasoner( [world] ) is where the reasoning is performed on the ontology.
 sync_reasoner() #TODO - understand this (JF)
 
 print('onto made')
 
 print(onto)
 
-# if 'y' == answer:
-#     for cup in tray:
-#         # for each in cup.allSubstances():
-#         s = cup.containsSubstance() # ask a specific query to the knowledge #TODO - understand this (JF) -
-#                     # I think that cup() lacks the method .taste() as this was only defined for Substances
-#         s.taste()
+
+
+# for cup in tray:
+    
+#     # for each in cup.allSubstances():
+#     s = cup.containsSubstance() # ask a specific query to the knowledge #TODO - understand this (JF) -
+#     # I think that cup() lacks the method .taste() as this was only defined for Substances
+#     s.taste()
 
     
