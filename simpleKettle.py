@@ -249,9 +249,10 @@ if 'y' == answer:
     
     close_world(Substance) #TODO - understand this (JF)
 
-    # The AllDifferent([]) command is like AllDisjoint([]) but for individuals.
-    # https://owlready2.readthedocs.io/en/latest/disjoint.html#different-individuals
-    AllDifferent(tray) #TODO - understand this (JF)
+# The AllDifferent([]) command is like AllDisjoint([]) but for individuals.
+# https://owlready2.readthedocs.io/en/latest/disjoint.html#different-individuals
+AllDifferent(tray) #TODO - understand this (JF)
+
 
 #%% 6. Pose Queries by Doing the reasoning (In other words, do the processing).
 
