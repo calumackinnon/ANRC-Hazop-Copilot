@@ -308,4 +308,13 @@ cup4.drink()
 #     # I think that cup() lacks the method .taste() as this was only defined for Substances
 #     s.taste()
 
+    #%% (INCOMPLETE) - Block of script to determine the contents of a cup:-
+"""
+Start by getting an object which is a list of the properties
+Use the property_class.get_relations() method
+"""
+for i in onto.:
     
+
+
+print(list(onto.containsSubstance.get_relations()))    
