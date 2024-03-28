@@ -77,10 +77,16 @@ if 'y' == input('Want to create a new world to reason within? (y/n) (hint: do th
         class Fridge(Container):                            pass
         class Jug(Container):                               pass
         class Teapot(Container):                            pass
-        class Cup(Container):                               
+        class Cup(Container):                               pass
+    
+        # To Python the following will look like it overwrites or replaces the
+        # previous class, but as in the OWLReady2 docs this instead extends it.
+        # https://owlready2.readthedocs.io/en/latest/mixing_python_owl.html#forward-declarations
+        class Cup(Container): 
             def drink(self): 
                 # substance = 
                 print('This cup has been drunk.')
+            
     
     #%%
         class Substance(Thing):         
@@ -112,7 +118,9 @@ if 'y' == input('Want to create a new world to reason within? (y/n) (hint: do th
             
             def taste(self):
                 print('Tasting...')
-        
+                
+                
+    #%% 
         class WeakTea(TeaMixture):
             
             equivalent_to = [TeaMixture & hasTemperature.max(50.0)]
@@ -154,6 +162,10 @@ if 'y' == input('Want to create a new world to reason within? (y/n) (hint: do th
         class containsSubstance(Container >> Substance):    
             python_name = "ingredients"
     
+                
+        class CupOfTea(Cup):
+            is_a = [containsSubstance.some(TeaMixture)]
+            
         class EmptyCup(Cup):
             equivalent_to = [Cup & Not(containsSubstance.some(Substance))]
             

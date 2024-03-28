@@ -114,7 +114,7 @@ config = Configuration.EQUIPMENT_BASED_EVALUATION
 
 go = None
 
-#%% Missing ontology_operations
+#%% Missing ontology_operations (ANRC developing this based on what we think is missing)
 
 """ At the link below there is an emphasis on using the 'with onto:' statement
      https://owlready2.readthedocs.io/en/latest/mixing_python_owl.html
@@ -1024,7 +1024,17 @@ class MySubstance:
         
         
         
-#%% Appendix D 
+#%% Appendix D - functions to build objects for a case study
+
+''' The functions in this appendix appear to call assemble_ontology_object () 
+    in the MyEquipmentEntity class in Appendix A, to build objects for each of
+    the two case studies given in Appendix W. Appendix W calls these functions
+    when building the NetworkX.Graph objects which represent each case study.
+    
+    So from this we know that the Graphs represent objects in the 'pipelines'
+    which are being studied, with edges to show how chemicals flow in between.
+'''
+    
 
 def source(identifier, circumstances, control_instance, transportable, operating_modes, max_pressure, max_temperature):
 
@@ -1178,6 +1188,7 @@ def shell_tube_heat_exchanger(identifier, circumstances, control_instance, trans
     return equipment_entity
 
 def reboiler(identifier, circumstances, control_instance, transportable, operating_modes, max_pressure, max_temperature):
+    
     equipment = equipment_onto.SteamDrivenReboilerEntity
     equipment_entity = MyEquipmentEntity(equipment, identifier, circumstances, transportable, operating_modes, max_pressure, max_temperature)
     equipment_entity.set_apparatus(equipment_onto.PressureVessel)
@@ -1291,6 +1302,7 @@ def centrifugal_pump_2( identifier,
                         max_pressure,
                         max_temperature,
                         volume_flow):
+    
     equipment = equipment_onto.PumpEntity
     equipment_entity = MyEquipmentEntity(equipment, identifier, circumstances, transportable, operating_modes, max_pressure, max_temperature)
     equipment_entity.set_volume_flow_of_transfer_equipment(volume_flow)
@@ -1367,6 +1379,7 @@ def pneumatically_flow_control_valve_1(identifier, circumstances, control_instan
     return equipment_entity
 
 def pneumatically_pressure_control_valve_1(identifier, circumstances, control_instance, transportable, operating_modes):
+
     equipment = equipment_onto.ValveEntity
     equipment_entity = MyEquipmentEntity(equipment, identifier, circumstances, transportable, operating_modes)
     equipment_entity.set_apparatus(equipment_onto.Body)
@@ -1382,6 +1395,7 @@ def pneumatically_pressure_control_valve_1(identifier, circumstances, control_in
     return equipment_entity
 
 def manual_three_way_valve(identifier, circumstances, control_instance, transportable, operating_modes):
+
     equipment = equipment_onto.ValveEntity
     equipment_entity = MyEquipmentEntity(equipment, identifier, circumstances, transportable, operating_modes)
     equipment_entity.add_instrumentation((equipment_onto.ThreeWayValve, "{}-VA1".format(identifier)))
@@ -1393,6 +1407,7 @@ def manual_three_way_valve(identifier, circumstances, control_instance, transpor
     return equipment_entity
 
 def throttling_valve(identifier, circumstances, control_instance, transportable, operating_modes, max_pressure, max_temperature):
+
     equipment = equipment_onto.ValveEntity
     equipment_entity = MyEquipmentEntity(equipment, identifier, circumstances, transportable, operating_modes, max_pressure, max_temperature)
     equipment_entity.add_instrumentation((equipment_onto.ThrottlingValve, "{}-VA1".format(identifier)))
@@ -1404,6 +1419,7 @@ def throttling_valve(identifier, circumstances, control_instance, transportable,
     return equipment_entity 
 
 def manual_valve(identifier, circumstances, control_instance, transportable, operating_modes):
+
     equipment = equipment_onto.ValveEntity
     equipment_entity = MyEquipmentEntity(equipment, identifier, circumstances, transportable, operating_modes)
     equipment_entity.add_instrumentation((equipment_onto.ShutOffValve, "{}-VA1".format(identifier)))
@@ -1415,6 +1431,7 @@ def manual_valve(identifier, circumstances, control_instance, transportable, ope
     return equipment_entity
 
 def air_cooled_condenser(identifier, circumstances, control_instance, transportable, operating_modes, max_pressure, max_temperature):
+    
     equipment = equipment_onto.AirCooledCondenserEntity
     equipment_entity = MyEquipmentEntity(equipment, identifier, circumstances, transportable, operating_modes, max_pressure, max_temperature)
     equipment_entity.add_instrumentation((equipment_onto.InletValve, "{}-VA1".format(identifier)))
@@ -1432,6 +1449,7 @@ def air_cooled_condenser(identifier, circumstances, control_instance, transporta
     return equipment_entity
 
 def shell_tube_evaporator(identifier, circumstances, control_instance, transportable, operating_modes, max_pressure, max_temperature, volume):
+    
     equipment = equipment_onto.ShellTubeEvaporatorEntity
     equipment_entity = MyEquipmentEntity(equipment, identifier, circumstances, transportable, operating_modes, max_pressure, max_temperature)
     equipment_entity.add_instrumentation((equipment_onto.InletValve, "{}-VA1".format(identifier)))
@@ -1495,6 +1513,7 @@ def cooling_tower(identifier, circumstances, control_instance, transportable, op
     return equipment_entity
 
 def crude_stabilizer_column(identifier, circumstances, control_instance, transportable, operating_modes, max_pressure, max_temperature):
+
     equipment = equipment_onto.StabilizerColumnEntity
     equipment_entity = MyEquipmentEntity(equipment, identifier, circumstances, transportable, operating_modes, max_pressure, max_temperature)
     equipment_entity.set_apparatus(equipment_onto.PressureVessel)
@@ -1528,7 +1547,6 @@ class CaseAttributes(Enum):
     InferredDeviation = 7    
     
 # propagation_case_base is a list of dictionaries.
-#TODO Check that equipment_onto is defined.
 propagation_case_base = [
     # === Pump
     {CaseAttributes.No: 1,
@@ -2918,6 +2936,9 @@ def calculate_similarity(new_case, old_case):
     similarities = []
     weights = []
     sum_of_weights = 0
+    
+    #TODO There is an error in the call to the function similar() below.
+    # Where is this function defined?
     
     for attr in attr_list:
         if old_case.get(attr)[0]:
