@@ -18,6 +18,7 @@ From Section 8.4.1 of Russel & Norvig, 3rd Ed. 2010, there is a 7-step process:
 """
 
 from owlready2 import *
+import pandas as pd
 
 #%% 1. A tea classifier.
 #       When you make tea, what you add determines how it tastes.
@@ -77,16 +78,22 @@ if 'y' == input('Want to create a new world to reason within? (y/n) (hint: do th
         class Fridge(Container):                            pass
         class Jug(Container):                               pass
         class Teapot(Container):                            pass
-        class Cup(Container):                               pass
-    
+
+        class Cup(Container):                               
         # To Python the following will look like it overwrites or replaces the
         # previous class, but as in the OWLReady2 docs this instead extends it.
         # https://owlready2.readthedocs.io/en/latest/mixing_python_owl.html#forward-declarations
-        class Cup(Container): 
-            def drink(self): 
-                # substance = 
-                print('This cup has been drunk.')
-            
+            def drink(self, df_relations):
+                desired_domain = self
+                # Filter the DataFrame based on the specified "Relation" and "Domain"
+                filtered_rows = df_relations.loc[(df_relations['Relation'] == onto.containsSubstance) & 
+                                                 (df_relations['Domain'] == desired_domain)]
+                # print("filtered_rows is", filtered_rows)
+                
+                # Join the elements of filtered_rows["Range"] with "and" as the separator
+                range_contents = " and ".join(map(str, filtered_rows["Range"]))
+                # Print the formatted output
+                print(f"The contents of {self} were {range_contents}")
     
     #%%
         class Substance(Thing):         
@@ -292,13 +299,70 @@ print('onto made')
 print(onto)
 
 
+#%% Block of script to determine the contents of a cup. 
+#TODO - Further edits to determine if it drink is acceptable and therefore drunk:-
+
+"""
+Start by getting an object which is a list of the properties
+Use the property_class.get_relations() method
+"""
+
+
+# import pandas as pd
+
+# Initialize an empty list to store relations
+relations = []
+
+# Define column names
+columns = ["Relation", "Domain", "Range"]
+
+# Iterate through properties in the ontology
+for prop in onto.properties():
+    # Retrieve relations for each property
+    for relation in prop.get_relations():
+        # Create a dictionary to store relation, domain, and range
+        relation_dict = {"Relation": prop, 
+                         "Domain": relation[0],
+                         "Range": relation[1]}
+        # Append the dictionary to the list of relations
+        relations.append(relation_dict)
+
+# Create a DataFrame from the list of relations
+df_relations = pd.DataFrame(relations, columns=columns)
+
+# Extract an element to check
+a = df_relations.loc[df_relations.index[0], "Domain"]
+type(a)
+a
+
+# Get the unique values for the "Domain" column
+unique_domains = df_relations['Domain'].unique()
+
+# print(list(onto.containsSubstance.get_relations()))
+
+
+#%% 
 # onto.containsSubstance.get_relations()
 # substance = cup1.drink()
 # substance.taste()
-cup1.drink()
-cup2.drink()
-cup3.drink()
-cup4.drink()
+cup1.drink(df_relations)
+cup2.drink(df_relations)
+cup3.drink(df_relations)
+cup4.drink(df_relations)
+
+
+# # Testing the self.drink() 
+# desired_domain = onto.cup1
+# # Filter the DataFrame based on the specified "Relation" and "Domain"
+# filtered_rows = df_relations.loc[(df_relations['Relation'] == onto.containsSubstance) & 
+#                                   (df_relations['Domain'] == desired_domain)]
+
+# # Join the elements of filtered_rows["Range"] with "and" as the separator
+# range_contents = " and ".join(map(str, filtered_rows["Range"]))
+# # Print the formatted output
+# print(f"The contents of {cup1} were {range_contents}")
+
+
 
 
 # for cup in tray:
@@ -308,13 +372,3 @@ cup4.drink()
 #     # I think that cup() lacks the method .taste() as this was only defined for Substances
 #     s.taste()
 
-    #%% (INCOMPLETE) - Block of script to determine the contents of a cup:-
-"""
-Start by getting an object which is a list of the properties
-Use the property_class.get_relations() method
-"""
-for i in onto.:
-    
-
-
-print(list(onto.containsSubstance.get_relations()))    
