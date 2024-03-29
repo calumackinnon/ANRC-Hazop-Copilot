@@ -1,0 +1,36 @@
+Hi Johannes,
+
+Firstly congratulations on a remarkable PhD and thank you for returning my message.
+
+We would like to replicate your method using the case studies you already provided (i.e. can you help us to run this for the hexane storage tank?) and to that end we started to transfer the scripts which you included in the appendices sections into a Python IDE, with the hope of executing these without errors.
+
+Here are some specific questions:-
+1. Are there any sources of data outside of the PhD dissertation which we will need? 
+
+As an example, in Appendix D, the Equipment entity library, we see that the connection pipe has a block of code...
+
+def connection_pipe(identifier, circumstances, control_instance, transportable, operating_modes, max_pressure, max_temperature):
+
+    equipment = equipment_onto.ConnectionPipeEntity
+    equipment_entity = MyEquipmentEntity(equipment, identifier, circumstances, transportable, operating_modes, max_pressure, max_temperature)
+    equipment_entity.set_intended_function(process_onto.Transport)
+    equipment_entity.set_apparatus(equipment_onto.NoApparatus)
+    equipment_entity.set_control_instance(control_instance)
+    equipment_entity.assemble_ontology_object(equipment)
+
+...yet were unable to find out where "equipment.onto" is first defined?
+
+I can repeat this question for all the variables called "xxxxxxxx_onto" where xxxxxxxx is effect, process, substance, deviation, causes, risk_assessment, consequence, boundary and site.
+
+
+
+
+cbr = None # case based reasoner (I think)
+# sync_reasoner = None 
+model = None
+= None
+
+default_world, results, pre_processing   (used in Appendix C - The main routine of the knowledge-based system)
+prep, cbr (used in Appendix Q - Inference and Analysis)
+
+subsequent_deviations = args[4]
