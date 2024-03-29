@@ -332,7 +332,7 @@ def findTypeOf(graph):
 
     """
     
-    assert isinstance(graph, nx.Digraph), 'Not a directed graph as anticipated'
+    assert isinstance(graph, nx.DiGraph), 'Not a directed graph as anticipated'
     
     ratios = calc_out_in_flow_ratio(graph)
     single_line = identify_single_line(ratios)
@@ -403,7 +403,7 @@ def replicate(graph, graph_type):
     """
     
     
-    assert isinstance(graph, nx.Digraph), 'Not a directed graph as anticipated'
+    assert isinstance(graph, nx.DiGraph), 'Not a directed graph as anticipated'
     
     ratios = calc_out_in_flow_ratio(graph)
     # single_line = identify_single_line(ratios)
@@ -843,7 +843,7 @@ def determine_propagation_strategy(graph):
         
     return type_of_graph, new_graph, intersection_node 
 
-#%% Appendix A - Equipment and Port Classes
+#%% Appendix A - Python Classes for Equipment and Ports
 
 class MyPort:
     
@@ -967,7 +967,7 @@ class MyEquipmentEntity:
         self.max_operating_pressure_in_barg = max_operating_pressure 
         
         
-#%% Appendix B - Substance Class
+#%% Appendix B - A Python Class for Substances
 
 class MySubstance:
     
@@ -6912,7 +6912,8 @@ with safeguard_onto:
     class ProvideGroundingOfPlant(Safeguard):
      equivalent_to = [Safeguard & safeguardPreventsEffect.some(effect_onto.GenerationOfElectrostaticCharge)]
      
-with pse_onto:
+with pse_onto: #TODO Calum: I'm not completely sure if this goes here, but pse_onto is referenced from elsewhere.
+
     class PeriodicInspection(safeguard_onto.Safeguard):
      equivalent_to = [safeguard_onto.Safeguard & safeguard_onto.safeguardPreventsCause.some(MalfunctionLubricationSystem)]
     class ImprovedOilSeparation(safeguard_onto.Safeguard):
@@ -7775,7 +7776,7 @@ def create_process_plant_hexane_storage_tank():
 
     Returns
     -------
-    graph : NetworkX.Digraph
+    graph : NetworkX.DiGraph
         A graph of 4 components linked by 3 edges in a direct sequence.
 
     """
@@ -7907,7 +7908,7 @@ def create_olefin_feed_section():
 
     Returns
     -------
-    graph : NetworkX.Digraph
+    graph : NetworkX.DiGraph
         A graph with 6 nodes and 5 edges, but not all in a linear sequence.
 
     """
