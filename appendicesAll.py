@@ -29,7 +29,6 @@ from owlready2 import OwlReadyInconsistentOntologyError
 import owlready2 as owl
 
 import itertools
-import unittest
 import time
 
 import networkx as nx
@@ -59,10 +58,9 @@ substance = get_ontology("http://webprotege.stanford.edu/RBmrmRPMEoUC51a1J5IYQ2m
 
 # #TODO The following are variables and modules referenced elsewhere in the code.
 results = None
-default_world = None
+# default_world = None
 prep = None
 cbr = None # case based reasoner (I think)
-# sync_reasoner = None 
 model = None
 pre_processing = None
 subsequent_deviations = []
@@ -2943,7 +2941,7 @@ def calculate_similarity(new_case, old_case):
     
     for attr in attr_list:
         if old_case.get(attr)[0]:
-            similarities.append(similar(new_case.get(attr), old_case.get(attr)[0])) #TODO Recursion ?
+            similarities.append(similar(new_case.get(attr), old_case.get(attr)[0])) #TODO Is this recursion ? # Maybe the correct call is owl.similar( ... ) or nx.similar( ... ) or a function J. Single wrote.
         else:
             similarities.append(0)
             weights.append(old_case.get(attr)[1])
@@ -2957,6 +2955,25 @@ def calculate_similarity(new_case, old_case):
     return similarity
 
 def match_case_with_cb(current_case, case_base):
+    """
+    I believe this function finds a difference (if there is one) between a 
+    baseline (defined as a long list in Appendix E) and a shorter study case.
+
+    Parameters
+    ----------
+    current_case : dict
+        A dictionary where the key is an Enum of the type CaseAttribute as 
+        defined in Appendix E.
+    case_base : dict
+        Another dictionary where the key is an Enum of type CaseAttribute.
+
+    Returns
+    -------
+    relevant_deviation : TYPE
+        DESCRIPTION.
+
+    """
+    
     list_similarities = []
     
     for case in case_base:
@@ -7005,14 +7022,14 @@ def callReasoner(): # Written by Calum on 29/3/24 to benefit from his mistakes.
     """
     try:
         
-        sync_reasoner(debug=0)
+        owl.sync_reasoner(debug=0) # This was previously sync_reasoner(debug=0)
         
     except OwlReadyInconsistentOntologyError as e:
         
         print(' -------------------------------------------------------- ')
         print(e)
         print(' -------------------------------------------------------- ')
-        print('Zhouxiang, a message from Calum to save some time.')
+        print(' Zhouxiang, a message from Calum to save some time.')
         print(' This error can be fixed by restarting the Kernel from the')
         print(' menu at the top right of the IPython Console in Spyder.')
 
@@ -8296,7 +8313,7 @@ if __name__ == '__main__':
     ontology_operations.save_ontology()
 
     # === Get errors
-    print(list(default_world.inconsistent_classes()))
+    print(list(default_world.inconsistent_classes())) # possibly owl.default_world. ...
     
     
         
