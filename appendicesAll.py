@@ -25,6 +25,7 @@ It is to do with p 118 in the dissertation.
 from owlready2 import Thing, FunctionalProperty, AllDisjoint, AsymmetricProperty
 from owlready2 import ThingClass
 from owlready2 import get_ontology
+from owlready2 import OwlReadyInconsistentOntologyError
 import owlready2 as owl
 
 import itertools
@@ -61,7 +62,7 @@ results = None
 default_world = None
 prep = None
 cbr = None # case based reasoner (I think)
-sync_reasoner = None 
+# sync_reasoner = None 
 model = None
 pre_processing = None
 subsequent_deviations = []
@@ -6985,6 +6986,38 @@ with pse_onto: #TODO Calum: I'm not completely sure if this goes here, but pse_o
 
 #%% Appendix Q - Inference and Analysis
 
+
+def callReasoner(): # Written by Calum on 29/3/24 to benefit from his mistakes.
+    """
+    Call the reasoner in a way to consistently catch errors with the ontology.
+    
+    These are errors which are not really to do with the Python code, but more
+    to do with the representation of the ontology classes and individuals held 
+    in memory as the Python code is running. An ontology persists, so the best
+    thing is to run the part of the code which defines it once, without relying
+    on this code to define it multiple times and potentially cause some logical 
+    inconsistencies to be defined if changes are made to the ontology classes.
+
+    Returns
+    -------
+    None.
+
+    """
+    try:
+        
+        sync_reasoner(debug=0)
+        
+    except OwlReadyInconsistentOntologyError as e:
+        
+        print(' -------------------------------------------------------- ')
+        print(e)
+        print(' -------------------------------------------------------- ')
+        print('Zhouxiang, a message from Calum to save some time.')
+        print(' This error can be fixed by restarting the Kernel from the')
+        print(' menu at the top right of the IPython Console in Spyder.')
+
+
+
 # Jonathan
 def equipment_based_hazard_specific_deviation(deviation, args):
     
@@ -7015,7 +7048,9 @@ def equipment_based_hazard_specific_deviation(deviation, args):
                                   causeInvolvesSiteInformation=[environment.onto_object],
                                   causeInvolvesSubstance=[substance.onto_object]
                                   ) # functional, nur 1 substanz übergeben
-        sync_reasoner(debug=0)
+        
+        callReasoner() # sync_reasoner(debug=0)
+        
     else:
         if isinstance(deviation, dict):
             if isinstance(deviation[prep.DictName.subsequent_deviation], str):
@@ -7069,7 +7104,8 @@ def equipment_based_hazard_specific_deviation(deviation, args):
                     prep.DictName.effect:           effect,
                     prep.DictName.consequence:      consequence}
         preliminary_scenario_list.append(scenario)
-    sync_reasoner(debug=0)
+    
+    callReasoner() # sync_reasoner(debug=0)
     
     #TODO CHECK indentation on statement below.
     infer_follow_up(process_unit,
@@ -7246,7 +7282,7 @@ def infer_follow_up(process_unit,
         safeguardInvolvesSubstance=[substance.onto_object]
     )
     
-    sync_reasoner(debug=0)
+    callReasoner() # sync_reasoner(debug=0)
     
     # === Pass results
     for scenario in scenario_list:
@@ -7612,7 +7648,7 @@ def propagation_based_hazard(devex, process_unit, substance, last_equipment_enti
         inferred_effects.append(effect)
         preliminary_scenario_list.append(scenario)
         
-    sync_reasoner(debug=0)
+    callReasoner() # sync_reasoner(debug=0)
     
     for scenario in preliminary_scenario_list:
         for effect in scenario[prep.DictName.effect].is_a:
@@ -7699,7 +7735,7 @@ def propagation_based_hazard(devex, process_unit, substance, last_equipment_enti
             scenario[prep.DictName.safeguard] = safeguard
     
     if scenario_list:
-        sync_reasoner(debug=0)
+        callReasoner() # sync_reasoner(debug=0)
     
     # === Check whether cause equals deviation
     do_not_consider = False
