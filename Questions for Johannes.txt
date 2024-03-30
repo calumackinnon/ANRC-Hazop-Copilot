@@ -1,13 +1,15 @@
 Hi Johannes,
 
 Firstly congratulations on a remarkable PhD and thank you for returning my message.
+My colleague has requested time to add to this message with other questions, however I want to send you a preliminary message now in case it suits your availability better...
 
-We would like to replicate your method using the case studies you already provided (i.e. can you help us to run this for the hexane storage tank?) and to that end we started to transfer the scripts which you included in the appendices sections into a Python IDE, with the hope of executing these without errors.
+Our main intention/question is this. We would like to replicate your method using one or more case studies which you wrote into the dissertation. Are there any sources of data outside of the PhD dissertation which we will need in order to replicate case study 1 - the hexane storage tank?
 
-Here are some specific questions:-
-1. Are there any sources of data outside of the PhD dissertation which we will need? 
+To replicate your method and hexane case study, we began transferring the scripts which you included in the appendices sections into a Python IDE, however we did not manage to structure and execute these in error-free fashion. Hence, the following is a list of some particular issues we are facing.
 
-As an example, in Appendix D, the Equipment entity library, we see that the connection pipe has a block of code...
+1. Variables definitions which we are seeking.
+
+In Appendix D, the Equipment entity library, we see that the connection pipe contains block of code such as follows...
 
 def connection_pipe(identifier, circumstances, control_instance, transportable, operating_modes, max_pressure, max_temperature):
 
@@ -18,20 +20,14 @@ def connection_pipe(identifier, circumstances, control_instance, transportable, 
     equipment_entity.set_control_instance(control_instance)
     equipment_entity.assemble_ontology_object(equipment)
 
-...yet were unable to find out where "equipment.onto" is first defined?
+Could you say where "equipment.onto" is first defined? Same question, again, for all the variables called "xxxxxxxx_onto" where xxxxxxxx is effect, process, substance, deviation, causes, risk_assessment, consequence, boundary and site.
 
-I can repeat this question for all the variables called "xxxxxxxx_onto" where xxxxxxxx is effect, process, substance, deviation, causes, risk_assessment, consequence, boundary and site.
+In Appendix C (The main routine of the knowledge-based system):-
+"default_world", "results", and "pre_processing"
 
+In Appendix Q (Inference and Analysis) - "prep", and "cbr".
 
-
-
-cbr = None # case based reasoner (I think)
-# sync_reasoner = None 
-model = None
-= None
-
-default_world, results, pre_processing   (used in Appendix C - The main routine of the knowledge-based system)
-prep, cbr (used in Appendix Q - Inference and Analysis)
+2. Understanding
 
 subsequent_deviations = args[4]
 
