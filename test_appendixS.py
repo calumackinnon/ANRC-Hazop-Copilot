@@ -15,8 +15,11 @@
 # """
 
 # import unittest
-# # from appendicesAll import create_process_plant_hexane_storage_tank
+# from appendicesAll import create_process_plant_hexane_storage_tank
+# from appendicesAll import create_olefin_feed_section
+# from appendicesAll import callReasoner
 # import boundary_onto
+# import networkx as nx
 
 # class TestNewUnitTests(unittest.TestCase):
     
@@ -42,6 +45,23 @@
         
 #         someNewCause = boundary_onto.UpstreamProcessInvolved()
 #         self.assertIsNotNone(someNewCause) # Can an object be created?
+        
+#     def testReasoner(self):
+        
+#         appendicesAll.callReasoner()
+#         self.assertTrue(True) # Simply a chance to raise uncaught errors.
+        
+#     def testUntitled(self):
+#         untitled0
+#         self.assertEqual(len(fruits), 3)
+        
+#     def testFindPathsAfterDivergingNode(self):
+        
+#         graphForTest = nx.DiGraph()
+#         # ... build the graph
+#         nlist = appendicesAll.findPathsAfterDivergingNode(graphForTest, successor, maxNodePosition)
+        
+#         self.assertIsNotNone(nlist)
 
 # class TestTheGivenMainFunction(unittest.TestCase):
     
@@ -92,12 +112,12 @@
 #         unit = equipment_onto.ConnectionPipeEntity()
 #         boundary_condition = [boundary_onto.ExternalFirePossible()]
 #         super_cause = causes_onto.SuperCause(isSupercauseOfCause=[cause],
-#                                              supercauseInvolvesUnit=[unit],
-#                                              supercauseRequiresBoundaryCondition=boundary_condition)
+#                                               supercauseInvolvesUnit=[unit],
+#                                               supercauseRequiresBoundaryCondition=boundary_condition)
 #         sync_reasoner()
 #         super_cause_ = pre_processing.stringify_cleanup_inferred_res(super_cause)
 #         super_cause_.sort()
 #         time.sleep(0.01)
 #         self.assertEqual(super_cause_, ['BlockedPipingAndHeatInput'],
-#                          "Should be ['BlockedPipingAndHeatInput']")
+#                           "Should be ['BlockedPipingAndHeatInput']")
 

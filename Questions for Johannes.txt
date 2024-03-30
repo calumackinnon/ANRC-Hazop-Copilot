@@ -34,3 +34,9 @@ default_world, results, pre_processing   (used in Appendix C - The main routine 
 prep, cbr (used in Appendix Q - Inference and Analysis)
 
 subsequent_deviations = args[4]
+
+
+Calum: in appendicesAll.py, everything above the line
+#%% Appendix R - ...
+is basically a set of references to everything in the code we can't directly tell what it is. It would be great to ask what was the structure of the files used, and if some of these missing references could be shared with us.
+

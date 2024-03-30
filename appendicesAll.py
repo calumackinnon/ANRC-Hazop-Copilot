@@ -122,13 +122,15 @@ go = None
      begin and end within the rest of this code.
 """ 
 
+
+# To write a docstring begin with """ on the row below a class or def keyword.
 class OntologyOperations():
     
     
     filename = 'onto.owl'
     onto = None
     
-    def __init__(self):
+    def __init__(self): # An object Constructor method in Python.
         
         pass 
         
@@ -143,7 +145,7 @@ class OntologyOperations():
         """
         self.onto.save(file=self.filename)
         
-    def save_ontology_as_sql(self):
+    def save_ontology_as_sql(self): # Every method of a class is passed 'self'.
         
         pass #TODO
         
@@ -383,6 +385,70 @@ def findTypeOf(graph):
                 return GraphType.ComplexSystem
     
     
+def findPathsAfterDivergingNode(graph, successor, max_ratio_node_pos):
+    """
+    Under construction.
+
+    Parameters
+    ----------
+    graph : NetworkX.DiGraph
+        DESCRIPTION.
+    successor : NetworkX.Node
+        DESCRIPTION.
+
+    Returns
+    -------
+    node_list : list
+        DESCRIPTION.
+
+    """
+    
+    
+    assert isinstance(graph, nx.DiGraph), 'Not a directed graph as anticipated'
+    
+    node_list = [max_ratio_node_pos, successor]
+    
+    end_reached = False 
+    # Replace this flag with 'while True: ... break' or better, 
+    # 'for next_successor in list(graph.successors ... ): 
+    #       ... 
+    #       if ...: 
+    #           break'
+    # but in any case maybe we need to get it to run first of all.
+    current_node = successor
+    
+    # === identify all paths after diverging node
+    while not end_reached: #TODO This does not look like good code.
+        try:
+            next_successor = list(graph.successors(current_node))[0]
+            node_list.append(next_successor)
+            
+            # === back at diverging node (indicated by maximum ratio)
+            if next_successor == max_ratio_node_pos:
+                end_reached = True #TODO Use the keyword 'break'
+            else:
+                current_node = next_successor
+        except IndexError: #TODO This does not look like good code.
+            end_reached = True
+            
+            
+    '''        
+    # === identify all paths after diverging node
+    for next_successor in list(graph.successors(current_node))[0]:
+        
+        node_list.append(next_successor)
+        
+        # === back at diverging node (indicated by maximum ratio)
+        if next_successor is max_ratio_node_pos: # If we are back at the start
+            break
+        
+        current_node = next_successor
+    '''
+            
+    return node_list
+    
+    
+    
 def replicate(graph, graph_type):
     """
     Create a replica of the Graph according to its type.
@@ -450,24 +516,11 @@ def replicate(graph, graph_type):
             successor_streams = []
             
             for successor in successors_of_branch:
-                node_list = [max_ratio_node_pos, successor]
-                end_reached = False
-                current_node = successor
                 
-                # === identify all paths after diverging node
-                while not end_reached:
-                    try:
-                        next_successor = list(graph.successors(current_node))[0]
-                        node_list.append(next_successor)
-                        
-                        # === back at diverging node (indicated by maximum ratio)
-                        if next_successor == max_ratio_node_pos:
-                            end_reached = True
-                        else:
-                            current_node = next_successor
-                    except IndexError:
-                        end_reached = True
-                        
+                node_list = findPathsAfterDivergingNode(graph, 
+                                                        successor, 
+                                                        max_ratio_node_pos)
+                
                 successor_streams.append(node_list)
             
             # sort nodes according to numbers (nodes with highest numbers last)
@@ -708,23 +761,11 @@ def determine_propagation_strategy(graph):
         successor_streams = []
         
         for successor in successors_of_branch:
-            node_list = [max_ratio_node_pos, successor]
-            end_reached = False
-            current_node = successor
             
-            # === identify all paths after diverging node
-            while not end_reached:
-                try:
-                    next_successor = list(graph.successors(current_node))[0]
-                    node_list.append(next_successor)
-                    
-                    # === back at diverging node (indicated by maximum ratio)
-                    if next_successor == max_ratio_node_pos:
-                        end_reached = True
-                    else:
-                        current_node = next_successor
-                except IndexError:
-                    end_reached = True
+            node_list = findPathsAfterDivergingNode(graph, 
+                                                    successor, 
+                                                    max_ratio_node_pos)
+            
             successor_streams.append(node_list)
         
         # sort nodes according to numbers (nodes with highest numbers last)
