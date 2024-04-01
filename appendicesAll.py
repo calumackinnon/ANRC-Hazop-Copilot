@@ -159,7 +159,30 @@ class Output(): #TODO This class definition needs a lot of further definition.
 ontology_operations = OntologyOperations()
 output = Output()
 
+def similar(caseA, caseB):
+    """
+    Evaluate the similarity between caseA and caseB. 
+    
+    This method is being retrospectively built due to being called later.
 
+    Parameters
+    ----------
+    caseA : dict
+        A dict to represent a single case as in the propagation_base_case list.
+    caseB : dict
+        A dict to represent a single case as in the propagation_base_case list.
+
+    Returns
+    -------
+    measureOfSimilarity : int.
+
+    """
+    
+    measureOfSimilarity = 0
+    
+    #TODO We have to define this method to compare cases.
+    
+    return measureOfSimilarity
 
 #%% Appendix R - Graph Manipulation # Tearing
 
@@ -392,14 +415,16 @@ def findPathsAfterDivergingNode(graph, successor, max_ratio_node_pos):
     Parameters
     ----------
     graph : NetworkX.DiGraph
-        DESCRIPTION.
+        A Graph to represent the system being studied or modelled.
     successor : NetworkX.Node
-        DESCRIPTION.
+        A node which follows the chosen node.
+    max_ratio_node_pos : NetworkX.Node
+        A reference to (I think) a node where there is a divergence.
 
     Returns
     -------
     node_list : list
-        DESCRIPTION.
+        A list of NetworkX.Graph nodes representing paths after the chosen one.
 
     """
     
@@ -432,7 +457,7 @@ def findPathsAfterDivergingNode(graph, successor, max_ratio_node_pos):
             end_reached = True
             
             
-    '''        
+    '''        The code below is not the same, but recursion might be possible.
     # === identify all paths after diverging node
     for next_successor in list(graph.successors(current_node))[0]:
         
