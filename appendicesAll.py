@@ -8349,7 +8349,50 @@ def equipmentBasedEvaluation(process_plant_model, stack):
     return stack
 
     
+def postprocessAndPrintTheResults():
     
+    global results # The original code in Appendix C refers to results 
+    # as if it is already defined as a global variable by one of the libraries.
+    
+    assert results is not None, 'It is not clear where results is defined.'
+    # ...but I think this is an output from the call to sync_reasoner() in owl.
+    
+    
+    # === remove duplicates and sort results table
+    # results = pre_processing.cleanup_result_list(results) #It was this before
+    results = cleanup_result_list(results) # removed the pre_processing. prefix
+    results = sorted(results, key=lambda k: k["process_equipment_id"])
+    
+    # === Hazop table
+    # if results: #This line is replaced by an assert statement for readability
+        
+    counter = 0
+    for row in results:
+        
+        if row["cause"] or row["effect"] or row["consequence"]:
+            
+            output.hazop_table.add_row([counter,
+                                        row["process_equipment"],
+                                        row["process_equipment_id"],
+                                        ', '.join(row["operation_mode"]),
+                                        row["substance"],
+                                        ', '.join(row["deviation"]),
+                                        ', '.join(row["super_cause"]),
+                                        ', '.join(row["cause"]),
+                                        ', '.join(row["effect"]),
+                                        ', '.join(row["consequence"]),
+                                        ', '.join(row["safeguard"]),
+                                        row["propagated"],
+                                        ', '.join(row["risk"]),
+                                        ])
+            
+        counter += 1
+            
+    print(output.hazop_table)
+
+    output.create_output()
+    
+
 if __name__ == '__main__':
     
     # === save all ontologies
@@ -8439,39 +8482,10 @@ if __name__ == '__main__':
                 
                 print("Case not covered by any strategy!")
                 
-    # === remove duplicates and sort results table
-    results = pre_processing.cleanup_result_list(results)
-    results = sorted(results, key=lambda k: k["process_equipment_id"])
+        
+    postprocessAndPrintTheResults()
     
-    # === Hazop table
-    if results:
-        counter = 0
-        for row in results:
-            
-            if row["cause"] or row["effect"] or row["consequence"]:
-                
-                output.hazop_table.add_row([counter,
-                                            row["process_equipment"],
-                                            row["process_equipment_id"],
-                                            ', '.join(row["operation_mode"]),
-                                            row["substance"],
-                                            ', '.join(row["deviation"]),
-                                            ', '.join(row["super_cause"]),
-                                            ', '.join(row["cause"]),
-                                            ', '.join(row["effect"]),
-                                            ', '.join(row["consequence"]),
-                                            ', '.join(row["safeguard"]),
-                                            row["propagated"],
-                                            ', '.join(row["risk"]),
-                                            ])
-                
-            counter += 1
-            
-    print(output.hazop_table)
-
-    output.create_output()
-    
-    
+    # Take note of the total time taken to complete the processing and print it
     elapsed_time = time.time() - start_time
     print(elapsed_time)
 
