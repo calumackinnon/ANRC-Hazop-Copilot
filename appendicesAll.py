@@ -507,6 +507,7 @@ def replicate(graph, graph_type):
     match graph_type:
         
         case GraphType.MultiCycleSystem:
+            
             for cycle in cycles:
                 copy_of_graph = graph.copy()
                 for node in graph.nodes:
@@ -3035,8 +3036,9 @@ def match_case_with_cb(current_case, case_base):
 
     Returns
     -------
-    relevant_deviation : TYPE
-        DESCRIPTION.
+    relevant_deviation : list
+        (I think) this is a list as the value selected by the key 
+        CaseAttributes.InferredDeviation.
 
     """
     
@@ -3315,6 +3317,7 @@ with deviation_onto:
     class LowLevel(Deviation):
      equivalent_to = [Deviation & (hasGuideword.some(Less) & hasParameter.some(Level))]
     LowLevel.label = ["low level"]
+    
     AllDisjoint([HighVibration, HighTemperature, HighCorrosion, LowTemperature, HighCorrosion, HighPressure,
      LowPressure, NoFlow, HighFlow, LowFlow, ElsewhereFlow, OtherSequence, ReverseFlow,
      OtherThanComposition, HighLevel, LowLevel])
@@ -3334,6 +3337,7 @@ with upper_onto:
      pass
     class StructuralPlantItem(PlantItem):
      pass
+ 
     AllDisjoint([FunctionalPlantItem, StructuralPlantItem])
     
     # === Ports
@@ -3364,7 +3368,7 @@ with upper_onto:
     class NotControlled(ControlInstance):
      pass
     
-    AllDisjoint([Operator, ProgrammableLogicController, NotControlled]) #TODO
+    AllDisjoint([Operator, ProgrammableLogicController, NotControlled])
     
     # === FailSafePosition
     class FailSafePosition(Thing):
@@ -7774,9 +7778,9 @@ def propagation_based_hazard(devex, process_unit, substance, last_equipment_enti
         )
         
         consequences = [scenario[prep.DictName.consequence],
-            scenario[prep.DictName.consequence_2nd],
-            scenario[prep.DictName.consequence_3rd]
-        ]
+                        scenario[prep.DictName.consequence_2nd],
+                        scenario[prep.DictName.consequence_3rd]
+                        ]
         
         scenario[prep.DictName.severity] = risk_assessment_onto.SeverityCategory(
             isSeverityOfConsequence=consequences,
@@ -8215,6 +8219,22 @@ def create_olefin_feed_section():
 #%% Appendix C - Main
 
 def equipmentBasedEvaluation(process_plant_model, stack):
+    """
+    
+
+    Parameters
+    ----------
+    process_plant_model : NetworkX.Graph
+        DESCRIPTION.
+    stack : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    stack : TYPE
+        DESCRIPTION.
+
+    """
     
     for index in range(len(process_plant_model.nodes)):
         equipment_specific_prop_scenarios = []
@@ -8352,7 +8372,9 @@ if __name__ == '__main__':
     if results:
         counter = 0
         for row in results:
+            
             if row["cause"] or row["effect"] or row["consequence"]:
+                
                 output.hazop_table.add_row([counter,
                                             row["process_equipment"],
                                             row["process_equipment_id"],
@@ -8367,6 +8389,7 @@ if __name__ == '__main__':
                                             row["propagated"],
                                             ', '.join(row["risk"]),
                                             ])
+                
             counter += 1
             
     print(output.hazop_table)
@@ -8379,7 +8402,7 @@ if __name__ == '__main__':
     ontology_operations.save_ontology()
 
     # === Get errors
-    print(list(default_world.inconsistent_classes())) # possibly owl.default_world. ...
+    print(list(owl.default_world.inconsistent_classes())) # possibly default_world. ...
     
     
         
