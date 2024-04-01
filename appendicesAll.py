@@ -8392,16 +8392,9 @@ def postprocessAndPrintTheResults():
 
     output.create_output()
     
-
-if __name__ == '__main__':
     
-    # === save all ontologies
-    ontology_operations.save_ontology()
-    ontology_operations.save_ontology_as_sql()
-    upper_onto.determine_onto()
     
-    start_time = time.time()
-    
+def processTheModel():
     # === Process model
     # process_plant_model = model.create_hazid_benchmark_1()
     process_plant_model = create_process_plant_hexane_storage_tank()
@@ -8482,7 +8475,19 @@ if __name__ == '__main__':
                 
                 print("Case not covered by any strategy!")
                 
-        
+
+# The code should first run from the following if statement, and call functions
+if __name__ == '__main__':
+    
+    # === save all ontologies
+    ontology_operations.save_ontology()
+    ontology_operations.save_ontology_as_sql()
+    upper_onto.determine_onto()
+    
+    start_time = time.time() # Take the time for comparison later
+    
+    # Do the main task
+    processTheModel()
     postprocessAndPrintTheResults()
     
     # Take note of the total time taken to complete the processing and print it
