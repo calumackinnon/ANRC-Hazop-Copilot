@@ -3704,7 +3704,7 @@ with equipment_onto:
      pass
     class hasPort(EquipmentEntity >> Port):
      pass
-    class portEquippedWithInstrumentation(Port >> Instrumentation, FunctionalProperty):
+    class portEquippedWithInstrumentation(Port >> Instrumentation, FunctionalProperty): # Redefinitions are okay according to OwlReady2
      pass
     
     
@@ -5086,7 +5086,7 @@ with causes_onto:
      isUnderlyingcauseOfCause.some(ExternalLeakage))]
     DefectiveSeal.comment = ["Called 'seal failure' in Lees' Loss Prevention ... pp. 12/40"]
     
-    class DepositionOfImpurities(UnderlyingCause):
+    class DepositionOfImpurities(UnderlyingCause): # Redefinitions are okay according to OwlReady2
      equivalent_to = [UnderlyingCause &
      isUnderlyingcauseOfCause.some(BlockedOutflowLine)]
      
@@ -6211,7 +6211,7 @@ with consequence_onto:
      effect_onto.LossOfHeatTransfer |
      effect_onto.IncompleteEvaporation)
      )]
-    class ReductionOfCoolingCapacity(consequence_onto.Consequence):
+    class ReductionOfCoolingCapacity(consequence_onto.Consequence): # Redefinitions are okay according to OwlReady2
      equivalent_to = [consequence_onto.Consequence &
      ((consequence_onto.isConsequenceOfEffect.some(LossOfHeatTransfer |
      IncompleteEvaporation) &
@@ -7133,7 +7133,7 @@ def equipment_based_hazard_specific_deviation(deviation, args):
     substance                   = args[1]
     environment                 = args[2]
     subsequent_deviation_loop   = args[3]
-    subsequent_deviations       = args[4]
+    # subsequent_deviations       = args[4]
     stack_elements              = args[5]
     
     # === Loop over causes =====================================================================================
@@ -7186,7 +7186,9 @@ def equipment_based_hazard_specific_deviation(deviation, args):
                         prep.DictName.underlying_cause: underlying_causes,
                         prep.DictName.effect:           effect,
                         prep.DictName.consequence:      consequence}
+            
             preliminary_scenario_list.append(scenario)
+            
     elif cause_list:
         underlying_causes, effect, consequence, = assemble_concept_instance(substance,
                                                                     process_unit,
@@ -7198,7 +7200,9 @@ def equipment_based_hazard_specific_deviation(deviation, args):
                     prep.DictName.underlying_cause: underlying_causes,
                     prep.DictName.effect:           effect,
                     prep.DictName.consequence:      consequence}
+        
         preliminary_scenario_list.append(scenario)
+        
     else:
         underlying_causes, effect, consequence = assemble_concept_instance(substance,
                                                                     process_unit,
@@ -7210,7 +7214,9 @@ def equipment_based_hazard_specific_deviation(deviation, args):
                     prep.DictName.underlying_cause: underlying_causes,
                     prep.DictName.effect:           effect,
                     prep.DictName.consequence:      consequence}
+        
         preliminary_scenario_list.append(scenario)
+        
     
     callReasoner()
     
@@ -8246,12 +8252,12 @@ def equipmentBasedEvaluation(process_plant_model, stack):
     ----------
     process_plant_model : NetworkX.Graph
         DESCRIPTION.
-    stack : TYPE
+    stack : list
         DESCRIPTION.
 
     Returns
     -------
-    stack : TYPE
+    stack : list
         DESCRIPTION.
 
     """
@@ -8287,8 +8293,10 @@ def equipmentBasedEvaluation(process_plant_model, stack):
                                         environment,
                                         equipment_specific_prop_scenarios )
 
-        stack.append({"{0}".format(equipment_entity.name): equipment_entity,
-                               pre_processing.DictName.scenario: equipment_specific_prop_scenarios})
+        stack.append(
+            {"{0}".format(equipment_entity.name):  equipment_entity,
+             pre_processing.DictName.scenario:     equipment_specific_prop_scenarios}
+            )
         
     return stack
 
@@ -8309,6 +8317,20 @@ if __name__ == '__main__':
     # deviation_number = None
     stack_elements = []
     
+    # === Tearing strategy/strategy for defining order of process equipment/start-end point
+    if len(process_plant_model.nodes) > 1:
+        
+        # The following single method is now subdivided into 3 for clarity.
+        # graph_type, newly_arranged_graphs, intersections = determine_propagation_strategy(process_plant_model)
+        graph_type = findTypeOf(process_plant_model)
+        newly_arranged_graphs = replicate(process_plant_model, graph_type)
+        intersections = getIntersectionNode(process_plant_model, graph_type)
+        
+        print(list(newly_arranged_graphs))    
+
+
+
+
     if config.EQUIPMENT_BASED_EVALUATION:
         
         stack_elements = equipmentBasedEvaluation(process_plant_model, stack_elements)
@@ -8316,27 +8338,14 @@ if __name__ == '__main__':
     # === Entry point for hazard/malfunction propagation
     if config.PROPAGATION_BASED_EVALUATION:
         
-        # === Tearing strategy/strategy for defining order of process equipment/start-end point
-        if len(process_plant_model.nodes) > 1:
-            
-            # The following single method is now subdivided into 3 for clarity.
-            # graph_type, newly_arranged_graphs, intersections = determine_propagation_strategy(process_plant_model)
-            graph_type = findTypeOf(process_plant_model)
-            newly_arranged_graphs = replicate(process_plant_model, graph_type)
-            intersections = getIntersectionNode(process_plant_model, graph_type)
-            
-            print(list(newly_arranged_graphs))    
-
         
         match graph_type:
             case GraphType.SingleLineSystem:
-        # if graph_type == GraphType.SingleLineSystem:
             
                 propagation_based_analysis(process_plant_model, 
                                            newly_arranged_graphs, 
                                            stack_elements)
             
-        # elif graph_type == GraphType.MultiCycleSystem:
             case GraphType.MultiCycleSystem:
                 
                 for index, cycle in enumerate(newly_arranged_graphs):
@@ -8357,9 +8366,6 @@ if __name__ == '__main__':
                                                stack_elements)
                 
             case GraphType.JunctionSystem:
-        # elif graph_type == GraphType.JunctionSystem or \
-        #         graph_type == GraphType.ComplexSystem or \
-        #         graph_type == GraphType.RecycleFlowSystem:
                     
                 for stream in newly_arranged_graphs:
                     propagation_based_analysis(process_plant_model, 
@@ -8381,8 +8387,9 @@ if __name__ == '__main__':
                                                stack_elements)
                     
             case _:
-        # else:
+                
                 print("Case not covered by any strategy!")
+                
 
     # === remove duplicates and sort results table
     results = pre_processing.cleanup_result_list(results)
