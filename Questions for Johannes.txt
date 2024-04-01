@@ -1,13 +1,33 @@
 Hi Johannes,
 
-Firstly congratulations on a remarkable PhD and thank you for returning my message.
+Firstly, thank you for returning my message. Congratulations on what is a remarkable PhD and please forgive us if some of the answers are already given in your dissertation. 
 
-We would like to replicate your method using the case studies you already provided (i.e. can you help us to run this for the hexane storage tank?) and to that end we started to transfer the scripts which you included in the appendices sections into a Python IDE, with the hope of executing these without errors.
+Our main intention is this - we would like to replicate your method using one or more case studies which you wrote into the dissertation. To replicate your method and hexane case study, we began transferring the scripts which you included in the appendices sections into a Python IDE, however we did not manage to structure and execute these in error-free fashion.
 
-Here are some specific questions:-
-1. Are there any sources of data outside of the PhD dissertation which we will need? 
+General questions:-
+- Are there any sources of data outside of the PhD dissertation which we will need in order to replicate case study #1 - the hexane storage tank? 
+- How did you structure your overall code (ordering in which appendices A-W should appear)?
 
-As an example, in Appendix D, the Equipment entity library, we see that the connection pipe has a block of code...
+Some specifics:-
+1. Variables definitions which we are seeking - "xxxxxxxx_onto", "ontology_operations", "output", "default_world", "results", "pre_processing, "prep", and "cbr".
+2. Defined functions which we are seeking:- 
+"stringify_cleanup_inferred_res(someSuperCause)", "assemble_concept_instance(a, b, c)", "assemble_deviation(deviation)", "assemble_input_object(scenario)", "complete_propagated_scenario(propagation, process_unit, substance)", "set_further_boundary_conditions(boundaryConditions, temp)", "instantiate_boundary_conditions(boundaryConditions)", "equipment_based_analysis(equipmentEntity, deviations, substances, environment, equipmentSpecificPropScenarios)", "add_edge_port(G, nodeindex, label1, node2index, label2)"
+
+I wanted to send you this preliminary message now as it contains the main aspects of our confusion. If you are still happy to help in due course then we may wish to ask some follow-up questions. 
+
+Happy Easter!
+
+Many thanks,
+Jonathan
+
+
+
+_________________________________________________________
+
+Here are some notes to elaborate on these questions.
+
+1. Variables definitions which we are seeking.
+In Appendix D, the Equipment entity library, we see that the connection pipe contains block of code such as follows...
 
 def connection_pipe(identifier, circumstances, control_instance, transportable, operating_modes, max_pressure, max_temperature):
 
@@ -18,27 +38,25 @@ def connection_pipe(identifier, circumstances, control_instance, transportable, 
     equipment_entity.set_control_instance(control_instance)
     equipment_entity.assemble_ontology_object(equipment)
 
-...yet were unable to find out where "equipment.onto" is first defined?
+Could you say where "equipment.onto" is first defined? Same question, again, for all the variables called "xxxxxxxx_onto" where xxxxxxxx is effect, process, substance, deviation, causes, risk_assessment, consequence, boundary and site.
 
-I can repeat this question for all the variables called "xxxxxxxx_onto" where xxxxxxxx is effect, process, substance, deviation, causes, risk_assessment, consequence, boundary and site.
+In Appendix C (The main routine of the knowledge-based system):-
+"ontology_operations", "output", "default_world", "results", and "pre_processing"
 
+In Appendix Q (Inference and Analysis) - "prep", and "cbr".
 
+2. Some functions we haven't yet understood properly.
+In Appendix C (The main routine of the knowledge-based system):-
+"equipment_based_analysis(equipmentEntity, deviations, substances, environment, equipmentSpecificPropScenarios)"
 
+Appendix Q-1/Q-2 (Equipment-based mode): "assemble_concept_instance(a, b, c)", and "assemble_deviation(deviation)"
+Appendix Q-5 (Propagation analysis): "assemble_input_object(scenario)" and "complete_propagated_scenario(propagation, process_unit, substance)"
 
-cbr = None # case based reasoner (I think)
-# sync_reasoner = None 
-model = None
-= None
+Appendix S (Example unit tests of formal class definitions): "stringify_cleanup_inferred_res(someSuperCause)"
 
-default_world, results, pre_processing   (used in Appendix C - The main routine of the knowledge-based system)
-prep, cbr (used in Appendix Q - Inference and Analysis)
+In Appendix W (Formal input objects of the case studies):-
+"set_further_boundary_conditions(boundaryConditions, temp)", "instantiate_boundary_conditions(boundaryConditions)", and "add_edge_port(G, nodeindex, label1, node2index, label2)"
 
-subsequent_deviations = args[4]
-
-
-Calum: in appendicesAll.py, everything above the line
-#%% Appendix R - ...
-is basically a set of references to everything in the code we can't directly tell what it is. It would be great to ask what was the structure of the files used, and if some of these missing references could be shared with us.
 
 What is the function similar(case1, case2) which is called within the calculate_similarity(new_case, old_case) function?
 
