@@ -473,7 +473,44 @@ def findPathsAfterDivergingNode(graph, successor, max_ratio_node_pos):
     return node_list
     
     
+def copyGraphCycles(graph, cycles):
+    """
+    Create a list of each cycle within a Graph. Maybe this can be simplified.
+
+    Parameters
+    ----------
+    graph : NetworkX.Graph
+        A Graph to represent the primary system being emulated.
+    cycles : list
+        A list of nodes representing the cycles of the same NetworkX.Graph.
+
+    Returns
+    -------
+    new_graph : list
+        A copy of the graph which only contains nodes that belong to cycles.
+
+    """
+    new_graph = []
     
+    for cycle in cycles:
+        
+        # Copy the whole graph
+        copy_of_graph = graph.copy()
+        
+        # Reduce the new copy to have only nodes in the chosen cycle
+        for node in graph.nodes:
+            if node not in cycle:
+                copy_of_graph.remove_node(node)
+                
+        # Add edges between adjacent nodes in the cycle
+        for current, next in zip(cycle, cycle[1:]):
+            copy_of_graph.add_edge(current, next)
+            
+        # Append the nodes to an overall list
+        new_graph.append(list(copy_of_graph))
+
+    return new_graph
+
 def replicate(graph, graph_type):
     """
     Create a replica of the Graph according to its type.
@@ -508,16 +545,8 @@ def replicate(graph, graph_type):
         
         case GraphType.MultiCycleSystem:
             
-            for cycle in cycles:
-                copy_of_graph = graph.copy()
-                for node in graph.nodes:
-                    if node not in cycle:
-                        copy_of_graph.remove_node(node)
-                        
-                for current, next in zip(cycle, cycle[1:]):
-                    copy_of_graph.add_edge(current, next)
-                new_graph.append(list(copy_of_graph))
-
+            new_graph = copyGraphCycles(graph, cycles)
+            
         case GraphType.RecycleFlowSystem:
             # === Tearing procedure in case of recycles  
             # H = graph.copy()
@@ -743,17 +772,8 @@ def determine_propagation_strategy(graph):
         intersection_node = intersections[0]["intersection"]
         if len(intersection_node) == 1:
             intersection_node = intersection_node[0]
-            
-        # =====================
-        for cycle in cycles:
-            copy_of_graph = graph.copy()
-            for node in graph.nodes:
-                if node not in cycle:
-                    copy_of_graph.remove_node(node)
-                    
-            for current, next in zip(cycle, cycle[1:]):
-                copy_of_graph.add_edge(current, next)
-            new_graph.append(list(copy_of_graph))
+                        
+        new_graph = copyGraphCycles(graph, cycles)
         
         type_of_graph = GraphType.MultiCycleSystem
     
