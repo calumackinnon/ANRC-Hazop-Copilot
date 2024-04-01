@@ -178,12 +178,60 @@ def similar(caseA, caseB):
 
     """
     
+    assert caseA is not None and caseB is not None, 'caseA or caseB is None'
+    
     measureOfSimilarity = 0
     
-    #TODO We have to define this method to compare cases.
+    #TODO This is a guess. We have to define & test this to compare cases.
+    exactMatches = 0
     
-    return measureOfSimilarity
+    for attribute in caseA.keys():
+        
+        exactMatches += 1 if caseA[attribute] == caseB[attribute] else 0
+        
+    measureOfSimilarity = exactMatches / len(caseA.keys())
+    
+    return int(measureOfSimilarity)
 
+def cleanup_result_list(resultList):
+    """
+    Remove duplicate entries from a dict of results. This is new and untested.
+
+    Parameters
+    ----------
+    resultList : dict
+        I can't tell where results is defined, but it is passed here as a dict.
+
+    Returns
+    -------
+    results : dict
+        A dictionary of results with no duplicates.
+
+    """
+        
+    targetLength = len(set(list(resultList.values()))) # Set removes duplicates
+    
+    if len(resultList) is targetLength: # Quickly check there are no duplicates
+        
+        return resultList # Return an unamended list to avoid excess processing
+    
+    seenList = []
+    
+    for key in resultList.keys(): # for every key in the dictionary...
+        
+        if resultList[key] in seenList: # if we have seen this value before...
+            
+            resultList.pop(key) # remove the duplicate item
+            
+            continue # to the next key in resultList.keys() the for loop calls
+        
+        seenList.append(resultList[key]) # if not a duplicate, add to seenList.
+    
+    # With all duplicates removed, a list and value set(...) will have same len
+    assert len(resultList) == targetLength, 'Something has gone wrong.'
+    
+    return resultList
+    
 #%% Appendix R - Graph Manipulation # Tearing
 
 
@@ -8301,6 +8349,7 @@ def equipmentBasedEvaluation(process_plant_model, stack):
     return stack
 
     
+    
 if __name__ == '__main__':
     
     # === save all ontologies
@@ -8390,7 +8439,6 @@ if __name__ == '__main__':
                 
                 print("Case not covered by any strategy!")
                 
-
     # === remove duplicates and sort results table
     results = pre_processing.cleanup_result_list(results)
     results = sorted(results, key=lambda k: k["process_equipment_id"])
@@ -8422,6 +8470,7 @@ if __name__ == '__main__':
     print(output.hazop_table)
 
     output.create_output()
+    
     
     elapsed_time = time.time() - start_time
     print(elapsed_time)
