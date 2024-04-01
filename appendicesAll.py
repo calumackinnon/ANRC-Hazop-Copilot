@@ -664,10 +664,10 @@ def replicate(graph, graph_type):
                     paths = nx.all_simple_paths(graph, root, leaf)
                     all_paths.extend(paths)
                     
-            # all_paths2 = []
-            # for root in roots:
-            #     paths = nx.all_simple_paths(graph, root, leaves)
-            #     all_paths2.extend(paths)
+            all_paths2 = []
+            for root in roots:
+                paths = nx.all_simple_paths(graph, root, leaves)
+                all_paths2.extend(paths)
                 
             new_graph = all_paths
             
@@ -7156,7 +7156,7 @@ def equipment_based_hazard_specific_deviation(deviation, args):
                                   causeInvolvesSubstance=[substance.onto_object]
                                   ) # functional, nur 1 substanz übergeben
         
-        callReasoner() # sync_reasoner(debug=0)
+        callReasoner()
         
     else:
         if isinstance(deviation, dict):
@@ -7212,7 +7212,7 @@ def equipment_based_hazard_specific_deviation(deviation, args):
                     prep.DictName.consequence:      consequence}
         preliminary_scenario_list.append(scenario)
     
-    callReasoner() # sync_reasoner(debug=0)
+    callReasoner()
     
     #TODO CHECK indentation on statement below.
     infer_follow_up(process_unit,
@@ -7389,7 +7389,7 @@ def infer_follow_up(process_unit,
         safeguardInvolvesSubstance=[substance.onto_object]
     )
     
-    callReasoner() # sync_reasoner(debug=0)
+    callReasoner()
     
     # === Pass results
     for scenario in scenario_list:
@@ -7755,7 +7755,7 @@ def propagation_based_hazard(devex, process_unit, substance, last_equipment_enti
         inferred_effects.append(effect)
         preliminary_scenario_list.append(scenario)
         
-    callReasoner() # sync_reasoner(debug=0)
+    callReasoner()
     
     for scenario in preliminary_scenario_list:
         for effect in scenario[prep.DictName.effect].is_a:
@@ -7842,7 +7842,7 @@ def propagation_based_hazard(devex, process_unit, substance, last_equipment_enti
             scenario[prep.DictName.safeguard] = safeguard
     
     if scenario_list:
-        callReasoner() # sync_reasoner(debug=0)
+        callReasoner()
     
     # === Check whether cause equals deviation
     do_not_consider = False

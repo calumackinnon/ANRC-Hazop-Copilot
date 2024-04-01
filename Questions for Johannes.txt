@@ -60,3 +60,13 @@ In Appendix W (Formal input objects of the case studies):-
 
 What is the function similar(case1, case2) which is called within the calculate_similarity(new_case, old_case) function?
 
+There are also some class definitions as subclasses of Cause in the ontology which it would be good to be able to define:
+AbnormalVaporIntake
+EquipmentFailure
+HeatInputByRecirculationPump
+OpenedInletValve
+OpenedOutletValve
+ConnectionsFaultyConnected
+FailureOfControlSystem
+
+
