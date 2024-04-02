@@ -4,7 +4,7 @@ Created on Sat Mar 23 14:00:37 2024
 
 A copy of Drug reasoner from https://owlready2.readthedocs.io/en/latest/reasoning.html
 
-@author: qrb15201
+@author: CM
 """
 
 from owlready2 import *

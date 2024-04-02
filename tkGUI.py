@@ -5,7 +5,7 @@ Created on Mon Mar 18 11:22:01 2024
 A script to display a matplotlib in a Tkinter GUI, as acquired from 
 https://www.geeksforgeeks.org/how-to-embed-matplotlib-charts-in-tkinter-gui/
 
-@author: qrb15201 (Calum Mackinnon)
+@author: CM
 """
 
 

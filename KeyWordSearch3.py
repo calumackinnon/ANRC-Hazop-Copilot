@@ -2,7 +2,7 @@
 """
 Created on Tue Aug  1 11:32:04 2023
 
-@author: nau03220, kenny fong
+@author: KF
 """
 
 ''' 

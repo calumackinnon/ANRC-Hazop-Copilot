@@ -8,7 +8,7 @@ For
     python -m unittest discover
 to work, this must be saved in a file entitled test*.py.
  
-@author: qrb15201
+@author: CM
 """
 
 import unittest

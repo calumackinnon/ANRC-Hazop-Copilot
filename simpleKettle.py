@@ -14,7 +14,7 @@ From Section 8.4.1 of Russel & Norvig, 3rd Ed. 2010, there is a 7-step process:
     6. Pose queries to the inference procedure and get answers
     7. Debug the knowledge base.
 
-@author: qrb15201
+@author: CM
 """
 
 from owlready2 import *

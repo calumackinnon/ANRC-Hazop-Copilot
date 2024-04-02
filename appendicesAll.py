@@ -17,7 +17,7 @@ Presently fixing a bug at from tearing import ... as go, I believe it is to do
 with NetworkX. Is it this? https://sdopt-tearing.readthedocs.io/en/latest/
 It is to do with p 118 in the dissertation.
 
-@author: qrb15201 Calum Mackinnon
+@author: CM
 """
 
 

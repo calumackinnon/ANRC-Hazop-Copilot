@@ -2,7 +2,7 @@
 """
 Created on Fri Mar 22 10:47:34 2024
 
-@author: qrb15201
+@author: CM
 """
 
 from owlready2 import Thing

@@ -5,7 +5,7 @@ Created on Thu Mar 14 16:09:25 2024
 from https://paul-bruffett.medium.com/building-ontologies-with-python-84238d6eee52
 and  https://owlready2.readthedocs.io/en/latest/install.html#installation-in-spyder-idle-or-any-other-python-console
 
-@author: qrb15201
+@author: CM
 """
 from owlready2 import *
 from owlready2 import Thing
