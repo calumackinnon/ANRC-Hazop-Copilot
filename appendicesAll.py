@@ -140,11 +140,11 @@ class OntologyOperations():
     def save_ontology(self):
         """
         https://owlready2.readthedocs.io/en/latest/onto.html#saving-an-ontology-to-an-owl-file
-
+        
         Returns
         -------
         None.
-
+        
         """
         self.onto.save(file=self.filename)
         
@@ -167,18 +167,18 @@ def similar(caseA, caseB):
     Evaluate the similarity between caseA and caseB. 
     
     This method is being retrospectively built due to being called later.
-
+    
     Parameters
     ----------
     caseA : dict
         A dict to represent a single case as in the propagation_base_case list.
     caseB : dict
         A dict to represent a single case as in the propagation_base_case list.
-
+        
     Returns
     -------
     measureOfSimilarity : int.
-
+    
     """
     
     assert caseA is not None and caseB is not None, 'caseA or caseB is None'
@@ -199,17 +199,17 @@ def similar(caseA, caseB):
 def cleanup_result_list(resultList):
     """
     Remove duplicate entries from a dict of results. This is new and untested.
-
+    
     Parameters
     ----------
     resultList : dict
         I can't tell where results is defined, but it is passed here as a dict.
-
+        
     Returns
     -------
     results : dict
         A dictionary of results with no duplicates.
-
+        
     """
         
     targetLength = len(set(list(resultList.values()))) # Set removes duplicates
@@ -249,23 +249,23 @@ class GraphType(Enum):
     # the structure of the code in the determine_propagation_strategy() method.
     SingleCycleSystem = 6 
     ComplexSystem = 7      #covered
- 
+
 # === Function to identify ratio pattern [0, 1, .., 1, 0]
 def identify_single_line(out_in_ratios):
     """
     Check if a list of 1s and 0s takes the form [0,1,1,...,1,1,0] nomatter its
     overall length.
-
+    
     Parameters
     ----------
     out_in_ratios : list
         A list of 0 and 1 digits.
-
+        
     Returns
     -------
     boolean
         Whether or not the out_in_ratios matches the expected pattern.
-
+        
     """
     if not isinstance(out_in_ratios, list): return False
     
@@ -284,7 +284,7 @@ def identify_single_line(out_in_ratios):
 
 def identify_and_add_predecessors_to_list(graph, current_node, tmp_list):
     end_reached = False
-    while not end_reached:
+    while not end_reached: #TODO Convert to for loop and return the new list.
         try:
             tmp_predecessor = list(graph.predecessors(current_node))[0]
             tmp_list.append(tmp_predecessor)
@@ -293,10 +293,10 @@ def identify_and_add_predecessors_to_list(graph, current_node, tmp_list):
             end_reached = True
 
 def identify_and_add_successors_to_list(graph, current_node, tmp_list):
-
+    
     end_reached = False
     
-    while not end_reached:
+    while not end_reached: #TODO Convert to for loop and return the new list.
         try:
             tmp_successor = list(graph.successors(current_node))[0]
             tmp_list.append(tmp_successor)
@@ -310,18 +310,18 @@ def my_max(e):  return max(e)
 def calc_out_in_flow_ratio(graph):
     """
     Evaluate the Graph structure in terms of output/input edges for each node.
-
+    
     Parameters
     ----------
     graph : NetworkX.Graph
         A directed Graph.
-
+        
     Returns
     -------
     node_out_in_ratio : list[float]
         A list of the same length as the numver of nodes in the Graph. It has a
         ratio of output / input edges for each node.
-
+        
     """
     
     node_out_in_ratio = []
@@ -350,7 +350,7 @@ def starting_with(arr, start_index):
         yield arr[i]
     for i in range(start_index):
         yield arr[i]
- 
+
 def determine_recycles(graph):
     
     ratios = calc_out_in_flow_ratio(graph)
@@ -384,7 +384,7 @@ def determine_cycle_intersections(list_of_cycles):
         list_of_intersections.append({"cycles": [a, b], "intersection": intersection})
         
     return list_of_intersections
-
+    
 # Check whether a list contains the same items
 def check_equality_of_list(lst):
     
@@ -394,17 +394,17 @@ def check_equality_of_list(lst):
 def findTypeOf(graph):
     """
     Evaluate a Graph's structure in order to help pick a propagation strategy.
-
+    
     Parameters
     ----------
     graph : NetworkX.DiGraph
         A Graph as defined by NetworkX.
-
+        
     Returns
     -------
     GraphType
         An Enum which describes the Graph structure.
-
+        
     """
     
     assert isinstance(graph, nx.DiGraph), 'Not a directed graph as anticipated'
@@ -417,7 +417,7 @@ def findTypeOf(graph):
     
     roots = list(v for v, d in graph.in_degree() if d == 0)
     leaves = list(v for v, d in graph.out_degree() if d == 0)
-
+    
     
     if len(cycles) > 1 and isinstance(cycles[0], list):
         return GraphType.MultiCycleSystem
@@ -447,7 +447,7 @@ def findTypeOf(graph):
             
             # === check for cycles
             cycles = list(nx.simple_cycles(graph))
-
+            
             if len(pos_min_elements) == 1 and \
                 min_ratio <= 0.5 and len(cycles) == 0 and len(roots) == 1:
                 return GraphType.JunctionSystem    
@@ -462,7 +462,7 @@ def findTypeOf(graph):
 def findPathsAfterDivergingNode(graph, successor, max_ratio_node_pos):
     """
     Under construction.
-
+    
     Parameters
     ----------
     graph : NetworkX.DiGraph
@@ -471,12 +471,12 @@ def findPathsAfterDivergingNode(graph, successor, max_ratio_node_pos):
         A node which follows the chosen node.
     max_ratio_node_pos : NetworkX.Node
         A reference to (I think) a node where there is a divergence.
-
+        
     Returns
     -------
     node_list : list
         A list of NetworkX.Graph nodes representing paths after the chosen one.
-
+        
     """
     
     
@@ -527,19 +527,19 @@ def findPathsAfterDivergingNode(graph, successor, max_ratio_node_pos):
 def copyGraphCycles(graph, cycles):
     """
     Create a list of each cycle within a Graph. Maybe this can be simplified.
-
+    
     Parameters
     ----------
     graph : NetworkX.Graph
         A Graph to represent the primary system being emulated.
     cycles : list
         A list of nodes representing the cycles of the same NetworkX.Graph.
-
+        
     Returns
     -------
     new_graph : list
         A copy of the graph which only contains nodes that belong to cycles.
-
+        
     """
     new_graph = []
     
@@ -559,25 +559,25 @@ def copyGraphCycles(graph, cycles):
             
         # Append the nodes to an overall list
         new_graph.append(list(copy_of_graph))
-
+        
     return new_graph
 
 def replicate(graph, graph_type):
     """
     Create a replica of the Graph according to its type.
-
+    
     Parameters
     ----------
     graph : NetworkX.DiGraph
         A directed Graph.
     graph_type : GraphType
         An Enum to specify the structure of the Graph.
-
+        
     Returns
     -------
     new_graph : list
         A copy of the graph structured as a list.
-
+        
     """
     
     
@@ -589,7 +589,7 @@ def replicate(graph, graph_type):
     # recycle = determine_recycles(graph)
     roots = list(v for v, d in graph.in_degree() if d == 0)
     leaves = list(v for v, d in graph.out_degree() if d == 0)
-
+    
     new_graph = []
     
     match graph_type:
@@ -634,7 +634,7 @@ def replicate(graph, graph_type):
             
             # Very first list are nodes from first to diverging node
             new_graph = global_list + successor_streams
-
+            
         case GraphType.JunctionSystem:
             # In determine_propagation_strategy(), there are two sections of 
             # code which create a new_graph for the GraphType.JunctionSystem
@@ -671,7 +671,7 @@ def replicate(graph, graph_type):
         
             # === identify minimum ratio
             min_ratio = min(i for i in ratios if i > 0)
-
+            
             node_list = list(graph.nodes)
             min_ratio_node_pos = ratios.index(min_ratio)
             min_ratio_node = node_list[min_ratio_node_pos]
@@ -697,7 +697,7 @@ def replicate(graph, graph_type):
             # === Sort results
             global_list.append(tmp_list)
             new_graph = global_list
-
+            
         case GraphType.BranchSystem:
             all_paths = []
             
@@ -706,7 +706,7 @@ def replicate(graph, graph_type):
                 all_paths.extend(paths)
                 
             new_graph = all_paths
-
+            
         case GraphType.ComplexSystem:
             all_paths = []
             
@@ -730,19 +730,19 @@ def replicate(graph, graph_type):
 def getIntersectionNode(graph, graph_type):
     """
     In a MultiCycleSystem, find one node where different cycles intersect.
-
+    
     Parameters
     ----------
     graph : NetworkX.DiGraph
         A directed Graph.
     graph_type : GraphType
         An Enum for the type of Graph structure.
-
+        
     Returns
     -------
     intersection_node : NetworkX.Graph.Node
         A node which forms a part of more than one cycle within the Graph.
-
+        
     """
     
     if graph_type != GraphType.MultiCycleSystem: return None
@@ -750,7 +750,7 @@ def getIntersectionNode(graph, graph_type):
     # === Cycle detection
     cycles = nx.simple_cycles(graph)
     cycles = list(cycles)
-
+    
     list_of_cycles = {}
     # Loop over cycles and assign a letter to each cycle (unambiguous identification)
     for idx, cycle in enumerate(cycles):
@@ -943,7 +943,7 @@ class MySubstance:
             hasFlashpointInKelvin=self.flash_point,
             hasUpperExplosionLimitInPercent=self.upper_explosion_limit,
             hasLowerExplosionLimitInPercent=self.lower_explosion_limit
-        )
+            )
         
         
         
@@ -960,7 +960,7 @@ class MySubstance:
     
 
 def source(identifier, circumstances, control_instance, transportable, operating_modes, max_pressure, max_temperature):
-
+    
     equipment = equipment_onto.SourceEntity
     equipment_entity = MyEquipmentEntity(equipment, identifier, circumstances, transportable, operating_modes, max_pressure, max_temperature )
     equipment_entity.set_intended_function(process_onto.NoIntendedFunction)
@@ -971,7 +971,7 @@ def source(identifier, circumstances, control_instance, transportable, operating
     return equipment_entity
 
 def sink(identifier, circumstances, control_instance, transportable, operating_modes, max_pressure, max_temperature):
-
+    
     equipment = equipment_onto.SinkEntity
     equipment_entity = MyEquipmentEntity(equipment, identifier, circumstances, transportable, operating_modes, max_pressure, max_temperature)
     equipment_entity.set_intended_function(process_onto.NoIntendedFunction)
@@ -982,7 +982,7 @@ def sink(identifier, circumstances, control_instance, transportable, operating_m
     return equipment_entity
 
 def connection_pipe(identifier, circumstances, control_instance, transportable, operating_modes, max_pressure, max_temperature):
-
+    
     equipment = equipment_onto.ConnectionPipeEntity
     equipment_entity = MyEquipmentEntity(equipment, identifier, circumstances, transportable, operating_modes, max_pressure, max_temperature)
     equipment_entity.set_intended_function(process_onto.Transport)
@@ -993,7 +993,7 @@ def connection_pipe(identifier, circumstances, control_instance, transportable, 
     return equipment_entity
 
 def tank_truck(identifier, circumstances, control_instance, transportable, operating_modes, max_pressure, max_temperature, volume_of_enclosure):
-
+    
     equipment = equipment_onto.TankTruckEntity
     equipment_entity = MyEquipmentEntity(equipment, identifier, circumstances, transportable, operating_modes, max_pressure, max_temperature)
     equipment_entity.set_volume_of_enclosure(volume_of_enclosure)
@@ -1023,7 +1023,7 @@ def storage_tank_1(identifier, circumstances, control_instance, transportable, o
     return equipment_entity
 
 def storage_tank_2(identifier, circumstances, control_instance, transportable, operating_modes, max_pressure, max_temperature, volume_of_enclosure):
-
+    
     equipment = equipment_onto.StorageTankEntity
     equipment_entity = MyEquipmentEntity(equipment, identifier, circumstances, transportable, operating_modes, max_pressure, max_temperature)
     equipment_entity.set_volume_of_enclosure(volume_of_enclosure)
@@ -1038,11 +1038,11 @@ def storage_tank_2(identifier, circumstances, control_instance, transportable, o
     equipment_entity.add_subunit(equipment_onto.ElectricalEnergySupply)
     equipment_entity.set_control_instance(control_instance)
     equipment_entity.assemble_ontology_object(equipment)
-
+    
     return equipment_entity
 
 def cooled_storage_tank_1(identifier, circumstances, control_instance, transportable, operating_modes):
-
+    
     equipment = equipment_onto.StorageTankEntity
     equipment_entity = MyEquipmentEntity(equipment, identifier, circumstances, transportable, operating_modes)
     equipment_entity.add_instrumentation((equipment_onto.InletValve, "{}-VA1".format(identifier)))
@@ -1096,6 +1096,7 @@ def reactor(identifier, circumstances, control_instance, transportable, operatin
 
 
 def shell_tube_heat_exchanger(identifier, circumstances, control_instance, transportable, operating_modes):
+    
     equipment = equipment_onto.ShellTubeHeatExchangerEntity
     equipment_entity = MyEquipmentEntity(equipment, identifier, circumstances, transportable, operating_modes)
     # T-O-D-O: wieso nur 2 Anschlüsse
@@ -1126,7 +1127,7 @@ def reboiler(identifier, circumstances, control_instance, transportable, operati
 
 
 def settling_tank(identifier, circumstances, control_instance, transportable, operating_modes, max_pressure, max_temperature, volume_of_enclosure):
-
+    
     equipment = equipment_onto.SettlingTankEntity
     equipment_entity = MyEquipmentEntity(equipment, identifier, circumstances, transportable, operating_modes, max_pressure, max_temperature)
     # equipment_entity.add_instrumentation((equipment_onto.InletValve, "{}-VA1".format(identifier)))
@@ -1143,7 +1144,7 @@ def settling_tank(identifier, circumstances, control_instance, transportable, op
     return equipment_entity
 
 def inertgas_blanketing(identifier, circumstances, control_instance, transportable, operating_modes, max_pressure, max_temperature):
-
+    
     equipment = equipment_onto.InertgasBlanketingEntity
     equipment_entity = MyEquipmentEntity(equipment, identifier, circumstances, transportable, operating_modes, max_pressure, max_temperature)
     equipment_entity.add_instrumentation((equipment_onto.PressureControlValve, "{}-VA1".format(identifier)))
@@ -1159,7 +1160,7 @@ def inertgas_blanketing(identifier, circumstances, control_instance, transportab
     return equipment_entity
 
 def pressure_vessel(identifier, circumstances, control_instance, transportable, operating_modes):
-
+    
     equipment = equipment_onto.PressureVesselEntity
     equipment_entity = MyEquipmentEntity(equipment, identifier, circumstances, transportable, operating_modes)
     equipment_entity.add_instrumentation((equipment_onto.InletValve, "{}-VA1".format(identifier)))
@@ -1172,6 +1173,7 @@ def pressure_vessel(identifier, circumstances, control_instance, transportable, 
     return equipment_entity
 
 def pressure_receiver(identifier, circumstances, control_instance, transportable, operating_modes, max_pressure, max_temperature, volume):
+    
     equipment = equipment_onto.PressureReceiverEntity
     equipment_entity = MyEquipmentEntity(equipment, identifier, circumstances, transportable, operating_modes, max_pressure, max_temperature)
     equipment_entity.add_instrumentation((equipment_onto.InletValve, "{}-VA1".format(identifier)))
@@ -1186,6 +1188,7 @@ def pressure_receiver(identifier, circumstances, control_instance, transportable
     return equipment_entity
 
 def plate_heat_exchanger(identifier, circumstances, control_instance, transportable, operating_modes):
+    
     equipment = equipment_onto.PlateHeatExchangerEntity
     equipment_entity = MyEquipmentEntity(equipment, identifier, circumstances, transportable, operating_modes)
     equipment_entity.add_instrumentation((equipment_onto.InletValve, "{}-VA1".format(identifier)))
@@ -1200,6 +1203,7 @@ def plate_heat_exchanger(identifier, circumstances, control_instance, transporta
     return equipment_entity
 
 def centrifugal_pump_1(identifier, circumstances, control_instance, transportable, operating_modes):
+    
     equipment = equipment_onto.PumpEntity
     equipment_entity = MyEquipmentEntity(equipment, identifier, circumstances, transportable, operating_modes)
     equipment_entity.add_instrumentation((equipment_onto.InletValve, "{}-VA1".format(identifier)))
@@ -1267,6 +1271,7 @@ def screw_compressor(identifier, circumstances, control_instance, transportable,
     return equipment_entity
 
 def piston_compressor(identifier, circumstances, control_instance, transportable, operating_modes):
+    
     equipment = equipment_onto.CompressorEntity
     equipment_entity = MyEquipmentEntity(equipment, identifier, circumstances, transportable, operating_modes)
     equipment_entity.add_instrumentation((equipment_onto.InletValve, "{}-VA1".format(identifier)))
@@ -1286,6 +1291,7 @@ def piston_compressor(identifier, circumstances, control_instance, transportable
 
 
 def pneumatically_flow_control_valve_1(identifier, circumstances, control_instance, transportable, operating_modes, max_pressure, max_temperature):
+    
     equipment = equipment_onto.ValveEntity
     equipment_entity = MyEquipmentEntity(equipment, identifier, circumstances, transportable, operating_modes, max_pressure, max_temperature)
     equipment_entity.set_apparatus(equipment_onto.Body)
@@ -1302,7 +1308,7 @@ def pneumatically_flow_control_valve_1(identifier, circumstances, control_instan
     return equipment_entity
 
 def pneumatically_pressure_control_valve_1(identifier, circumstances, control_instance, transportable, operating_modes):
-
+    
     equipment = equipment_onto.ValveEntity
     equipment_entity = MyEquipmentEntity(equipment, identifier, circumstances, transportable, operating_modes)
     equipment_entity.set_apparatus(equipment_onto.Body)
@@ -1318,7 +1324,7 @@ def pneumatically_pressure_control_valve_1(identifier, circumstances, control_in
     return equipment_entity
 
 def manual_three_way_valve(identifier, circumstances, control_instance, transportable, operating_modes):
-
+    
     equipment = equipment_onto.ValveEntity
     equipment_entity = MyEquipmentEntity(equipment, identifier, circumstances, transportable, operating_modes)
     equipment_entity.add_instrumentation((equipment_onto.ThreeWayValve, "{}-VA1".format(identifier)))
@@ -1330,7 +1336,7 @@ def manual_three_way_valve(identifier, circumstances, control_instance, transpor
     return equipment_entity
 
 def throttling_valve(identifier, circumstances, control_instance, transportable, operating_modes, max_pressure, max_temperature):
-
+    
     equipment = equipment_onto.ValveEntity
     equipment_entity = MyEquipmentEntity(equipment, identifier, circumstances, transportable, operating_modes, max_pressure, max_temperature)
     equipment_entity.add_instrumentation((equipment_onto.ThrottlingValve, "{}-VA1".format(identifier)))
@@ -1342,7 +1348,7 @@ def throttling_valve(identifier, circumstances, control_instance, transportable,
     return equipment_entity 
 
 def manual_valve(identifier, circumstances, control_instance, transportable, operating_modes):
-
+    
     equipment = equipment_onto.ValveEntity
     equipment_entity = MyEquipmentEntity(equipment, identifier, circumstances, transportable, operating_modes)
     equipment_entity.add_instrumentation((equipment_onto.ShutOffValve, "{}-VA1".format(identifier)))
@@ -1436,7 +1442,7 @@ def cooling_tower(identifier, circumstances, control_instance, transportable, op
     return equipment_entity
 
 def crude_stabilizer_column(identifier, circumstances, control_instance, transportable, operating_modes, max_pressure, max_temperature):
-
+    
     equipment = equipment_onto.StabilizerColumnEntity
     equipment_entity = MyEquipmentEntity(equipment, identifier, circumstances, transportable, operating_modes, max_pressure, max_temperature)
     equipment_entity.set_apparatus(equipment_onto.PressureVessel)
@@ -1569,7 +1575,7 @@ propagation_case_base = [
      CaseAttributes.IntendedFunction: (process_onto.MaterialTransfer, intended_function_weight),
      CaseAttributes.SubstancePhase: (substance_onto.Liquid, phase_weight),
      CaseAttributes.InferredDeviation: [deviation_onto.HighTemperature]}, 
-
+    
     {CaseAttributes.No: 13,
      CaseAttributes.EquipmentEntity: (equipment_onto.PumpEntity, equipment_weight),
      CaseAttributes.Event: (deviation_onto.HighPressure, event_weight),
@@ -2841,8 +2847,6 @@ propagation_case_base = [
      CaseAttributes.InferredDeviation: [deviation_onto.OtherThanComposition]}, 
 ] 
 
-    
-    
 def calculate_similarity(new_case, old_case):
     
     if new_case is None or old_case is None:
@@ -2882,7 +2886,7 @@ def match_case_with_cb(current_case, case_base):
     """
     I believe this function finds a difference (if there is one) between a 
     baseline (defined as a long list in Appendix E) and a shorter study case.
-
+    
     Parameters
     ----------
     current_case : dict
@@ -2890,20 +2894,20 @@ def match_case_with_cb(current_case, case_base):
         defined in Appendix E.
     case_base : dict
         Another dictionary where the key is an Enum of type CaseAttribute.
-
+        
     Returns
     -------
     relevant_deviation : list
         (I think) this is a list as the value selected by the key 
         CaseAttributes.InferredDeviation.
-
+        
     """
     
     list_similarities = []
     
     for case in case_base:
         list_similarities.append((calculate_similarity(current_case, case), case.get(CaseAttributes.InferredDeviation)))
-
+        
     res_list = [x[0] for x in list_similarities]
     max_similarity_measure = max(res_list)
     
@@ -2922,7 +2926,7 @@ def match_case_with_cb(current_case, case_base):
 
 
 with causes_onto:
-
+    
     # ===Cause ========================================
     class Cause(Thing):
         pass
@@ -2958,11 +2962,8 @@ with causes_onto:
     class underlyingcauseRequiresBoundaryCondition(UnderlyingCause >> boundary_onto.BoundaryCondition):
         pass
 
-
-
-
 with effect_onto:
-
+    
     # === Effect ========================================
     class Effect(Thing):
         pass
@@ -2987,7 +2988,7 @@ with effect_onto:
      pass
     class effectImpliedByUnderlyingcause(Effect >> causes_onto.UnderlyingCause):
      pass
-    
+
 with consequence_onto:
     
     # === Consequence ========================================
@@ -3037,7 +3038,7 @@ with safeguard_onto:
      pass
     class impliesSafeguard(Safeguard >> Safeguard, AsymmetricProperty):
      pass
-    
+
     # === Disjoint statement
     AllDisjoint([deviation_onto.Deviation,
      causes_onto.Cause,
@@ -3195,7 +3196,7 @@ with upper_onto:
      pass
     class StructuralPlantItem(PlantItem):
      pass
- 
+     
     AllDisjoint([FunctionalPlantItem, StructuralPlantItem])
     
     # === Ports
@@ -6859,7 +6860,7 @@ with safeguard_onto:
      equivalent_to = [Safeguard & safeguardPreventsEffect.some(effect_onto.GenerationOfElectrostaticCharge)]
      
 with pse_onto: #TODO Calum: I'm not completely sure if this goes here, but pse_onto is referenced from elsewhere.
-
+    
     class PeriodicInspection(safeguard_onto.Safeguard):
      equivalent_to = [safeguard_onto.Safeguard & safeguard_onto.safeguardPreventsCause.some(MalfunctionLubricationSystem)]
     class ImprovedOilSeparation(safeguard_onto.Safeguard):
@@ -6942,11 +6943,11 @@ def callReasoner(): # Written by Calum on 29/3/24 to benefit from his mistakes.
     thing is to run the part of the code which defines it once, without relying
     on this code to define it multiple times and potentially cause some logical 
     inconsistencies to be defined if changes are made to the ontology classes.
-
+    
     Returns
     -------
     None.
-
+    
     """
     try:
         
@@ -7404,7 +7405,6 @@ def infer_follow_up(process_unit,
                 subsequent_deviations.append(dev)
 
 
-# Calum
 # infer.py
 def propagation_based_analysis(plant_graph, order, propagation_stacks):
     """
@@ -7412,7 +7412,7 @@ def propagation_based_analysis(plant_graph, order, propagation_stacks):
     analysis. This returns nothing, as callReasoner() keeps details in memory. 
     This is why the __main__ routine has two core functions: one before a call
     to callReasoner() and one after it to query the resulting global variables.
-
+    
     Parameters
     ----------
     plant_graph : NetworkX.DiGraph
@@ -7421,11 +7421,11 @@ def propagation_based_analysis(plant_graph, order, propagation_stacks):
         A copy of the Graph (or part of it) but structured as a list of nodes.
     propagation_stacks : list
         A list of dict items to list equipment and scenarios.
-
+        
     Returns
     -------
     None.
-
+    
     """
     # create copy of original plant layout and remove edges that are not in 'order' list
     # therefore a graph is created according to order
@@ -7579,7 +7579,7 @@ def propagation_based_hazard(devex, process_unit, substance, last_equipment_enti
         
     This function would be more readable if return statements are used, and if
     it can be restructured to firstly handle a base case then a recursive case.
-
+    
     Parameters
     ----------
     devex : TYPE
@@ -7595,11 +7595,11 @@ def propagation_based_hazard(devex, process_unit, substance, last_equipment_enti
         give each call of this recursive method access to the previous case.
     consumed_flag : bool
         DESCRIPTION.
-
+        
     Returns
     -------
     None.
-
+    
     """
     
     
@@ -7809,12 +7809,12 @@ def propagation_based_hazard(devex, process_unit, substance, last_equipment_enti
 def create_process_plant_hexane_storage_tank():
     """
     Create a specific case study about a hexane storage tank.
-
+    
     Returns
     -------
     graph : NetworkX.DiGraph
         A graph of 4 components linked by 3 edges in a direct sequence.
-
+        
     """
     
     hazard_classes = [substance_onto.FlammableLiquidCategory2, substance_onto.SkinCorrosionIrritationCategory2,
@@ -7941,12 +7941,12 @@ def create_process_plant_hexane_storage_tank():
 def create_olefin_feed_section():
     """
     Create a specific case study about an olefin feed section.
-
+    
     Returns
     -------
     graph : NetworkX.DiGraph
         A graph with 6 nodes and 5 edges, but not all in a linear sequence.
-
+        
     """
     
     # Mixture of Hexane/Hexene and water
@@ -8134,25 +8134,25 @@ def create_olefin_feed_section():
 def equipmentBasedEvaluation(process_plant_model, stack):
     """
     This function calls equipment_based_analysis, which is not available to us.
-
+    
     Parameters
     ----------
     process_plant_model : NetworkX.DiGraph
         A directed Graph as defined by NetworkX to describe equipment studied.
     stack : list
         As currently structured, this is always an empty list passed in.
-
+        
     Returns
     -------
     stack : list
         A list of dict items to list equipment and scenarios.
-
+        
     """
     assert isinstance(process_plant_model, nx.DiGraph), 'Expected a nx.DiGraph'
     assert False, 'This function is incomplete as one below is missing. \n \
                     We raise an error here instead of trying to run it. \n \
                     Test only with propagation based evaluation.'
-
+    
     for index in range(len(process_plant_model.nodes)):
         equipment_specific_prop_scenarios = []
         
@@ -8183,7 +8183,7 @@ def equipmentBasedEvaluation(process_plant_model, stack):
                                         substances,
                                         environment,
                                         equipment_specific_prop_scenarios )
-
+        
         stack.append(
             {"{0}".format(equipment_entity.name):  equipment_entity,
              pre_processing.DictName.scenario:     equipment_specific_prop_scenarios}
@@ -8191,7 +8191,6 @@ def equipmentBasedEvaluation(process_plant_model, stack):
         
     return stack
 
-    
 def postprocessAndPrintTheResults():
     
     global results # The original code in Appendix C refers to results 
@@ -8232,7 +8231,7 @@ def postprocessAndPrintTheResults():
         counter += 1
             
     print(output.hazop_table)
-
+    
     output.create_output()
     
     
@@ -8249,7 +8248,7 @@ def processTheModel():
     if config.EQUIPMENT_BASED_EVALUATION:
         
         stack_elements = equipmentBasedEvaluation(process_plant_model, stack_elements)
-
+        
     # === Tearing strategy/strategy for defining order of process equipment/start-end point
     if len(process_plant_model.nodes) > 1:
         
@@ -8258,10 +8257,10 @@ def processTheModel():
         intersections = getIntersectionNode(process_plant_model, graph_type)
         
         print(list(newly_arranged_graphs))    
-
-
-
-
+        
+        
+        
+        
     # === Entry point for hazard/malfunction propagation
     if config.PROPAGATION_BASED_EVALUATION:
         
@@ -8305,7 +8304,7 @@ def processTheModel():
                     propagation_based_analysis(process_plant_model, 
                                                stream, 
                                                stack_elements)
-
+                    
             case GraphType.RecycleFlowSystem:
                 
                 for stream in newly_arranged_graphs:
@@ -8335,12 +8334,9 @@ if __name__ == '__main__':
     # Take note of the total time taken to complete the processing and print it
     elapsed_time = time.time() - start_time
     print(elapsed_time)
-
+    
     ontology_operations.save_ontology()
-
+    
     # === Get errors
     print(list(owl.default_world.inconsistent_classes())) # possibly default_world. ...
     
-    
-        
-        
