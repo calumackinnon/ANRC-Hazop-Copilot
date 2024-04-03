@@ -57,7 +57,7 @@ substance = get_ontology("http://webprotege.stanford.edu/RBmrmRPMEoUC51a1J5IYQ2m
 
 
 # #TODO The following are variables and modules referenced elsewhere in the code.
-results = None
+# results = None
 # default_world = None
 prep = None
 cbr = None # case based reasoner (I think)
@@ -76,6 +76,8 @@ def instantiate_boundary_conditions(boundaryConditions):        pass
 def equipment_based_analysis(equipmentEntity, deviations, 
                              substances, environment, 
                              equipmentSpecificPropScenarios):   pass
+    
+def get_inferred_results( cause ): return None 
     
 def add_edge_port(G, nodeindex, label1, node2index, label2):
     
@@ -7008,9 +7010,9 @@ def equipment_based_hazard_specific_deviation(deviation, args):
                 deviation = deviation[prep.DictName.subsequent_deviation]()
                 
     if cause and cause.is_a:
-        cause_lst = prep.get_inferred_results(cause)
+        cause_lst = prep.get_inferred_results(cause)    #TODO A typo ?
         
-        for idx, cause_ in enumerate(cause_lst):
+        for idx, cause_ in enumerate(cause_lst):        # Same typo  ?
             underlying_causes, effect, consequence, = assemble_concept_instance(substance,
                                                                             process_unit,
                                                                             deviation,
@@ -7495,7 +7497,7 @@ def propagation_based_analysis(plant_graph, order, propagation_stacks):
                                                  False,
                                                  previous_case,
                                                  consumed_flag
-                        )
+                                                 )
                         
                         # === Propagate partial scenario in case no effect have been identified
                         if not consumed_flag:
@@ -7506,12 +7508,12 @@ def propagation_based_analysis(plant_graph, order, propagation_stacks):
                         consumed_flag = False
                         for propagation in propagation_stacks[pos][prep.DictName.passed_scenarios]:
                             propagation_based_hazard(propagation,
-                                    process_unit,
-                                    substance,
-                                    False, # last equipment in graph
-                                    previous_case,
-                                    consumed_flag
-                                )
+                                                     process_unit,
+                                                     substance,
+                                                     False, # last equipment in graph
+                                                     previous_case,
+                                                     consumed_flag
+                                                     )
                             
                             # === Propagate partial scenario in case no effect have been identified
                             if not consumed_flag:
@@ -7570,6 +7572,35 @@ def propagation_based_analysis(plant_graph, order, propagation_stacks):
 
 
 def propagation_based_hazard(devex, process_unit, substance, last_equipment_entity, previous_case, consumed_flag):
+    """
+    Normally, a recursive function has:
+        a base case; and
+        a recursive case.
+        
+    This function would be more readable if return statements are used, and if
+    it can be restructured to firstly handle a base case then a recursive case.
+
+    Parameters
+    ----------
+    devex : TYPE
+        DESCRIPTION.
+    process_unit : TYPE
+        DESCRIPTION.
+    substance : TYPE
+        DESCRIPTION.
+    last_equipment_entity : bool
+        True if this is the last piece of equipment in the sequence.
+    previous_case : dict
+        A dict of CaseAttributes as keys and ontology references as values, to
+        give each call of this recursive method access to the previous case.
+    consumed_flag : bool
+        DESCRIPTION.
+
+    Returns
+    -------
+    None.
+
+    """
     
     
     global results
