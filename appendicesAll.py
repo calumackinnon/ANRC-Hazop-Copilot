@@ -83,10 +83,11 @@ def add_edge_port(G, nodeindex, label1, node2index, label2):
         
     G.add_edge(nodeindex, node2index)
     
-class Configuration(Enum):
+class Configuration(Enum): # Of course, this is nothing more than a guess.
     
     CONSIDER_DEV_2_DEV_PROPAGATION = 0
     EQUIPMENT_BASED_EVALUATION = 1
+    PROPAGATION_BASED_EVALUATION = 2
 
 
 # A local ontology for BoundaryConditions
@@ -7303,7 +7304,7 @@ def infer_follow_up(process_unit,
     
     # === Identify subsequent deviations based on the results
     if not subsequent_deviation_loop:
-        if subsequent_deviation_loop:
+        if subsequent_deviation_loop: # TODO Control flow only reaches here if False.
             current_deviation = deviation[prep.DictName.subsequent_deviation].copy()
         else:
             if isinstance(deviation, list):
@@ -7403,6 +7404,26 @@ def infer_follow_up(process_unit,
 # Calum
 # infer.py
 def propagation_based_analysis(plant_graph, order, propagation_stacks):
+    """
+    Prepare to call the recursive function propagation_based_hazard() to run an
+    analysis. This returns nothing, as callReasoner() keeps details in memory. 
+    This is why the __main__ routine has two core functions: one before a call
+    to callReasoner() and one after it to query the resulting global variables.
+
+    Parameters
+    ----------
+    plant_graph : NetworkX.DiGraph
+        A directed Graph to represent a system (or plant items) being studied.
+    order : list
+        A copy of the Graph (or part of it) but structured as a list of nodes.
+    propagation_stacks : list
+        A list of dict items to list equipment and scenarios.
+
+    Returns
+    -------
+    None.
+
+    """
     # create copy of original plant layout and remove edges that are not in 'order' list
     # therefore a graph is created according to order
     graph = plant_graph.copy()
@@ -8087,12 +8108,12 @@ def equipmentBasedEvaluation(process_plant_model, stack):
     process_plant_model : NetworkX.DiGraph
         A directed Graph as defined by NetworkX to describe equipment studied.
     stack : list
-        DESCRIPTION.
+        As currently structured, this is always an empty list passed in.
 
     Returns
     -------
     stack : list
-        DESCRIPTION.
+        A list of dict items to list equipment and scenarios.
 
     """
     assert isinstance(process_plant_model, nx.DiGraph), 'Expected a nx.DiGraph'
