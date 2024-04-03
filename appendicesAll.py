@@ -394,7 +394,7 @@ def findTypeOf(graph):
 
     Parameters
     ----------
-    graph : NetworkX.Graph
+    graph : NetworkX.DiGraph
         A Graph as defined by NetworkX.
 
     Returns
@@ -565,8 +565,8 @@ def replicate(graph, graph_type):
 
     Parameters
     ----------
-    graph : NetworkX.Graph
-        A Graph.
+    graph : NetworkX.DiGraph
+        A directed Graph.
     graph_type : GraphType
         An Enum to specify the structure of the Graph.
 
@@ -730,7 +730,7 @@ def getIntersectionNode(graph, graph_type):
 
     Parameters
     ----------
-    graph : NetworkX.Graph
+    graph : NetworkX.DiGraph
         A directed Graph.
     graph_type : GraphType
         An Enum for the type of Graph structure.
@@ -8080,12 +8080,12 @@ def create_olefin_feed_section():
 
 def equipmentBasedEvaluation(process_plant_model, stack):
     """
-    
+    This function calls equipment_based_analysis, which is not available to us.
 
     Parameters
     ----------
-    process_plant_model : NetworkX.Graph
-        DESCRIPTION.
+    process_plant_model : NetworkX.DiGraph
+        A directed Graph as defined by NetworkX to describe equipment studied.
     stack : list
         DESCRIPTION.
 
@@ -8095,7 +8095,11 @@ def equipmentBasedEvaluation(process_plant_model, stack):
         DESCRIPTION.
 
     """
-    
+    assert isinstance(process_plant_model, nx.DiGraph), 'Expected a nx.DiGraph'
+    assert False, 'This function is incomplete as one below is missing. \n \
+                    We raise an error here instead of trying to run it. \n \
+                    Test only with propagation based evaluation.'
+
     for index in range(len(process_plant_model.nodes)):
         equipment_specific_prop_scenarios = []
         
@@ -8121,7 +8125,7 @@ def equipmentBasedEvaluation(process_plant_model, stack):
         deviations = config.deviation_selector(process_unit_obj)
         
         # === Infer hazards
-        equipment_based_analysis( equipment_entity,
+        equipment_based_analysis( equipment_entity,  #TODO function is missing
                                         deviations,
                                         substances,
                                         environment,
@@ -8181,6 +8185,7 @@ def postprocessAndPrintTheResults():
     
     
 def processTheModel():
+    
     # === Process model
     # process_plant_model = model.create_hazid_benchmark_1()
     process_plant_model = create_process_plant_hexane_storage_tank()
@@ -8188,11 +8193,13 @@ def processTheModel():
     # deviation_number = None
     stack_elements = []
     
+    if config.EQUIPMENT_BASED_EVALUATION:
+        
+        stack_elements = equipmentBasedEvaluation(process_plant_model, stack_elements)
+
     # === Tearing strategy/strategy for defining order of process equipment/start-end point
     if len(process_plant_model.nodes) > 1:
         
-        # The following single method is now subdivided into 3 for clarity.
-        # graph_type, newly_arranged_graphs, intersections = determine_propagation_strategy(process_plant_model)
         graph_type = findTypeOf(process_plant_model)
         newly_arranged_graphs = replicate(process_plant_model, graph_type)
         intersections = getIntersectionNode(process_plant_model, graph_type)
@@ -8201,10 +8208,6 @@ def processTheModel():
 
 
 
-
-    if config.EQUIPMENT_BASED_EVALUATION:
-        
-        stack_elements = equipmentBasedEvaluation(process_plant_model, stack_elements)
 
     # === Entry point for hazard/malfunction propagation
     if config.PROPAGATION_BASED_EVALUATION:
@@ -8229,7 +8232,7 @@ def processTheModel():
     
                     # === Change order of graph [intersection + 1] as starting node
                     new_order = []
-                    for node in go.starting_with(cycle, intersection_node_index):
+                    for node in starting_with(cycle, intersection_node_index):
                         new_order.append(node)
         
                     propagation_based_analysis(process_plant_model,
