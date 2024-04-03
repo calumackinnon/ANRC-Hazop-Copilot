@@ -2925,7 +2925,7 @@ with causes_onto:
     class Cause(Thing):
         pass
     
-    Cause.label = ["cause"] #TODO This is where there is a bug.
+    Cause.label = ["cause"]
     Cause.comment = ["Initiating event in the sequence of events of a scenario", "represents an event or situation"]
     
     class UnderlyingCause(Thing):
@@ -2934,7 +2934,8 @@ with causes_onto:
     UnderlyingCause.comment = ["Underlying event in the sequence of events of a scenario",
                                "represents ambient conditions, systemic and organizational causes, "
                                "and causes arising from latent human errors"]
-    class causeInvolvesEquipmentEntity(Cause >> equipment_onto.EquipmentEntity):
+    
+    class causeInvolvesEquipmentEntity(Cause >> equipment_onto.EquipmentEntity): #TODO The bug has now moved to here, due to the equipment_onto reference.
         pass
     class causeInvolvesSubstance(Cause >> substance_onto.Substance):
         pass
