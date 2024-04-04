@@ -62,6 +62,10 @@
 #         nlist = appendicesAll.findPathsAfterDivergingNode(graphForTest, successor, maxNodePosition)
         
 #         self.assertIsNotNone(nlist)
+        
+#     def testPropagationForAThreeNodeGraph(self):
+        
+#         self.assertFalse(True)
 
 # class TestTheGivenMainFunction(unittest.TestCase):
     

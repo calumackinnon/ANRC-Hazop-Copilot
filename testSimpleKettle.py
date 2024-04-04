@@ -12,7 +12,7 @@ to work, this must be saved in a file entitled test*.py.
 """
 
 import unittest
-import simpleKettle
+# import simpleKettle
 
 class SimpleKettle(unittest.TestCase):
     
@@ -20,6 +20,6 @@ class SimpleKettle(unittest.TestCase):
         self.assertTrue(True) # Check this test is run without an underscore.
         
     def checkAnotherTestWillRun(self):
-        self.assertTrue(True) # This does not run without a title like 'test*'.
+        self.assertTrue(False) # This must not run without a title like 'test*'
         
     
