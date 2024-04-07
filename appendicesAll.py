@@ -7605,13 +7605,12 @@ def propagation_based_hazard(devex, process_unit, substance, last_equipment_enti
     
     global results
     
+    cause = []
     try:
         if isinstance(devex[prep.DictName.initiating_event].is_a[0], ThingClass):
             cause = [devex[prep.DictName.initiating_event]]
-        else:
-            cause = []
-    except:
-        cause = []
+    except Error as e:
+        print(str(e))
         
     preliminary_scenario_list = []
     scenario_list = []
