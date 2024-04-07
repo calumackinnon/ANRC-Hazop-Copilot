@@ -7651,26 +7651,28 @@ def propagation_based_hazard(devex, process_unit, substance, last_equipment_enti
     
     for scenario in preliminary_scenario_list:
         for effect in scenario[prep.DictName.effect].is_a:
-            if effect.is_a != [owl.Thing]:
-                for consequence in scenario[prep.DictName.consequence].is_a:
-                    
-                    # === inspecting individual
-                    for prop in scenario[prep.DictName.consequence].get_properties():
-                        if prop == consequence_onto.isConsequenceOfEffect:
-                            for value in prop[scenario[prep.DictName.consequence]]:
-                                for effect_ in value.is_a:
+            if effect.is_a == [owl.Thing]:
+                continue # to the next effect
+            
+            for consequence in scenario[prep.DictName.consequence].is_a:
+                
+                # === inspecting individual
+                for prop in scenario[prep.DictName.consequence].get_properties():
+                    if prop == consequence_onto.isConsequenceOfEffect:
+                        for value in prop[scenario[prep.DictName.consequence]]:
+                            for effect_ in value.is_a:
+                                
+                                # === Effect of consequence matches overall effect
+                                if effect_ == effect and scenario[prep.DictName.cause] and effect:
+                                    scenario_list.append({prep.DictName.cause:              scenario[prep.DictName.cause],
+                                                          prep.DictName.underlying_cause:   scenario[prep.DictName.underlying_cause],
+                                                          prep.DictName.effect:             effect(),
+                                                          prep.DictName.consequence:        consequence(),
+                                                          prep.DictName.likelihood:         scenario[prep.DictName.likelihood]}
+                                                         )
                                     
-                                    # === Effect of consequence matches overall effect
-                                    if effect_ == effect and scenario[prep.DictName.cause] and effect:
-                                        scenario_list.append({prep.DictName.cause:              scenario[prep.DictName.cause],
-                                                              prep.DictName.underlying_cause:   scenario[prep.DictName.underlying_cause],
-                                                              prep.DictName.effect:             effect(),
-                                                              prep.DictName.consequence:        consequence(),
-                                                              prep.DictName.likelihood:         scenario[prep.DictName.likelihood]}
-                                                             )
-                                        
-                                        # Consume deviation in case full scenario is found
-                                        consumed_flag = True
+                                    # Consume deviation in case full scenario is found
+                                    consumed_flag = True
     
     for scenario in scenario_list:
         scenario[prep.DictName.consequence_2nd] = consequence_onto.Consequence(
