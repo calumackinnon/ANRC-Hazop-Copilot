@@ -7340,7 +7340,7 @@ def infer_follow_up(process_unit,
                                     cbr.CaseAttributes.IntendedFunction:    process_unit.intended_function[0].is_a[0],
                                     cbr.CaseAttributes.SubstancePhase:      substance.onto_object.hasStateOfAggregation[0].is_a[0]}
                         
-                    match = cbr.match_case_with_cb(current_case, cbr.propagation_case_base)
+                    match = match_case_with_cb(current_case, cbr.propagation_case_base)
                     if match:
                         for m in match:
                             if match != current_deviation:
@@ -7365,7 +7365,7 @@ def infer_follow_up(process_unit,
                                     cbr.CaseAttributes.IntendedFunction:    process_unit.intended_function[0].is_a[0],
                                     cbr.CaseAttributes.SubstancePhase:      substance.onto_object.hasStateOfAggregation[0].is_a[0]}
                     
-                    match = cbr.match_case_with_cb(current_case, cbr.propagation_case_base)
+                    match = match_case_with_cb(current_case, cbr.propagation_case_base)
                     if match:
                         for m in match:
                             if match != current_deviation:
@@ -7392,7 +7392,7 @@ def infer_follow_up(process_unit,
                         cbr.CaseAttributes.Apparatus:           apparatus,
                         cbr.CaseAttributes.IntendedFunction:    intended_function,
                         cbr.CaseAttributes.SubstancePhase:      substance.onto_object.hasStateOfAggregation[0].is_a[0]}
-        match = cbr.match_case_with_cb(current_case, cbr.propagation_case_base)
+        match = match_case_with_cb(current_case, cbr.propagation_case_base)
         
         if match and match != current_deviation:
             fmt_phase = str(substance.onto_object.hasStateOfAggregation[0].is_a[0]).split('.', 1)[1]
@@ -7777,7 +7777,7 @@ def propagation_based_hazard(devex, process_unit, substance, last_equipment_enti
                         cbr.CaseAttributes.SubstancePhase:      substance.onto_object.hasStateOfAggregation[0].is_a[0]
                         }
         
-        match = cbr.match_case_with_cb(current_case, cbr.propagation_case_base)
+        match = match_case_with_cb(current_case, cbr.propagation_case_base)
         
         # === make sure there is a match and match is not the same as the last one
         # (prevent infinite run due to recursion)
