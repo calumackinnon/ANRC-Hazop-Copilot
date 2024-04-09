@@ -7473,20 +7473,21 @@ def propagation_based_analysis(plant_graph, order, propagation_stacks):
                     print("========= Mode of Operation: {} = {} of {} =========".format(mode.name, m + 1, len(process_unit.operating_mode)))
                     process_unit.onto_object.hasOperationMode = [mode()]
                     
-                considered_deviations = []
                 last_element = len(rel_order) - 1
-                no_passed_scenario_flag = True
                 
                 if 1 <= index < last_element:
-                    isLastItem = False
-                elif index == len(rel_order) - 1: # index is the last item in rel_order
-                    isLastItem = True
+                    isLastItemInGraph = False
+                elif index == last_element: # index is the last item in rel_order
+                    isLastItemInGraph = True
                     
                 pos = rel_order[index - 1] # pos is the previous item
+                no_passed_scenario_flag = True
                 
-                match isLastItem:
+                match isLastItemInGraph:
                     case False:
                     
+                        considered_deviations = []
+                        
                         # === Remove duplicates
                         scenario_list = [i for n, i in enumerate(propagation_stacks[pos][prep.DictName.scenario]) if i not in propagation_stacks[pos][prep.DictName.scenario][n + 1:]]
                         # === Set flag
@@ -7501,7 +7502,7 @@ def propagation_based_analysis(plant_graph, order, propagation_stacks):
                             propagation_based_hazard(subsequent_deviation,
                                                      process_unit,
                                                      substance,
-                                                     isLastItem,
+                                                     isLastItemInGraph,
                                                      previous_case,
                                                      consumed_flag
                                                      )
@@ -7518,7 +7519,7 @@ def propagation_based_analysis(plant_graph, order, propagation_stacks):
                                 propagation_based_hazard(propagation,
                                                          process_unit,
                                                          substance,
-                                                         isLastItem, # last equipment in graph
+                                                         isLastItemInGraph,
                                                          previous_case,
                                                          consumed_flag
                                                          )
@@ -7536,7 +7537,8 @@ def propagation_based_analysis(plant_graph, order, propagation_stacks):
                             if propagation[prep.DictName.explanation] not in list_of_all_values and propagation[prep.DictName.underlying_cause] not in list_of_all_values:
                                 propagation_stacks[pos + 1][prep.DictName.passed_scenarios].append(propagation)
                             
-                # elif index == len(rel_order) - 1: # index is the last item in rel_order
+                            
+                            
                     case True:
                         if propagation_stacks[pos][prep.DictName.passed_scenarios]:
                             propagation_stacks[pos][prep.DictName.passed_scenarios] = [i for n, i in enumerate(
@@ -7547,7 +7549,7 @@ def propagation_based_analysis(plant_graph, order, propagation_stacks):
                                 propagation_based_hazard(propagation,
                                                          process_unit,
                                                          substance,
-                                                         isLastItem, # last equipment in graph
+                                                         isLastItemInGraph,
                                                          previous_case,
                                                          consumed_flag
                                                          )
@@ -7574,7 +7576,7 @@ def propagation_based_analysis(plant_graph, order, propagation_stacks):
                                         propagation_based_hazard(   propagation,
                                                                     process_unit,
                                                                     substance,
-                                                                    isLastItem, # last equipment in graph
+                                                                    isLastItemInGraph,
                                                                     previous_case,
                                                                     consumed_flag)
 
