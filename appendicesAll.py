@@ -7629,6 +7629,38 @@ def propagation_based_analysis(plant_graph, order, propagation_stacks):
                     case _:
                         raise RuntimeWarning('index in propagation_based_analysis reached the default case.')
                         
+                        
+    
+def inspectEachIndividual(scenario, consequence, effect, consumed_flag):
+    
+    
+    #TODO It is not ideal to nest if statements within for loops like this. 
+    # This is because it undermines the instructions pipeline meaning this
+    # code in its present format is likely to be slowed by these conditional
+    # if statements. There might be ways to reduce the impact of this.
+    
+    theNewScenarios = []
+    
+    # === inspecting individual
+    for prop in scenario[prep.DictName.consequence].get_properties():
+        if prop == consequence_onto.isConsequenceOfEffect:
+            for value in prop[scenario[prep.DictName.consequence]]:
+                for effect_ in value.is_a:
+                    
+                    # === Effect of consequence matches overall effect
+                    if effect_ == effect and scenario[prep.DictName.cause] and effect:
+                        theNewScenarios.append({prep.DictName.cause:              scenario[prep.DictName.cause],
+                                              prep.DictName.underlying_cause:   scenario[prep.DictName.underlying_cause],
+                                              prep.DictName.effect:             effect(),
+                                              prep.DictName.consequence:        consequence(),
+                                              prep.DictName.likelihood:         scenario[prep.DictName.likelihood]}
+                                             )
+                        
+                        # Consume deviation in case full scenario is found
+                        consumed_flag = True
+    
+    return theNewScenarios, consumed_flag
+
 def propagation_based_hazard(devex, process_unit, substance, last_equipment_entity, previous_case, consumed_flag):
     """
     Normally, a recursive function has:
@@ -7714,24 +7746,13 @@ def propagation_based_hazard(devex, process_unit, substance, last_equipment_enti
             
             for consequence in scenario[prep.DictName.consequence].is_a:
                 
-                # === inspecting individual
-                for prop in scenario[prep.DictName.consequence].get_properties():
-                    if prop == consequence_onto.isConsequenceOfEffect:
-                        for value in prop[scenario[prep.DictName.consequence]]:
-                            for effect_ in value.is_a:
-                                
-                                # === Effect of consequence matches overall effect
-                                if effect_ == effect and scenario[prep.DictName.cause] and effect:
-                                    scenario_list.append({prep.DictName.cause:              scenario[prep.DictName.cause],
-                                                          prep.DictName.underlying_cause:   scenario[prep.DictName.underlying_cause],
-                                                          prep.DictName.effect:             effect(),
-                                                          prep.DictName.consequence:        consequence(),
-                                                          prep.DictName.likelihood:         scenario[prep.DictName.likelihood]}
-                                                         )
-                                    
-                                    # Consume deviation in case full scenario is found
-                                    consumed_flag = True
-    
+                newScenarioList, consumed_flag = inspectEachIndividual(
+                    scenario, consequence, effect, consumed_flag
+                    )
+                
+            for scen in newScenarioList:
+                scenario_list.append(scen)
+        
     for scenario in scenario_list:
         scenario[prep.DictName.consequence_2nd] = consequence_onto.Consequence(
             consequenceInvolvesSubstance=[substance.onto_object],
