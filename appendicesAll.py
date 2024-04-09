@@ -7592,6 +7592,10 @@ def propagation_based_analysis(plant_graph, order, propagation_stacks):
                     isLastItemInGraph = True
                     
                 pos = rel_order[index - 1] # pos is the previous item
+                
+                #TODO Having now restructured the code, it seems clear that the
+                # flag below is redundant since it is reset on each iteration
+                # around the loop and always matches an isLastItemInGraph flag.
                 no_passed_scenario_flag = True
                 
                 match isLastItemInGraph:
