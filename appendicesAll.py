@@ -76,6 +76,10 @@ def instantiate_boundary_conditions(boundaryConditions):        pass
 def equipment_based_analysis(equipmentEntity, deviations, 
                              substances, environment, 
                              equipmentSpecificPropScenarios):   pass
+def log_scenario(index, processUnit, substanceName, deviation,
+                 cause, effect, underlyingCause, consequences,
+                 pairOfSafeguards, isPropagated, risk):         pass
+# log_scenario probably creates the structure used to build the HAZOP table.
     
 def get_inferred_results( cause ): return None 
     
@@ -7277,7 +7281,8 @@ def infer_follow_up(process_unit,
                                 scenario[prep.DictName.effect],
                                 scenario[prep.DictName.underlying_cause],
                                 actual_consequences,
-                                [scenario[prep.DictName.safeguard], scenario[prep.DictName.safeguard_2nd]],
+                                [scenario[prep.DictName.safeguard],
+                                 scenario[prep.DictName.safeguard_2nd]],
                                 False, # propagated
                                 scenario[prep.DictName.risk]
             )
@@ -7670,12 +7675,19 @@ def propagation_based_hazard(devex, process_unit, substance, last_equipment_enti
     This function would be more readable if return statements are used, and if
     it can be restructured to firstly handle a base case then a recursive case.
     
+    I think this should not be a recursive function at all, it is not written 
+    like one besides that it calls itself. I believe the supervisor must have 
+    suggested or requested that recursion is used to simplify the code, while 
+    the first pass attempt to write this functionality has been iterative only.
+    
     Parameters
     ----------
     devex : TYPE
         DESCRIPTION.
-    process_unit : TYPE
-        DESCRIPTION.
+    process_unit : equipment_onto. <some class>
+        A reference to the item of equipment which forms a node in the DiGraph.
+        Once passed to this function it seems to not change, but rather is part
+        of a list being iterated through by a for loop in a previous function.
     substance : TYPE
         DESCRIPTION.
     last_equipment_entity : bool
@@ -7713,6 +7725,7 @@ def propagation_based_hazard(devex, process_unit, substance, last_equipment_enti
     # catch the case where by mistake no safeguard is provided
     if not devex[prep.DictName.safeguard]:
         devex[prep.DictName.safeguard] = []
+        
     if cause_list:
         underlying_causes, effect, consequence = assemble_concept_instance(
                                                             substance,
@@ -7721,7 +7734,7 @@ def propagation_based_hazard(devex, process_unit, substance, last_equipment_enti
                                                             underlying_cause,
                                                             cause,
                                                             True
-                                                        )
+                                                            )
         if devex[prep.DictName.likelihood]:
             likelihood = devex[prep.DictName.likelihood]
         else:
@@ -7760,7 +7773,7 @@ def propagation_based_hazard(devex, process_unit, substance, last_equipment_enti
             isConsequenceOfDeviation=deviation,
             isSubsequentConsequence=[scenario[prep.DictName.consequence]],
             consequenceRequiresBoundaryCondition=process_unit.boundary_condition
-        )
+            )
         
         scenario[prep.DictName.consequence_3rd] = consequence_onto.Consequence(
             consequenceInvolvesSubstance=[substance.onto_object],
@@ -7768,7 +7781,7 @@ def propagation_based_hazard(devex, process_unit, substance, last_equipment_enti
             isConsequenceOfDeviation=deviation,
             isSubsequentConsequence=[scenario[prep.DictName.consequence_2nd]],
             consequenceRequiresBoundaryCondition=process_unit.boundary_condition
-        )
+            )
         
         consequences = [scenario[prep.DictName.consequence],
                         scenario[prep.DictName.consequence_2nd],
@@ -7781,12 +7794,12 @@ def propagation_based_hazard(devex, process_unit, substance, last_equipment_enti
             severityInvolvesSubstance=[substance.onto_object],
             severityInvolvesEquipment=[process_unit.onto_object],
             severityRequiresBoundaryCondition=process_unit.boundary_condition
-        )
+            )
         
         scenario[prep.DictName.risk] = risk_assessment_onto.RiskCategory(
             involvesSeverity=[scenario[prep.DictName.severity]],
             involvesLikelihood=scenario[prep.DictName.likelihood]
-        )
+            )
         
         cause_argument = []
         if isinstance(scenario[prep.DictName.cause], ThingClass):
@@ -7802,7 +7815,7 @@ def propagation_based_hazard(devex, process_unit, substance, last_equipment_enti
                                              safeguardInvolvesSubstance=[substance.onto_object]
                                              )
         
-        if devex[prep.DictName.safeguard]:
+        if devex[prep.DictName.safeguard]: # like line 7714
             if safeguard:
                 scenario[prep.DictName.safeguard] = [devex[prep.DictName.safeguard]]
                 scenario[prep.DictName.safeguard].append(safeguard)
@@ -7821,7 +7834,10 @@ def propagation_based_hazard(devex, process_unit, substance, last_equipment_enti
         
     # === Pass results
     for scenario in scenario_list:
-        consequence_list = [scenario[prep.DictName.consequence], scenario[prep.DictName.consequence_2nd], scenario[prep.DictName.consequence_3rd]]
+        
+        consequence_list = [scenario[prep.DictName.consequence], 
+                            scenario[prep.DictName.consequence_2nd], 
+                            scenario[prep.DictName.consequence_3rd]]
         
         # Somehow it is not always set above
         if not prep.DictName.safeguard in scenario:
