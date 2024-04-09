@@ -2911,12 +2911,12 @@ def match_case_with_cb(current_case, case_base):
     res_list = [x[0] for x in list_similarities]
     max_similarity_measure = max(res_list)
     
+    relevant_deviation = None
+    
     if max_similarity_measure >= 0.75:
         index = res_list.index(max_similarity_measure)
         relevant_deviation = list_similarities[index][1]
-    else:
-        relevant_deviation = None
-        
+    
     return relevant_deviation
 
 
@@ -7340,10 +7340,10 @@ def infer_follow_up(process_unit,
                                     cbr.CaseAttributes.IntendedFunction:    process_unit.intended_function[0].is_a[0],
                                     cbr.CaseAttributes.SubstancePhase:      substance.onto_object.hasStateOfAggregation[0].is_a[0]}
                         
-                    match = match_case_with_cb(current_case, cbr.propagation_case_base)
-                    if match:
-                        for m in match:
-                            if match != current_deviation:
+                    theMatchFound = match_case_with_cb(current_case, cbr.propagation_case_base)
+                    if theMatchFound:
+                        for m in theMatchFound:
+                            if theMatchFound != current_deviation:
                                 dev = {}
                                 fmt_phase = str(substance.onto_object.hasStateOfAggregation[0].is_a[0]).split('.', 1)[1]
                                 dev[prep.DictName.subsequent_deviation] = m
@@ -7365,10 +7365,10 @@ def infer_follow_up(process_unit,
                                     cbr.CaseAttributes.IntendedFunction:    process_unit.intended_function[0].is_a[0],
                                     cbr.CaseAttributes.SubstancePhase:      substance.onto_object.hasStateOfAggregation[0].is_a[0]}
                     
-                    match = match_case_with_cb(current_case, cbr.propagation_case_base)
-                    if match:
-                        for m in match:
-                            if match != current_deviation:
+                    theMatchFound = match_case_with_cb(current_case, cbr.propagation_case_base)
+                    if theMatchFound:
+                        for m in theMatchFound:
+                            if theMatchFound != current_deviation:
                                 dev = {}
                                 fmt_phase = \
                                 str(substance.onto_object.hasStateOfAggregation[0].is_a[0]).split('.', 1)[1]
@@ -7392,12 +7392,12 @@ def infer_follow_up(process_unit,
                         cbr.CaseAttributes.Apparatus:           apparatus,
                         cbr.CaseAttributes.IntendedFunction:    intended_function,
                         cbr.CaseAttributes.SubstancePhase:      substance.onto_object.hasStateOfAggregation[0].is_a[0]}
-        match = match_case_with_cb(current_case, cbr.propagation_case_base)
+        theMatchFound = match_case_with_cb(current_case, cbr.propagation_case_base)
         
-        if match and match != current_deviation:
+        if theMatchFound and theMatchFound != current_deviation:
             fmt_phase = str(substance.onto_object.hasStateOfAggregation[0].is_a[0]).split('.', 1)[1]
             
-            for m in match:
+            for m in theMatchFound:
                 dev = {prep.DictName.subsequent_deviation: m,
                        prep.DictName.explanation: process_unit.identifier + ": " + current_deviation.name + " -> " + m.name + " " + "(" + fmt_phase + ")",
                        prep.DictName.likelihood: scenario[prep.DictName.likelihood].is_a[0]} # cannot really be estimated
@@ -7835,12 +7835,15 @@ def propagation_based_hazard(devex, process_unit, substance, last_equipment_enti
                         cbr.CaseAttributes.SubstancePhase:      substance.onto_object.hasStateOfAggregation[0].is_a[0]
                         }
         
-        match = match_case_with_cb(current_case, cbr.propagation_case_base)
+        if current_case == previous_case:
+            return None # This is possibly the base case for recursion.
+        
+        theMatchFound = match_case_with_cb(current_case, cbr.propagation_case_base)
         
         # === make sure there is a match and match is not the same as the last one
         # (prevent infinite run due to recursion)
-        if match and current_case != previous_case:
-            for m in match:
+        if theMatchFound is not None:
+            for m in theMatchFound:
                 explanation = process_unit.identifier + ": " + cause[0].is_a[0].name + " -> " + scenario[prep.DictName.effect].is_a[0].name + " -> " + \
                 m.name + " " + "(" + substance.onto_object.hasStateOfAggregation[0].is_a[0].name + ")"
                 
@@ -7861,7 +7864,9 @@ def propagation_based_hazard(devex, process_unit, substance, last_equipment_enti
                                          )
                 
                 previous_case = current_case
-
+            
+        
+    return None # A recursive function requires at least two return statements.
 
 #%% Appendix W - Specific Case Studies
 
@@ -8208,9 +8213,10 @@ def equipmentBasedEvaluation(process_plant_model, stack):
         
     """
     assert isinstance(process_plant_model, nx.DiGraph), 'Expected a nx.DiGraph'
-    assert False, 'This function is incomplete as one below is missing. \n \
+    raise PendingDeprecationWarning('This function is incomplete as one below\
+                                    is missing. \n \
                     We raise an error here instead of trying to run it. \n \
-                    Test only with propagation based evaluation.'
+                    Test only with propagation based evaluation.')
     
     for index in range(len(process_plant_model.nodes)):
         equipment_specific_prop_scenarios = []
