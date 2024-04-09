@@ -7767,12 +7767,9 @@ def propagation_based_hazard(devex, process_unit, substance, last_equipment_enti
             involvesLikelihood=scenario[prep.DictName.likelihood]
         )
         
+        cause_argument = []
         if isinstance(scenario[prep.DictName.cause], ThingClass):
             cause_argument = [scenario[prep.DictName.cause]]
-        elif isinstance(scenario[prep.DictName.cause], list):
-            cause_argument = []
-        else:
-            cause_argument = []
             
         safeguard = safeguard_onto.Safeguard(safeguardOfDeviation=deviation,
                                              safeguardPreventsEffect=[scenario[prep.DictName.effect]],
@@ -7793,14 +7790,13 @@ def propagation_based_hazard(devex, process_unit, substance, last_equipment_enti
         else:
             scenario[prep.DictName.safeguard] = safeguard
     
-    if scenario_list:
-        callReasoner()
+    
+    callReasoner()
     
     # === Check whether cause equals deviation
-    do_not_consider = False
     no_of_devs_in_cause = cause_list[0].count(deviation.is_a[0].name)
-    if no_of_devs_in_cause == 2:
-        do_not_consider = True
+    
+    flagToConsider = False if no_of_devs_in_cause == 2 else True
         
     # === Pass results
     for scenario in scenario_list:
@@ -7813,7 +7809,7 @@ def propagation_based_hazard(devex, process_unit, substance, last_equipment_enti
             else:
                 scenario[prep.DictName.safeguard] = []
                 
-        if not do_not_consider:
+        if flagToConsider:
             prep.log_scenario(0,
                               process_unit,
                               substance.name,
