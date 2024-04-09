@@ -7545,10 +7545,6 @@ def propagation_based_analysis(plant_graph, order, propagation_stacks):
         if node[0] not in order:
             graph.remove_node(node[0])
             
-    # === Attach a placeholder
-    for stack in propagation_stacks:
-        stack[prep.DictName.passed_scenarios] = []
-        
     # Check for cycle since topological sort not working for cycles
     cycle = list(nx.simple_cycles(graph))
     
@@ -7557,6 +7553,10 @@ def propagation_based_analysis(plant_graph, order, propagation_stacks):
         rel_order = list(nx.topological_sort(graph)) # TODO: unit test, if this is working
     else:
         rel_order = list(graph.nodes)
+        
+    # # === Attach a placeholder
+    # for stack in propagation_stacks:
+    #     stack[prep.DictName.passed_scenarios] = []
         
     previous_case = {}
     consumed_flag = False
@@ -7567,25 +7567,23 @@ def propagation_based_analysis(plant_graph, order, propagation_stacks):
         process_unit = plant_graph.nodes[node_pos]["data"]
         
         # Do not assume propagation in case the sink has been reached
-        if process_unit == equipment_onto.SinkEntity:
-            break
+        if process_unit == equipment_onto.SinkEntity: break
         
         substances = plant_graph.nodes[node_pos]["substances"]
         
         # === Loop over substances
         for s, substance in enumerate(substances):
             print("========= Substance: {} = {} of {} =========".format(substance.name, s + 1, len(substances)))
+            
             for m, mode in enumerate(process_unit.operating_mode):
                 
                 # === if no mode is specified continue
-                if not mode:
-                    continue
-                else:
-                    print("========= Mode of Operation: {} = {} of {} =========".format(mode.name, m + 1, len(process_unit.operating_mode)))
-                    process_unit.onto_object.hasOperationMode = [mode()]
-                    
-                last_element = len(rel_order) - 1
+                if not mode: continue
                 
+                print("========= Mode of Operation: {} = {} of {} =========".format(mode.name, m + 1, len(process_unit.operating_mode)))
+                process_unit.onto_object.hasOperationMode = [mode()]
+                
+                last_element = len(rel_order) - 1
                 if 1 <= index < last_element:
                     isLastItemInGraph = False
                 elif index == last_element: # index is the last item in rel_order
