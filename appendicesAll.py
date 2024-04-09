@@ -7591,12 +7591,7 @@ def propagation_based_analysis(plant_graph, order, propagation_stacks):
                 elif index == last_element: # index is the last item in rel_order
                     isLastItemInGraph = True
                     
-                pos = rel_order[index - 1] # pos is the previous item
-                
-                #TODO Having now restructured the code, it seems clear that the
-                # flag below is redundant since it is reset on each iteration
-                # around the loop and always matches an isLastItemInGraph flag.
-                no_passed_scenario_flag = True
+                pos = rel_order[index - 1]
                 
                 match isLastItemInGraph:
                     case False:
@@ -7605,20 +7600,15 @@ def propagation_based_analysis(plant_graph, order, propagation_stacks):
                             propagation_stacks, process_unit, pos, isLastItemInGraph, previous_case
                             )
                         
-                        no_passed_scenario_flag = False
-                        
                     case True:
                         
                         propagation_stacks, process_unit, previous_case, consumed_flag = propagationForLastEquipmentItem(
                             propagation_stacks, pos, process_unit, isLastItemInGraph, previous_case, consumed_flag
                             )
                         
-                        # Reached in case no scenarios are passed but the end is already reached
-                        if no_passed_scenario_flag:
-                            
-                            process_unit, previous_case, consumed_flag = propagationForLastEquipmentItemWithoutScenariosPassed(
-                                propagation_stacks, pos, process_unit, isLastItemInGraph, previous_case, consumed_flag
-                                )
+                        process_unit, previous_case, consumed_flag = propagationForLastEquipmentItemWithoutScenariosPassed(
+                            propagation_stacks, pos, process_unit, isLastItemInGraph, previous_case, consumed_flag
+                            )
                         
 def propagation_based_hazard(devex, process_unit, substance, last_equipment_entity, previous_case, consumed_flag):
     """
