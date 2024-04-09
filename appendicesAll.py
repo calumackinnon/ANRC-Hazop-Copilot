@@ -7466,12 +7466,11 @@ def propagation_based_analysis(plant_graph, order, propagation_stacks):
             print("========= Substance: {} = {} of {} =========".format(substance.name, s + 1, len(substances)))
             for m, mode in enumerate(process_unit.operating_mode):
                 
-                if mode:
-                    print("========= Mode of Operation: {} = {} of {} =========".format(mode.name, m + 1, len(process_unit.operating_mode)))
-                # === it no mode is specified continue
+                # === if no mode is specified continue
                 if not mode:
                     continue
                 else:
+                    print("========= Mode of Operation: {} = {} of {} =========".format(mode.name, m + 1, len(process_unit.operating_mode)))
                     process_unit.onto_object.hasOperationMode = [mode()]
                     
                 considered_deviations = []
@@ -7479,104 +7478,105 @@ def propagation_based_analysis(plant_graph, order, propagation_stacks):
                 no_passed_scenario_flag = True
                 
                 if 1 <= index < last_element:
-                    
                     isLastItem = False
+                elif index == len(rel_order) - 1: # index is the last item in rel_order
+                    isLastItem = True
                     
-                    pos = rel_order[index - 1]
+                pos = rel_order[index - 1] # pos is the previous item
+                
+                match isLastItem:
+                    case False:
                     
-                    # === Remove duplicates
-                    scenario_list = [i for n, i in enumerate(propagation_stacks[pos][prep.DictName.scenario]) if i not in propagation_stacks[pos][prep.DictName.scenario][n + 1:]]
-                    # === Set flag
-                    no_passed_scenario_flag = False
-                    consumed_flag = False
-                    
-                    # === Loop over propagating scenarios
-                    for scenario in scenario_list:
-                        # === Create input object from scenario, #TODO: use scenario object directly
-                        subsequent_deviation = assemble_input_object(scenario)
-                        # === infer scenarios
-                        propagation_based_hazard(subsequent_deviation,
-                                                 process_unit,
-                                                 substance,
-                                                 isLastItem,
-                                                 previous_case,
-                                                 consumed_flag
-                                                 )
-                        
-                        # === Propagate partial scenario in case no effect have been identified
-                        if not consumed_flag:
-                            considered_deviations.append(subsequent_deviation)
-                        
-                    # === consider passed propagation that had no effect in previous equipment
-                    if propagation_stacks[pos][prep.DictName.passed_scenarios]:
+                        # === Remove duplicates
+                        scenario_list = [i for n, i in enumerate(propagation_stacks[pos][prep.DictName.scenario]) if i not in propagation_stacks[pos][prep.DictName.scenario][n + 1:]]
+                        # === Set flag
+                        no_passed_scenario_flag = False
                         consumed_flag = False
-                        #TODO There is some duplication between the content of this if statement and lines 7487 to 7504 above.
-                        for propagation in propagation_stacks[pos][prep.DictName.passed_scenarios]:
-                            propagation_based_hazard(propagation,
+                        
+                        # === Loop over propagating scenarios
+                        for scenario in scenario_list:
+                            # === Create input object from scenario, #TODO: use scenario object directly
+                            subsequent_deviation = assemble_input_object(scenario)
+                            # === infer scenarios
+                            propagation_based_hazard(subsequent_deviation,
                                                      process_unit,
                                                      substance,
-                                                     isLastItem, # last equipment in graph
+                                                     isLastItem,
                                                      previous_case,
                                                      consumed_flag
                                                      )
                             
                             # === Propagate partial scenario in case no effect have been identified
                             if not consumed_flag:
-                                propagation_stacks[pos + 1][prep.DictName.passed_scenarios].append(propagation)
-                    
-                    # === Propagate not consumed propagations into next element
-                    for propagation in considered_deviations:
-                        # Create a list of all values in list of dictionaries
-                        list_of_all_values = [value for elem in propagation_stacks[pos + 1][prep.DictName.passed_scenarios] for value in elem.values()]
-                        
-                        # Catch duplicate in relevant propagation stack
-                        if propagation[prep.DictName.explanation] not in list_of_all_values and propagation[prep.DictName.underlying_cause] not in list_of_all_values:
-                            propagation_stacks[pos + 1][prep.DictName.passed_scenarios].append(propagation)
+                                considered_deviations.append(subsequent_deviation)
                             
-                elif index == len(rel_order) - 1: # index is the last item in rel_order
-                    pos = rel_order[index - 1] # pos is the previous item
-                    
-                    isLastItem = True
-                    
-                    if propagation_stacks[pos][prep.DictName.passed_scenarios]:
-                        propagation_stacks[pos][prep.DictName.passed_scenarios] = [i for n, i in enumerate(
-                        propagation_stacks[pos][prep.DictName.passed_scenarios]) if i not in propagation_stacks[pos][
-                        prep.DictName.passed_scenarios][n + 1:]]
-                            
-                        for propagation in propagation_stacks[pos][prep.DictName.passed_scenarios]:
-                            propagation_based_hazard(propagation,
-                                                     process_unit,
-                                                     substance,
-                                                     isLastItem, # last equipment in graph
-                                                     previous_case,
-                                                     consumed_flag
-                                                     )
-                    
-                    # Reached in case no scenarios are passed but the end is already reached
-                    if no_passed_scenario_flag:
-                        
-                        # === Remove duplicates
-                        scenario_list = [i for n, i in enumerate(propagation_stacks[pos][prep.DictName.scenario]) if
-                                         i not in propagation_stacks[pos][prep.DictName.scenario][n + 1:]]
-                        
-                        for p, propagation in enumerate(scenario_list):
-                            print("=== LAST NODE: {} of {} scenarios ===".format(p, len(scenario_list)))
-                            
-                            # === is case there is an effect means that no consequence was found for the equipment previously
-                            if propagation[prep.DictName.effect].is_a[0] != effect_onto.Effect:
-                                complete_propagated_scenario(propagation, process_unit, substance)
+                        # === consider passed propagation that had no effect in previous equipment
+                        if propagation_stacks[pos][prep.DictName.passed_scenarios]:
+                            consumed_flag = False
+                            #TODO There is some duplication between the content of this if statement and lines 7487 to 7504 above.
+                            for propagation in propagation_stacks[pos][prep.DictName.passed_scenarios]:
+                                propagation_based_hazard(propagation,
+                                                         process_unit,
+                                                         substance,
+                                                         isLastItem, # last equipment in graph
+                                                         previous_case,
+                                                         consumed_flag
+                                                         )
                                 
-                            else:
-                                # === Create input object from scenario,
-                                propagation = assemble_input_object(propagation)
-                                # == infer scenarios
-                                if propagation:
-                                    propagation_based_hazard(   propagation,
-                                                                process_unit,
-                                                                substance,
-                                                                isLastItem, # last equipment in graph
-                                                                previous_case,
-                                                                consumed_flag)
+                                # === Propagate partial scenario in case no effect have been identified
+                                if not consumed_flag:
+                                    propagation_stacks[pos + 1][prep.DictName.passed_scenarios].append(propagation)
+                        
+                        # === Propagate not consumed propagations into next element
+                        for propagation in considered_deviations:
+                            # Create a list of all values in list of dictionaries
+                            list_of_all_values = [value for elem in propagation_stacks[pos + 1][prep.DictName.passed_scenarios] for value in elem.values()]
+                            
+                            # Catch duplicate in relevant propagation stack
+                            if propagation[prep.DictName.explanation] not in list_of_all_values and propagation[prep.DictName.underlying_cause] not in list_of_all_values:
+                                propagation_stacks[pos + 1][prep.DictName.passed_scenarios].append(propagation)
+                            
+                # elif index == len(rel_order) - 1: # index is the last item in rel_order
+                    case True:
+                        if propagation_stacks[pos][prep.DictName.passed_scenarios]:
+                            propagation_stacks[pos][prep.DictName.passed_scenarios] = [i for n, i in enumerate(
+                            propagation_stacks[pos][prep.DictName.passed_scenarios]) if i not in propagation_stacks[pos][
+                            prep.DictName.passed_scenarios][n + 1:]]
+                                
+                            for propagation in propagation_stacks[pos][prep.DictName.passed_scenarios]:
+                                propagation_based_hazard(propagation,
+                                                         process_unit,
+                                                         substance,
+                                                         isLastItem, # last equipment in graph
+                                                         previous_case,
+                                                         consumed_flag
+                                                         )
+                        
+                        # Reached in case no scenarios are passed but the end is already reached
+                        if no_passed_scenario_flag:
+                            
+                            # === Remove duplicates
+                            scenario_list = [i for n, i in enumerate(propagation_stacks[pos][prep.DictName.scenario]) if
+                                             i not in propagation_stacks[pos][prep.DictName.scenario][n + 1:]]
+                            
+                            for p, propagation in enumerate(scenario_list):
+                                print("=== LAST NODE: {} of {} scenarios ===".format(p, len(scenario_list)))
+                                
+                                # === is case there is an effect means that no consequence was found for the equipment previously
+                                if propagation[prep.DictName.effect].is_a[0] != effect_onto.Effect:
+                                    complete_propagated_scenario(propagation, process_unit, substance)
+                                    
+                                else:
+                                    # === Create input object from scenario,
+                                    propagation = assemble_input_object(propagation)
+                                    # == infer scenarios
+                                    if propagation:
+                                        propagation_based_hazard(   propagation,
+                                                                    process_unit,
+                                                                    substance,
+                                                                    isLastItem, # last equipment in graph
+                                                                    previous_case,
+                                                                    consumed_flag)
 
 
 def propagation_based_hazard(devex, process_unit, substance, last_equipment_entity, previous_case, consumed_flag):
