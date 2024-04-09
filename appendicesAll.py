@@ -7515,6 +7515,41 @@ def propagationForLastEquipmentItemWithoutScenariosPassed(propagation_stacks, po
     
     return process_unit, previous_case, consumed_flag
 
+def getRelOrder(pGraph, ordering):
+    """
+    Try to sort the list of nodes, wherever a DiGraph has no simple cycles.
+    
+    Parameters
+    ----------
+    pGraph : NetworkX.DiGraph
+        A directed Graph to represent a system (or plant items) being studied.
+    ordering : list
+        A copy of the graph structured as a list.
+        
+    Returns
+    -------
+    relOrder : list
+        A list of nodes within the DiGraph.
+        
+    """
+    
+    # create copy of original plant layout and remove edges that are not in 'order' list
+    # therefore a graph is created according to order
+    graph = pGraph.copy()
+    for node in pGraph.nodes(data=True):
+        if node[0] not in ordering:
+            graph.remove_node(node[0])
+            
+    # Check for cycle since topological sort not working for cycles
+    cycle = list(nx.simple_cycles(graph))
+    
+    # Consider direction of graph and rearrange order
+    if not cycle:
+        relOrder = list(nx.topological_sort(graph)) # TODO: unit test, if this is working
+    else:
+        relOrder = list(graph.nodes)
+        
+    return relOrder
 
 # infer.py
 def propagation_based_analysis(plant_graph, order, propagation_stacks):
@@ -7538,26 +7573,9 @@ def propagation_based_analysis(plant_graph, order, propagation_stacks):
     None.
     
     """
-    # create copy of original plant layout and remove edges that are not in 'order' list
-    # therefore a graph is created according to order
-    graph = plant_graph.copy()
-    for node in plant_graph.nodes(data=True):
-        if node[0] not in order:
-            graph.remove_node(node[0])
-            
-    # Check for cycle since topological sort not working for cycles
-    cycle = list(nx.simple_cycles(graph))
     
-    # Consider direction of graph and rearrange order
-    if not cycle:
-        rel_order = list(nx.topological_sort(graph)) # TODO: unit test, if this is working
-    else:
-        rel_order = list(graph.nodes)
-        
-    # # === Attach a placeholder
-    # for stack in propagation_stacks:
-    #     stack[prep.DictName.passed_scenarios] = []
-        
+    rel_order = getRelOrder(plant_graph, order)
+    
     previous_case = {}
     consumed_flag = False
     
