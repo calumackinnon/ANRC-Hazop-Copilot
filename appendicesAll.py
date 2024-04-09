@@ -7609,6 +7609,9 @@ def propagation_based_analysis(plant_graph, order, propagation_stacks):
                         process_unit, previous_case, consumed_flag = propagationForLastEquipmentItemWithoutScenariosPassed(
                             propagation_stacks, pos, process_unit, isLastItemInGraph, previous_case, consumed_flag
                             )
+                    
+                    case _:
+                        raise RuntimeWarning('index in propagation_based_analysis reached the default case.')
                         
 def propagation_based_hazard(devex, process_unit, substance, last_equipment_entity, previous_case, consumed_flag):
     """
@@ -8354,7 +8357,7 @@ def processTheModel():
                     
             case _:
                 
-                print("Case not covered by any strategy!")
+                raise RuntimeWarning('Case not covered by any strategy!')
                 
 
 # The code should first run from the following if statement, and call functions
